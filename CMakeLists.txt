@@ -1,3 +1,13 @@
+# ------------------------- BEGIN: lists to maintain manually -------------------------
+
+# Directories where Qt Creator can find QML files of Kirigami etc. on your system.
+#   (This setting is cached in variable QML_IMPORT_DIR, see below. Delete
+#   ${BUIL_DIR}/CMakeCache.txt to make make changes here effective.)
+list(APPEND QML_DIRS "/usr/lib/x86_64-linux-gnu/qt5/qml")
+
+# ------------------------- END: lists to maintain manually -------------------------
+
+
 cmake_minimum_required(VERSION 3.0)
 
 set(KF5_VERSION "5.47.0")     # Handled by release scripts.
@@ -73,4 +83,11 @@ feature_summary(
     WHAT ALL
     INCLUDE_QUIET_PACKAGES
     FATAL_ON_MISSING_REQUIRED_PACKAGES
+)
+
+# Tell Qt Creator where to find QML files.
+#   (The build process will work without this, but no code completion etc..)
+set(
+    QML_IMPORT_PATH "${QML_DIRS}"
+    CACHE STRING "Qt Creator 4.1 extra qml import paths"
 )
