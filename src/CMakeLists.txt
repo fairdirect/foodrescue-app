@@ -65,7 +65,8 @@ else()
     message(WARNING "Could not find command kpackagetool5. Appstream information won't be generated for ${component}.")
 endif()
 
-# Define the name of the executable.
+# Define the name of the executable and its required inputs.
+#   (This will appear as a list "[hammer] exec name" in the Qt Creator project view.)
 add_executable(foodrescue ${foodrescue_SRCS} ${RESOURCES})
 
 # Link all required libraries with the executable.
