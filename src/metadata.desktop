@@ -1,0 +1,24 @@
+[Desktop Entry]
+Name=Food Rescue
+Name[de]=LebensmittelRetter
+GenericName=Food Rescue Information Browser
+GenericName[de]=Lebensmittel-Haltbarkeits-Informierer
+Comment=Helps to assess if food is still edible.
+Comment[de]=Hilft zu entscheiden, ob Lebensmittel noch essbar sind.
+
+Type=Application
+Exec=foodrescue
+Icon=preferences-desktop-theme
+Categories=Qt;KDE;
+
+X-KDE-ParentApp=
+X-KDE-PluginInfo-Author=Matthias Ansorg
+X-KDE-PluginInfo-Email=matthias@ansorgs.de
+X-KDE-PluginInfo-Name=org.fairdirect.foodrescue
+X-KDE-PluginInfo-Version=0.1
+X-KDE-PluginInfo-Website=
+X-KDE-PluginInfo-Category=
+X-KDE-PluginInfo-Depends=
+X-KDE-PluginInfo-License=
+X-KDE-PluginInfo-EnabledByDefault=false
+X-Plasma-MainScript=

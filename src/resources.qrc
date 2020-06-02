@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/MainArea.qml</file>
+        <file>qml/BaseApp.qml</file>
+        <file>qml/MobileApp.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>metadata.desktop</file>
+    </qresource>
+</RCC>

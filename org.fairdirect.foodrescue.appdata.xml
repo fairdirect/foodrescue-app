@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+  <id>org.fairdirect.foodrescue</id>
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>MIT</project_license>
+
+  <name>Food Rescue</name>
+  <name xml:lang="de">Lebensmittel-Rettung</name>
+
+  <summary>Helps to assess if food is still edible.</summary>
+  <summary xml:lang="de">Hilft zu entscheiden, ob Lebensmittel noch essbar sind.</summary>
+
+  <description>
+    <p>See https://fairdirect.org/food-rescue-app</p>
+    <p xml:lang="de">Siehe https://fairdirect.org/realmhd-app</p>
+  </description>
+
+  <url type="homepage">https://fairdirect.org/food-rescue-app</url>
+  <url type="bugtracker">https://github.com/fairdirect/foodrescue-app/issues</url>
+  <url type="donation"></url>
+
+  <developer_name>Matthias Ansorg &lt;matthias@ansorgs.de&gt;</developer_name>
+
+  <icon type="stock">preferences-desktop-theme</icon>
+
+  <launchable type="desktop-id">org.fairirect.foodrescue.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>
+        <!--
+          see https://www.freedesktop.org/software/appstream/docs/chap-Metadata.html#tag-screenshots
+          Central hosting for uploading at https://phabricator.kde.org/source/websites-product-screenshots/
+          Central URL to use here https://cdn.kde.org/screenshots/...
+        -->
+      </image>
+    </screenshot>
+  </screenshots>
+
+  <provides>
+    <binary>foodrescue</binary>
+  </provides>
+
+  <project_group>KDE</project_group>
+</component>

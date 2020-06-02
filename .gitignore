@@ -1,0 +1,6 @@
+# Ignore Qt Creator user settings.
+# (As they can be burdensome to create, an example is provided in CMakeLists.txt.user.template.)
+/CMakeLists.txt.user
+
+# Ignore build output, as configured in CMakeLists.txt.user.template.
+/build/
