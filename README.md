@@ -1,16 +1,15 @@
 # Food Rescue App
 
+----
+🚧 🚧 🚧 **This application is under construction.** 🚧 🚧 🚧
 
-**Table of Contents**
+The code does not provide a useful application just yet. Check back at 2020-08-31 to find the first full release here!
+----
 
 **[1. Overview](#1-overview)**
-
 **[2. Repository Structure](#2-repository-structure)**
-
 **[3. Installation](#3-installation)**
-
 **[4. Usage](#4-usage)**
-
 **[5. Development Guide](#5-development-guide)**
 
   * [5.1. Development Setup](#51-development-setup)
@@ -96,9 +95,9 @@ The following keyboard combinations are available:
         sudo apt install kirigami2-dev libkf5kirigami2-doc
         ```
 
-        To install Kirigami 5.68.0 manually, choose commit `f47bf906` ([source](https://invent.kde.org/frameworks/kirigami/-/tags)). This can be necessary where the latest version does not build with your system's Qt libraries.
+        To install Kirigami 5.68.0 manually, choose the corresponding commit `f47bf906` ([source](https://invent.kde.org/frameworks/kirigami/-/tags)). Avoiding a higher version can be necessary if it does not build with your system's Qt libraries otherwise.
 
-    * **Qt 5.12.0 or higher.** [As required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0, [corresponding to commit `f47bf906`](https://invent.kde.org/frameworks/kirigami/-/tags). Under Ubuntu 20.04 LTS, it is [installed automatically as a dependency]((https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2).
+    * **Qt 5.12.0 or higher.** [As required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0, [corresponding to commit `f47bf906`](https://invent.kde.org/frameworks/kirigami/-/tags). Under Ubuntu 20.04 LTS, it is [installed automatically as a dependency](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2).
 
     * **Breeze icon theme.** Under Ubuntu 20.04 LTS, install with:
 
@@ -118,12 +117,12 @@ The following keyboard combinations are available:
     git clone git@github.com:fairdirect/foodrescue-app.git
     ```
 
-3. **Adapt the CMake files.** marked section at the beginning of `./CMakeLists.txt` to your system. (This will be fixed in a later version ….)
+3. **Adapt the CMake files.** There is a marked section at the beginning of `./CMakeLists.txt` that you have to adapt to your system. (This will be fixed in a later version, since Makefiles should not include system-specific configuration.)
 
 
 ### 5.2. Build and Development Process
 
-To build the software using the command line:
+**To build the software using the command line:**
 
 ```
 cd example && mkdir build && cd build
@@ -133,7 +132,7 @@ make
 
 (TODO: How to build the various targets, such as an Android APK etc.. How to deploy to a phone and run it there.)
 
-To build the software with Qt Creator:
+**To build the software with Qt Creator:**
 
 1. "File → Open File or Project.." and open the project's `CMakeLists.txt`. (This is how you open CMake projects with Qt Creator.)
 
@@ -143,6 +142,8 @@ To build the software with Qt Creator:
 
 
 ### 5.3. Release Process
+
+TODO
 
 
 ### 5.4. Software Design
