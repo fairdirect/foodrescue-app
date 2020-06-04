@@ -1,15 +1,17 @@
 # Food Rescue App
 
 ----
+
 🚧 🚧 🚧 **This application is under construction.** 🚧 🚧 🚧
 
-The code does not provide a useful application just yet. Check back at 2020-08-31 to find the first full release here!
+The code does not provide a useful application just yet. Check back at 2020-08-31 to find the first full release here.
+
 ----
 
-**[1. Overview](#1-overview)**
-**[2. Repository Structure](#2-repository-structure)**
-**[3. Installation](#3-installation)**
-**[4. Usage](#4-usage)**
+**[1. Overview](#1-overview)**<br/>
+**[2. Repository Structure](#2-repository-structure)**<br/>
+**[3. Installation](#3-installation)**<br/>
+**[4. Usage](#4-usage)**<br/>
 **[5. Development Guide](#5-development-guide)**
 
   * [5.1. Development Setup](#51-development-setup)
