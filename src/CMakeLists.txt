@@ -1,20 +1,22 @@
-# ------------------------- BEGIN: lists to maintain manually -------------------------
+# ################# Lists to maintain manually #####################################################
 
-# Application source files to be compiled.
+# Application C++ source files to compile.
 set(foodrescue_SRCS
     main.cpp
 )
 
-# Qt Resource Collection (.qrc) files, listing files to include into the executable.
+# Qt Resource Collection (.qrc) files.
+#   (Files listed in .qrc files will be included into the executable.)
 qt5_add_resources(RESOURCES
     resources.qrc
 )
 
 # Libraries to statically link into the Android executable.
-#   (Desktop systems will supply these system-wide as dynamic libraries.)
-#   TODO: What happens on iOS?
+#   (Desktop Linux systems will supply these system-wide as dynamic libraries.)
+#   TODO: What happens on iOS, Windows and Mac OS X?
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
-    find_package(KF5Kirigami2 ${KF5_DEP_VERSION})
+    # Require the package that provides the Kirigami library we want to include.
+    find_package(KF5Kirigami2 ${KF5_DEP_VERSION} REQUIRED)
     set(foodrescue_EXTRA_LIBS Qt5::AndroidExtras
         KF5::Kirigami2
         KF5::I18n # TODO: Remove if not using KDE i18n.
@@ -24,7 +26,9 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     )
 endif()
 
-# In-use Breeze icons, to bundle into the Android APK.
+# Breeze icons used in the application, to include into the Android APK.
+#   (Desktop Linux systems will supply these system-wide for inclusion at run-time.)
+#   TODO: What happens on iOS, Windows and Mac OS X?
 #
 #   To browse available icons to choose from, execute (as per https://askubuntu.com/a/1246673):
 #   pcmanfm-qt "search:///usr/share/icons/breeze?recursive=1&name_regex=*&mime_types=image/*"
@@ -45,8 +49,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     )
 endif()
 
-# ------------------------- END: lists to maintain manually -------------------------
 
+# ################# Compilation and installation ###################################################
 
 # Define executable to generate, and its required inputs.
 #   (Represented as "[hammer icon] foodrescue" in the Qt Creator project outline.)
@@ -58,8 +62,8 @@ target_link_libraries(foodrescue
     # library should need bundling for desktop targets, so all should be extra libs (only
     # included for Android builds), no?
     Qt5::Core
-    Qt5::Qml
     Qt5::Quick
+    Qt5::Qml
     Qt5::Svg
     ${foodrescue_EXTRA_LIBS}
 )
