@@ -95,16 +95,16 @@ set(
 
 add_subdirectory(src)
 
-# Install the .desktop file.
+# Install the file with FreeDesktop spec application meta-infos.
 install(
-    FILES metadata.desktop
+    FILES metadata-freedesktop.desktop
     DESTINATION ${KDE_INSTALL_APPDIR}
     RENAME org.fairdirect.foodrescue.desktop
 )
 
 # Install the file with KDE application meta-infos.
 install(
-    FILES appdata.xml
+    FILES metadata-kde.xml
     DESTINATION ${KDE_INSTALL_METAINFODIR}
     RENAME org.fairdirect.foodrescue.appdata.xml
 )
