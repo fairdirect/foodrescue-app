@@ -23,7 +23,7 @@
 
   <icon type="stock">preferences-desktop-theme</icon>
 
-  <launchable type="desktop-id">org.fairirect.foodrescue.desktop</launchable>
+  <launchable type="desktop-id">org.fairdirect.foodrescue.desktop</launchable>
 
   <screenshots>
     <screenshot type="default">

@@ -4,7 +4,6 @@
         <file>qml/BaseApp.qml</file>
         <file>qml/MobileApp.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>metadata.desktop</file>
         <file>images/secondfood-applogo-256x188.png</file>
     </qresource>
 </RCC>
