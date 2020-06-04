@@ -5,29 +5,41 @@ set(foodrescue_SRCS
     main.cpp
 )
 
-# Define Qt Resource Collection (.qrc) files, to include the resource files listed there.
+# Bundle the files listed in Qt Resource Collection (.qrc) files.
 qt5_add_resources(RESOURCES
     resources.qrc
 )
 
-# Define libraries to link statically with the application.
+# Define libraries to bundle and link with the application.
 #   (Needed on Android only, as desktop systems should supply these system-wide.)
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     find_package(KF5Kirigami2 ${KF5_DEP_VERSION})
     set(foodrescue_EXTRA_LIBS Qt5::AndroidExtras
         KF5::Kirigami2
+        KF5::I18n # TODO: Remove if not using KDE i18n.
         # FIXME: Linking with QQC2 should not be needed. But if we don't, the lib will not be
         # included into the Android APK package.
         Qt5::QuickControls2
     )
 endif()
 
-# Include in-use icons with the Android APK package.
+# Include in-use Breeze icons with the Android APK package.
+#   To browse available icons to choose from, execute as per https://askubuntu.com/a/1246673 :
+#   pcmanfm-qt "search:///usr/share/icons/breeze?recursive=1&name_regex=*&mime_types=image/*"
+#
+#   Also note that some Breeze icons are used by Kirigami components themselves and already
+#   packaged. They can be re-used in the application without increasing file size. For
+#   Kirigami 5.68.0, these icons are:
+#     go-next go-previous go-up handle-sort overflow-menu-left overflow-menu-right
+#     go-next-symbolic go-next-symbolic-rtl go-previous-symbolic go-previous-symbolic-rtl
+#     overflow-menu user view-left-new view-right-new view-left-close view-right-close
+#   Source: https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L15
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     find_package(KF5Kirigami2 REQUIRED)
     kirigami_package_breeze_icons(ICONS
-        applications-graphics
         configure
+        dialog-warning
+        help-about
     )
 endif()
 
@@ -65,12 +77,15 @@ else()
     message(WARNING "Could not find command kpackagetool5. Appstream information won't be generated for ${component}.")
 endif()
 
-# Define the name of the executable and its required inputs.
-#   (This will appear as a list "[hammer] exec name" in the Qt Creator project view.)
+# Define executable to generate, and its required inputs.
+#   (Represented as "[hammer icon] foodrescue" in the Qt Creator project outline.)
 add_executable(foodrescue ${foodrescue_SRCS} ${RESOURCES})
 
 # Link all required libraries with the executable.
 target_link_libraries(foodrescue
+    # TODO: Why are some Qt libraries here and some in ${foodrescue_EXTRA_LIBS}? No Qt
+    # library should need bundling for desktop targets, so all should be extra libs (only
+    # included for Android builds), no?
     Qt5::Core
     Qt5::Qml
     Qt5::Quick
@@ -78,10 +93,5 @@ target_link_libraries(foodrescue
     ${foodrescue_EXTRA_LIBS}
 )
 
-# What files to install during deploys (the executable and KDE's .desktop file).
+# Install the binary generated in this makefile.
 install(TARGETS foodrescue ${KF5_INSTALL_TARGETS_DEFAULT_ARGS})
-install(
-    FILES metadata.desktop
-    DESTINATION ${XDG_APPS_INSTALL_DIR}
-    RENAME org.fairdirect.foodrescue.desktop
-)
