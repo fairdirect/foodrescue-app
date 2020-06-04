@@ -15,9 +15,10 @@
 
   * [5.1. Development Setup](#51-development-setup)
   * [5.2. Build and Development Process](#52-build-and-development-process)
-  * [5.3. Software Design](#53-software-design)
-  * [5.4. Code Style Guide](#54-code-style-guide)
-  * [5.5. Documentation Style Guide](#55-documentation-style-guide)
+  * [5.3. Release Process](#53-release-process)
+  * [5.4. Software Design](#54-software-design)
+  * [5.5. Code Style Guide](#55-code-style-guide)
+  * [5.6. Documentation Style Guide](#56-documentation-style-guide)
 
 **[6. License and Credits](#6-license-and-credits)**
 
@@ -32,9 +33,15 @@ This repository contains an open source application to help assess if food is st
 
 * **Convergent.** The application runs from the same codebase and with the same user interface as a native (!) application on both phones, tablets and desktop computers. This is made possible by Qt5 and, based on that, the [KDE Kirigami](https://kde.org/products/kirigami/) framework.
 
-* **Cross-platform.** The application is cross-platform, running on all platforms supported by the KDE Kirigami framework. As of 2020-06, these are: Android, iOS, Windows, Mac OS X, Linux.
+* **Cross-platform.** The application is cross-platform, running on all platforms supported by the KDE Kirigami framework. As of 2020-06, these are: Android, iOS, Windows, Mac OS X, Linux, FreeBSD ([see](https://invent.kde.org/frameworks/kirigami/-/blob/master/metainfo.yaml#L5)).
 
 * **Scan to check.** To quickly find the required information about a food item, scan its GTIN barcode with the camera of your device.
+
+* **Keyboard control.** The application can be fully controlled by keyboard shortcuts. That also works in the mobile variant, such as for Android based netbooks.
+
+* **Desktop touch control.** As a side effect of convergent application development, the user interface is touch control friendly even on the desktop version. That's useful for the considerable amount of notebook computers with touchscreens.
+
+
 
 **Documentation:**
 
@@ -52,7 +59,7 @@ TODO
 
 ## 3. Installation
 
-Right now, you would have to compile the software yourself from source ☹️
+Right now, you would have to compile the software yourself from source ☹️ See sections [5.1. Development Setup](#51-development-setup) and [5.2. Build and Development Process](#52-build-and-development-process) below for that.
 
 Eventually you will be able to install the software comfortably as follows:
 
@@ -60,7 +67,7 @@ Eventually you will be able to install the software comfortably as follows:
 
 * **For iOS.** Install from the Apple App Store.
 
-* **For Linux.** Install from a Debian package provided in a PPA package repository.
+* **For Linux.** For Ubuntu 20.04 LTS and its variants, a Debian package is provided in a PPA package repository.
 
 * **For Windows.** Download a self-extracting installer and install from there.
 
@@ -69,27 +76,81 @@ Eventually you will be able to install the software comfortably as follows:
 
 ## 4. Usage
 
-TODO
+The following keyboard combinations are available:
+
+* **Close the application.** Ctrl + Q (Kirigami default)
+* **Select menu item.** Alt + highlighted letter while menu drawer is open
 
 
 ## 5. Development Guide
 
 ### 5.1. Development Setup
 
-TODO
+1. **Install the required dependencies.** The dependencies are chosen to be matched by the newest Ubuntu LTS releases. So for example, from 2020-04 to 2022-04 ([see](https://ubuntu.com/about/release-cycle)), releases will be installable under Ubuntu 20.04 LTS and you can use the packages from its standard repositories for development. (The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.)
+
+    If your distribution provides older versions of the following dependencies or you develop under Windows or Mac OS X, you have to install dependencies manually.
+
+    * **KDE Kirigami 5.68.0 or higher.** [As provided](https://launchpad.net/ubuntu/focal/amd64/kirigami2-dev) under Ubuntu 20.04 LTS and installed there with:
+
+        ```
+        sudo apt install kirigami2-dev libkf5kirigami2-doc
+        ```
+
+        To install Kirigami 5.68.0 manually, choose commit `f47bf906` ([source](https://invent.kde.org/frameworks/kirigami/-/tags)). This can be necessary where the latest version does not build with your system's Qt libraries.
+
+    * **Qt 5.12.0 or higher.** [As required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0, [corresponding to commit `f47bf906`](https://invent.kde.org/frameworks/kirigami/-/tags). Under Ubuntu 20.04 LTS, it is [installed automatically as a dependency]((https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2).
+
+    * **Breeze icon theme.** Under Ubuntu 20.04 LTS, install with:
+
+        ```
+        sudo apt install breeze-icon-theme
+        ```
+
+    * **Development tooling.** Under Ubuntu 20.04 LTS, install with:
+
+         ```
+         sudo apt install build-essential cmake extra-cmake-modules
+         ```
+
+2. **Clone the repository.**
+
+    ```
+    git clone git@github.com:fairdirect/foodrescue-app.git
+    ```
+
+3. **Adapt the CMake files.** marked section at the beginning of `./CMakeLists.txt` to your system. (This will be fixed in a later version ….)
 
 
 ### 5.2. Build and Development Process
 
+To build the software using the command line:
+
+```
+cd example && mkdir build && cd build
+cmake ..
+make
+```
+
+(TODO: How to build the various targets, such as an Android APK etc.. How to deploy to a phone and run it there.)
+
+To build the software with Qt Creator:
+
+1. "File → Open File or Project.." and open the project's `CMakeLists.txt`. (This is how you open CMake projects with Qt Creator.)
+
+2. Select the "Projects" tab from the sidebar and configure the project's build targets (TODO: how).
+
+3. In the lower left build control toolbar, select your build target and then click the large green "Run" button.
+
+
+### 5.3. Release Process
+
+
+### 5.4. Software Design
+
 TODO
 
 
-### 5.3. Software Design
-
-TODO
-
-
-### 5.4. Code Style Guide
+### 5.5. Code Style Guide
 
 The guiding idea is to write code that reads almost like natural language. That affects variable and method naming, source code layout and also choice of the logical flow and distributing algorithmic complexity so that one can understand everything while reading through once.
 
@@ -99,10 +160,10 @@ TODO
 
 And for QML code, this means specifically:
 
-TODO
+* **Visual order.** Order code elements as much as possible in the order they will appear in the user interface (top to bottom, left to right). If that means mixing contained QML types and QML attributes, so be it.
 
 
-### 5.5. Documentation Style Guide
+### 5.6. Documentation Style Guide
 
 TODO
 

@@ -1,41 +1,53 @@
-import QtQuick 2.1
-import QtQuick.Controls 2.0 as QQC2
+import QtQuick 2.12
+import QtQuick.Controls 2.12 as Controls
 import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.4 as Kirigami
+import org.kde.kirigami 2.10 as Kirigami
 
-Kirigami.ScrollablePage {
-    id: pageRoot
+// The main area of the app, including every control element except the sidebar drawer.
+Kirigami.Page {
 
-    title: qsTr("Empty App")
+    // TODO: Why does the SwipeView stop working if this is different from "page"?
+    id: page
 
-    background: Rectangle {
-        color: Kirigami.Theme.backgroundColor
-    }
-    implicitWidth: Kirigami.Units.gridUnit * 12 // Subdivides available for sizing things.
+    // Page title, currently not shown as Controls.Page does not show titles.
+    // TODO: Set the title as suitable for the tab contents, such as "Search product" for "Search".
+    // title: "Food Rescue"
 
-    ListView {
-        id: mainAreaList
+    // Area for all the app's changing content.
+    Controls.SwipeView {
+        id: swipeView
+        anchors.fill: parent
+        currentIndex: tabBar.currentIndex
+        clip: true
 
-        currentIndex: -1 // Don't show any list item as "selected".
-        focus: true
+        Repeater {
+            model: 3
 
-        model: ListModel {
-            ListElement {
-                text: qsTr("List Item 1")
-            }
-            ListElement {
-                text: qsTr("List Item 2")
-            }
-            ListElement {
-                text: qsTr("List Item 3")
+            // Tab content.
+            Item {
+                Controls.Label {
+                    width: parent.width
+                    wrapMode: Controls.Label.Wrap
+                    horizontalAlignment: Qt.AlignHCenter
+                    text: "Page " + modelData
+                }
             }
         }
+    }
 
-        delegate: Kirigami.BasicListItem {
-            id: listItem
-            label: model.text
-            highlighted: focus && ListView.isCurrentItem
-            checked: mainAreaList.openPageIndex === index
+    // Footer tabbar, the main navigation element.
+    footer: Controls.TabBar {
+        id: tabBar
+        currentIndex: swipeView.currentIndex
+
+        Controls.TabButton {
+            text: "Search"
+        }
+        Controls.TabButton {
+            text: "Rescue"
+        }
+        Controls.TabButton {
+            text: "History"
         }
     }
 }
