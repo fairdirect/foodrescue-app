@@ -17,12 +17,14 @@ qt5_add_resources(RESOURCES
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     # Require the package that provides the Kirigami library we want to include.
     find_package(KF5Kirigami2 ${KF5_DEP_VERSION} REQUIRED)
-    set(foodrescue_EXTRA_LIBS Qt5::AndroidExtras
-        KF5::Kirigami2
-        KF5::I18n # TODO: Remove if not using KDE i18n.
+
+    set(foodrescue_EXTRA_LIBS
         # FIXME: Static linking with QQC2 should not be needed, as it should be a dynamic
         # library coming in the APK. But if not listed here, the lib is omitted from the APK.
         Qt5::QuickControls2
+        Qt5::AndroidExtras
+        KF5::Kirigami2
+        KF5::I18n # TODO: Remove if not using KDE i18n.
     )
 endif()
 
@@ -41,7 +43,9 @@ endif()
 #     overflow-menu user view-left-new view-right-new view-left-close view-right-close
 #   Source: https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L15
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
+    # Require the package providing kirigami_package_breeze_icons().
     find_package(KF5Kirigami2 REQUIRED)
+
     kirigami_package_breeze_icons(ICONS
         configure
         dialog-warning

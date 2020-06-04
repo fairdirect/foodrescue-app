@@ -14,8 +14,8 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
 **[4. Usage](#4-usage)**<br/>
 **[5. Development Guide](#5-development-guide)**
 
-  * [5.1. Development Setup](#51-development-setup)
-  * [5.2. Build and Development Process](#52-build-and-development-process)
+  * [5.1. Development Setup and Build Process](#51-development-setup-and-build-process)
+  * [5.2. Qt Creator Configuration](#52-qt-creator-configuration)
   * [5.3. Release Process](#53-release-process)
   * [5.4. Software Design](#54-software-design)
   * [5.5. Code Style Guide](#55-code-style-guide)
@@ -50,7 +50,7 @@ This repository contains an open source application to help assess if food is st
 
 * **API documentation.** The project's C++ source files contain in-code documentation that you can compile into full API docs with [Doxygen](https://www.doxygen.nl/).
 
-* **Other documentation.** Extensive project documentation about planned features, used technologies, frequent tasks and related projects and initiatives is available in a [Dynalist document](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA). The same content is also available as an exported version under `doc/doc.html` in this repository. But the export is still rough and does not support proper navigation in the document, so at this time the Dynalist live document is preferable.
+* **Other documentation.** Extensive project documentation about planned features, used technologies, frequent tasks and related projects and initiatives is available as a Dynalist document ["Food Rescue App Documentation"](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA). The same content is also available as an exported version under `doc/doc.html` in this repository. But the export is still rough and does not support proper navigation in the document, so at this time the Dynalist live document is preferable.
 
 
 ## 2. Repository Structure
@@ -85,7 +85,9 @@ The following keyboard combinations are available:
 
 ## 5. Development Guide
 
-### 5.1. Development Setup
+### 5.1. Development Setup and Build Process
+
+**To install code and dependencies for development:**
 
 1. **Install the required dependencies.** The dependencies are chosen to be matched by the newest Ubuntu LTS releases. So for example, from 2020-04 to 2022-04 ([see](https://ubuntu.com/about/release-cycle)), releases will be installable under Ubuntu 20.04 LTS and you can use the packages from its standard repositories for development. (The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.)
 
@@ -119,28 +121,37 @@ The following keyboard combinations are available:
     git clone git@github.com:fairdirect/foodrescue-app.git
     ```
 
-3. **Adapt the CMake files.** There is a marked section at the beginning of `./CMakeLists.txt` that you have to adapt to your system. (This will be fixed in a later version, since Makefiles should not include system-specific configuration.)
-
-
-### 5.2. Build and Development Process
-
-**To build the software using the command line:**
+**To build the application from the command line:**
 
 ```
-cd example && mkdir build && cd build
-cmake ..
-make
+cd foodrescue-app
+mkdir -p build/CommandLineBuild && cd build/CommandLineBuild
+cmake ../..
+cmake --build .
 ```
+
+As an alternative to `cmake --build .`, you can also simply run `make`, because CMake is a tool that generates GNU Make makefiles.
 
 (TODO: How to build the various targets, such as an Android APK etc.. How to deploy to a phone and run it there.)
 
-**To build the software with Qt Creator:**
+**To build the application in Qt Creator:**
 
 1. "File → Open File or Project.." and open the project's `CMakeLists.txt`. (This is how you open CMake projects with Qt Creator.)
 
 2. Select the "Projects" tab from the sidebar and configure the project's build targets (TODO: how).
 
 3. In the lower left build control toolbar, select your build target and then click the large green "Run" button.
+
+
+### 5.2. Qt Creator configuration
+
+If you use Qt Creator as your IDE, here are ways to make developing for this (and other) applications pleasant and efficient:
+
+1. **If not on Ubuntu: Adapt your `QML_IMPORT_PATH`.** The `QML_IMPORT_PATH` is needed for Qt Creator's code completion to work. Otherwise, it will complain at QML `import` statements but builds would still succeed. This application already defines `QML_IMPORT_PATH` for all required QML files as found in Ubuntu Linux based distributions, using [this technique](https://stackoverflow.com/a/62202304). If you're not on Ubuntu, you may have to add some directories, as follows:
+
+    1. In Qt Creator, open the "Projects" sidebar tab and there go to "Build & Run → [your build config's entry] → Build → CMake".
+
+    2. In the list of CMake configuration settings, set the value of setting `QML_IMPORT_PATH` according to your system. To add multiple directories, separate them with "`;`".
 
 
 ### 5.3. Release Process

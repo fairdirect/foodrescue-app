@@ -1,16 +1,4 @@
-# ################# Lists to maintain manually #####################################################
-
-# Directories where Qt Creator can find QML files of Kirigami etc. on your system.
-#   (This setting is cached in variable QML_IMPORT_DIR, see below. Delete
-#   ${BUIL_DIR}/CMakeCache.txt to make make changes here effective.)
-#   (Source: https://stackoverflow.com/a/38266179)
-list(APPEND QML_DIRS "/usr/lib/x86_64-linux-gnu/qt5/qml")
-
-
 # ################# CMake boilerplate ##############################################################
-
-cmake_minimum_required(VERSION 3.0)
-project(foodrescue-app VERSION ${KF5_VERSION})
 
 # Do not allow in-source builds.
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
@@ -18,11 +6,62 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 endif()
 
 
+# ################# Project configuration #############################################################
+
+# Require CMake ≥3.3 to get the IN_LIST operator.
+# Required before up here before any use of the required language features.
+cmake_minimum_required(VERSION 3.0)
+
+# Project name and version. Also enables "CXX" language
+project(foodrescue-app VERSION 0.1)
+
+# TODO: What's this?
+include(FeatureSummary)
+feature_summary(
+    WHAT ALL
+    INCLUDE_QUIET_PACKAGES
+    FATAL_ON_MISSING_REQUIRED_PACKAGES
+)
+
+# Application depends on the Qt required by the Kirigami version found in Ubuntu 20.04 LTS.
+# See README.md for the reasoning and source.
+set(REQUIRED_QT_VERSION 5.12.0)
+
+# Application depends on KDE Framework version found in Ubuntu 20.04 LTS.
+# See README.md for the reasoning and source.
+set(KF5_DEP_VERSION 5.68.0)
+
+# Directories where Qt Creator can find QML files of Kirigami etc..
+#
+#   Needed to make Qt Creator code completion happy. Not needed for builds to succeed.
+#   To make a local change for your system only, see https://stackoverflow.com/a/62202304
+#
+# Kirigami QML path for Ubuntu systems.
+list(APPEND            QML_IMPORT_PATH "/usr/lib/x86_64-linux-gnu/qt5/qml")
+# To prevent adding duplicates at each run of CMake, remove the duplicates again.
+list(REMOVE_DUPLICATES QML_IMPORT_PATH)
+# The variable is cached in ${BUILD_DIR}/CMakeCache.txt. We need FORCE to change it there
+# immediately. Also, add a comment to the cache file.
+set(QML_IMPORT_PATH ${QML_IMPORT_PATH}
+    CACHE STRING "Qt Creator 4.1 extra qml import paths"
+    FORCE
+)
+
+# Enable Qt MOC (Meta Object Compiler) pre-processor to run on C++ source files when needed.
+# TODO: Remove if it turns out to be unnecessary. Only needed when using Q_OBJECT macros in our code.
+set(CMAKE_AUTOMOC ON)
+set(AUTOMOC_MOC_OPTIONS "-Muri=org.kde.kirigami")
+
+# TODO: What's this?
+add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
+
+# Enable C++11 features for clang and gcc.
+set(CMAKE_CXX_STANDARD 11)
+
+
 # ################# CMake module includes ##########################################################
 
 # include()s have to be up here because the new CMake functionality can only be used afterwards.
-
-include(FeatureSummary)
 
 # CPack available to easily generate binary packages.
 include(CPack)
@@ -47,41 +86,9 @@ include(ECMPoQmTools)
 include(ECMQMLModules)
 
 
-# ################# Misc configuration #############################################################
-
-# TODO: What's this?
-feature_summary(
-    WHAT ALL
-    INCLUDE_QUIET_PACKAGES
-    FATAL_ON_MISSING_REQUIRED_PACKAGES
-)
-
-# TODO: What's this?
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-# TODO: What's this? It's not in the Kirigami repo's app template, so maybe not needed.
-set(CMAKE_AUTOMOC ON)
-set(AUTOMOC_MOC_OPTIONS -Muri=org.kde.kirigami)
-
-# TODO: What's this?
-add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
-
-# Enable C++11 features for clang and gcc.
-set(CMAKE_CXX_STANDARD 11)
-
-# Tell Qt Creator where to find QML files to make code completion happy.
-set(
-    QML_IMPORT_PATH "${QML_DIRS}"
-    CACHE STRING "Qt Creator 4.1 extra qml import paths"
-)
-
-
 # ################# Application dependencies (packages, QML modules) ###############################
 
 # Find the Qt installation.
-# Application depends on the Qt required by the Kirigami version found in Ubuntu 20.04 LTS.
-# Which is 5.12.0. See README.md for the reasoning and source.
-set(REQUIRED_QT_VERSION 5.12.0)
 find_package(
     Qt5 ${REQUIRED_QT_VERSION}
     REQUIRED
@@ -90,6 +97,8 @@ find_package(
     # TODO: If the above causes issues, replace with previous version:
     # COMPONENTS Core Quick Gui Svg QuickControls2
 )
+
+# Require the package providing library Qt5::AndroidExtras, as needed in src/CMakeLists.txt.
 if(CMAKE_SYSTEM_NAME STREQUAL "Android")
     find_package(Qt5AndroidExtras ${REQUIRED_QT_VERSION} REQUIRED)
 endif()
