@@ -19,7 +19,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     find_package(KF5Kirigami2 ${KF5_DEP_VERSION} REQUIRED)
 
     set(foodrescue_EXTRA_LIBS
-        # FIXME: Static linking with QQC2 should not be needed, as it should be a dynamic
+        # TODO: Static linking with QQC2 should not be needed, as it should be a dynamic
         # library coming in the APK. But if not listed here, the lib is omitted from the APK.
         Qt5::QuickControls2
         Qt5::AndroidExtras

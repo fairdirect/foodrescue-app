@@ -18,10 +18,10 @@ Kirigami.ApplicationWindow {
     id: root
 
     // Main content area.
-    pageStack.initialPage: mainAreaComponent
+    pageStack.initialPage: mainPageComponent
     Component {
-        id: mainAreaComponent
-        MainArea {} // See MainArea.qml.
+        id: mainPageComponent
+        MainPage {} // See MainPage.qml.
     }
 
     // Left sidebar drawer with the menu.
@@ -36,9 +36,7 @@ Kirigami.ApplicationWindow {
             // TODO: Add a separator line here, to separate from any menu items above.
             Kirigami.Action {
                 text: "Warnings"
-                icon {
-                    name: "dialog-warning"
-                }
+                icon { name: "dialog-warning" }
             },
 
             Kirigami.Action {
@@ -47,21 +45,23 @@ Kirigami.ApplicationWindow {
 
             Kirigami.Action {
                 text: "Settings"
-                icon {
-                    name: "configure"
-                }
+                icon { name: "configure" }
             },
 
             Kirigami.Action {
                 text: "Help"
-                icon {
-                    name: "help-about"
-                }
+                icon { name: "help-about" }
             },
 
             Kirigami.Action {
-                text: "About this App"
+                text: "About and License"
+                onTriggered: {
+                    pageStack.layers.push(
+                        Qt.resolvedUrl("AboutPage.qml")
+                    );
+                }
             }
+
         ]
     }
 }

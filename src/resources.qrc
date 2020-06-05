@@ -1,9 +1,10 @@
 <RCC>
     <qresource prefix="/">
-        <file>qml/MainArea.qml</file>
+        <file>qml/MainPage.qml</file>
         <file>qml/BaseApp.qml</file>
         <file>qml/MobileApp.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>images/secondfood-applogo-256x188.png</file>
+        <file>qml/AboutPage.qml</file>
     </qresource>
 </RCC>
