@@ -119,9 +119,7 @@ The following keyboard combinations are available:
 
 **Additionally for Android application development:**
 
-1. **Install dependencies.**
-
-    * **Breeze icon theme.** Used for the icons packaged into the Android APK. Under Ubuntu 20.04 LTS, install with:
+1. **Install Breeze icons.** Used for the icons packaged into the Android APK. Under Ubuntu 20.04 LTS, install with:
 
     ```
     sudo apt install breeze-icon-theme

@@ -31,10 +31,30 @@ set(REQUIRED_QT_VERSION 5.12.0)
 # See README.md for the reasoning and source.
 set(KF5_DEP_VERSION 5.68.0)
 
+# If building for Android and Breeze icons are installed as on Ubuntu, set the path.
+#   If not installed, the build process will do a git clone.
+#   For documentation of the technique here and instructions to make a local change for your
+#   system only, see https://stackoverflow.com/a/62202304
+if(CMAKE_SYSTEM_NAME STREQUAL "Android" AND IS_DIRECTORY "/usr/share/icons/breeze")
+    list(APPEND            BREEZEICONS_DIR "/usr/share/icons/breeze")
+
+    # To prevent adding duplicates at each run of CMake, remove the duplicates again.
+    list(REMOVE_DUPLICATES BREEZEICONS_DIR)
+
+    # The variable is cached in ${BUILD_DIR}/CMakeCache.txt. We need FORCE to change it there
+    # immediately. Also, add a comment to the cache file.
+    set(BREEZEICONS_DIR ${BREEZEICONS_DIR}
+        CACHE STRING "Path to the KDE Breeze icon set, for the Kirigami's Android packaging scripts"
+        FORCE
+    )
+endif()
+
 # Directories where Qt Creator can find QML files of Kirigami etc..
 #
 #   Needed to make Qt Creator code completion happy. Not needed for builds to succeed.
-#   To make a local change for your system only, see https://stackoverflow.com/a/62202304
+#
+#   For documentation of the technique here and instructions to make a local change for your
+#   system only, see https://stackoverflow.com/a/62202304
 #
 # Kirigami QML path for Ubuntu systems.
 list(APPEND            QML_IMPORT_PATH "/usr/lib/x86_64-linux-gnu/qt5/qml")
@@ -43,7 +63,7 @@ list(REMOVE_DUPLICATES QML_IMPORT_PATH)
 # The variable is cached in ${BUILD_DIR}/CMakeCache.txt. We need FORCE to change it there
 # immediately. Also, add a comment to the cache file.
 set(QML_IMPORT_PATH ${QML_IMPORT_PATH}
-    CACHE STRING "Qt Creator 4.1 extra qml import paths"
+    CACHE STRING "Qt Creator 4.1 extra QML import paths"
     FORCE
 )
 
