@@ -87,11 +87,17 @@ The following keyboard combinations are available:
 
 ### 5.1. Development Setup and Build Process
 
-**To install code and dependencies for development:**
+**For desktop application development:**
 
-1. **Install the required dependencies.** The dependencies are chosen to be matched by the newest Ubuntu LTS releases. So for example, from 2020-04 to 2022-04 ([see](https://ubuntu.com/about/release-cycle)), releases will be installable under Ubuntu 20.04 LTS and you can use the packages from its standard repositories for development. (The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.)
+1. **Install dependencies.** The dependencies are chosen to be matched by the newest Ubuntu LTS releases. So for example, from 2020-04 to 2022-04 ([see](https://ubuntu.com/about/release-cycle)), releases will be installable under Ubuntu 20.04 LTS and you can use the packages from its standard repositories for development. (The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.) Note that the KDE Plasma desktop environment is not a dependency – you don't have to use it to develop with Kirigami, or even have it installed.
 
     If your distribution provides older versions of the following dependencies or you develop under Windows or Mac OS X, you have to install dependencies manually.
+
+    * **Basic development tooling.** Under Ubuntu 20.04 LTS, install with:
+
+     ```
+     sudo apt install build-essential cmake extra-cmake-modules
+     ```
 
     * **KDE Kirigami 5.68.0 or higher.** [As provided](https://launchpad.net/ubuntu/focal/amd64/kirigami2-dev) under Ubuntu 20.04 LTS and installed there with:
 
@@ -103,23 +109,40 @@ The following keyboard combinations are available:
 
     * **Qt 5.12.0 or higher.** [As required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0, [corresponding to commit `f47bf906`](https://invent.kde.org/frameworks/kirigami/-/tags). Under Ubuntu 20.04 LTS, it is [installed automatically as a dependency](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2).
 
-    * **Breeze icon theme.** Under Ubuntu 20.04 LTS, install with:
-
-        ```
-        sudo apt install breeze-icon-theme
-        ```
-
-    * **Development tooling.** Under Ubuntu 20.04 LTS, install with:
-
-         ```
-         sudo apt install build-essential cmake extra-cmake-modules
-         ```
 
 2. **Clone the repository.**
 
     ```
     git clone git@github.com:fairdirect/foodrescue-app.git
     ```
+
+
+**Additionally for Android application development:**
+
+1. **Install dependencies.**
+
+    * **Breeze icon theme.** Used for the icons packaged into the Android APK. Under Ubuntu 20.04 LTS, install with:
+
+    ```
+    sudo apt install breeze-icon-theme
+    ```
+
+    This is not strictly necessary. The build system will [clone the Breeze repository](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L63)
+if it's not found. But it's cleaner to install this way, and allows to preview the same icons when compiling the desktop application.
+
+2. **If not on Ubuntu: configure `BREEZEICONS_DIR` in Qt Creator.** CMake variable `BREEZEICONS_DIR` is needed for CMake to find your Breeze icon theme. Otherwise it will clone the Breeze repository. For Ubuntu, this application already defines `BREEZEICONS_DIR` using [this technique](https://stackoverflow.com/a/62202304). If you did not install from the Ubuntu packages, define `BREEZEICONS_DIR` yourself following [these instructions](https://stackoverflow.com/a/62222947).
+
+3. **Configure Qt desktop applications to use Breeze icons.** When developing for Android, compiling and testing changes on the desktop application first is a good way to speed up development. In order to look as much as possible like the Android UI, you want your Qt desktop applications to also use the Breeze icons that get packaged into the Android package.
+
+    This is not guaranteed: Breeze is the default icon theme in KDE Plasma, but if you don't use KDE Plasma then another tool could have selected a different icon theme. And when starting, any Kirigami application like Food Rescue App will simply pick up the Qt icon theme in use.
+
+    The places to change the icon theme are as follows:
+
+    * **If you use Lubuntu (LXQt):** In `lxqt-config-appearance`, select "Icons Theme → Breeze".
+    * **If you use KDE:** Breeze is the default icon theme, but maybe you changed it before. There is a nice command line way to change it back: `lookandfeeltool -a org.kde.breeze.desktop`.
+    * **If you use another desktop environment:** Change the icon theme in the ways your desktop environment wants it to be done. Qt applications should pick up this change.
+    * **If nothing else works:** Install the Qt5 Configuration Tool (`sudo apt install qt5ct`) and in tab "Icon Theme" select "Breeze".
+
 
 **To build the application from the command line:**
 
@@ -134,6 +157,7 @@ As an alternative to `cmake --build .`, you can also simply run `make`, because 
 
 (TODO: How to build the various targets, such as an Android APK etc.. How to deploy to a phone and run it there.)
 
+
 **To build the application in Qt Creator:**
 
 1. "File → Open File or Project.." and open the project's `CMakeLists.txt`. (This is how you open CMake projects with Qt Creator.)
@@ -147,11 +171,7 @@ As an alternative to `cmake --build .`, you can also simply run `make`, because 
 
 If you use Qt Creator as your IDE, here are ways to make developing for this (and other) applications pleasant and efficient:
 
-1. **If not on Ubuntu: Adapt your `QML_IMPORT_PATH`.** The `QML_IMPORT_PATH` is needed for Qt Creator's code completion to work. Otherwise, it will complain at QML `import` statements but builds would still succeed. This application already defines `QML_IMPORT_PATH` for all required QML files as found in Ubuntu Linux based distributions, using [this technique](https://stackoverflow.com/a/62202304). If you're not on Ubuntu, you may have to add some directories, as follows:
-
-    1. In Qt Creator, open the "Projects" sidebar tab and there go to "Build & Run → [your build config's entry] → Build → CMake".
-
-    2. In the list of CMake configuration settings, set the value of setting `QML_IMPORT_PATH` according to your system. To add multiple directories, separate them with "`;`".
+1. **If not on Ubuntu: Adapt your `QML_IMPORT_PATH`.** The `QML_IMPORT_PATH` is needed for Qt Creator's code completion to work. Otherwise, it will complain at QML `import` statements but builds would still succeed. This application already defines `QML_IMPORT_PATH` for all required QML files as found in Ubuntu Linux based distributions, using [this technique](https://stackoverflow.com/a/62202304). If you're not on Ubuntu, you may have to add some directories by defining CMake variable `QML_IMPORT_PATH` according to [these instructions](https://stackoverflow.com/a/62222947).
 
 
 ### 5.3. Release Process
@@ -179,7 +199,7 @@ And for QML code, this means specifically:
 
 ### 5.6. Documentation Style Guide
 
-TODO
+**Outsource to Stack Exchange.** To keep this README and other documentation short and to avoid mentioning the same instructions in multiple places, publish re-usable Q&A style instructions as answers to suitable questions on [StackOverflow](https://stackoverflow.com/) or if necessary one of its sister sites. And include just the hyperlink into the project documentation. This also lets others profit from your re-usable pieces of knowledge. Stack Exchange is reasonably stable, so it can be assumed that the links will rot slower than this software itself.
 
 
 ## 6. License and Credits

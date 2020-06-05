@@ -6,13 +6,13 @@ set(foodrescue_SRCS
 )
 
 # Qt Resource Collection (.qrc) files.
-#   (Files listed in .qrc files will be included into the executable.)
+#   Files listed in .qrc files will be bundled into the executable.
 qt5_add_resources(RESOURCES
     resources.qrc
 )
 
 # Libraries to statically link into the Android executable.
-#   (Desktop Linux systems will supply these system-wide as dynamic libraries.)
+#   Desktop Linux systems will supply these system-wide as dynamic libraries.
 #   TODO: What happens on iOS, Windows and Mac OS X?
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     # Require the package that provides the Kirigami library we want to include.
@@ -28,16 +28,24 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     )
 endif()
 
-# Breeze icons used in the application, to include into the Android APK.
-#   (Desktop Linux systems will supply these system-wide for inclusion at run-time.)
-#   TODO: What happens on iOS, Windows and Mac OS X?
+# Icons to package with the Android APK, specified using FreeDesktop icon names.
 #
-#   To browse available icons to choose from, execute (as per https://askubuntu.com/a/1246673):
-#   pcmanfm-qt "search:///usr/share/icons/breeze?recursive=1&name_regex=*&mime_types=image/*"
+#   The FreeDesktop Icon Naming Spec lists all available icon names that can be used here:
+#   https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html#names
+#   To browse available icons to choose from, see: https://commons.wikimedia.org/wiki/Comparison_of_icon_sets
 #
-#   Also note that some Breeze icons are used by Kirigami components themselves and already
-#   packaged. They can be re-used in the application without increasing file size. For
-#   Kirigami 5.68.0, these icons are:
+#   On Linux desktop systems, the application can use all icons from the user's current Qt icon
+#   theme. No need to bundle icons here, as the application package will depend on an icon theme
+#   being installed. But on Android, there is no system-wide icon theme, so you have to list the
+#   icons that your application uses.
+#
+#   The icons bundled into the Android APK here are from "Breeze", the default KDE5 icon theme.
+#
+#   TODO: What happens when building for on iOS, Windows and Mac OS X?
+#
+#   Some Breeze icons are used by Kirigami components themselves and always bundled into an Android
+#   APK. They can be re-used in the application without increasing file size. For Kirigami 5.68.0,
+#   these icons are:
 #     go-next go-previous go-up handle-sort overflow-menu-left overflow-menu-right
 #     go-next-symbolic go-next-symbolic-rtl go-previous-symbolic go-previous-symbolic-rtl
 #     overflow-menu user view-left-new view-right-new view-left-close view-right-close
@@ -45,6 +53,8 @@ endif()
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     # Require the package providing kirigami_package_breeze_icons().
     find_package(KF5Kirigami2 REQUIRED)
+    # TODO: Why don't we have to do include(KF5Kirigami2Macros) before using
+    # kirigami_package_breeze_icons()?
 
     kirigami_package_breeze_icons(ICONS
         configure
@@ -52,6 +62,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
         help-about
     )
 endif()
+
+message("BREEZEICONS_DIR = \"${BREEZEICONS_DIR}\"")
 
 
 # ################# Compilation and installation ###################################################

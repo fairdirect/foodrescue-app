@@ -22,7 +22,8 @@ Kirigami.ScrollablePage {
               <h1>About</h1>
 
               <p>Food Rescue App helps you decide which food is still edible. It is a cross-platform
-                convergent application available for Android, iOS, Windows, Mac OS X and Linux.</p>
+                convergent application available for Android, iOS, Plasma Mobile, Windows, Mac OS X
+                and Linux.</p>
 
               <p>Please report any problems and bugs in <a href="https://github.com/fairdirect/foodrescue-app/issues">
                 the issue tracker</a>. You can contact the project team via the

@@ -36,7 +36,7 @@ Kirigami.ApplicationWindow {
             // TODO: Add a separator line here, to separate from any menu items above.
             Kirigami.Action {
                 text: "Warnings"
-                icon { name: "dialog-warning" }
+                icon.name: "dialog-warning"
             },
 
             Kirigami.Action {
@@ -45,12 +45,12 @@ Kirigami.ApplicationWindow {
 
             Kirigami.Action {
                 text: "Settings"
-                icon { name: "configure" }
+                icon.name: "configure"
             },
 
             Kirigami.Action {
                 text: "Help"
-                icon { name: "help-about" }
+                icon.name: "help-about"
             },
 
             Kirigami.Action {
