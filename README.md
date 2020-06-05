@@ -14,12 +14,13 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
 **[4. Usage](#4-usage)**<br/>
 **[5. Development Guide](#5-development-guide)**
 
-  * [5.1. Development Setup and Build Process](#51-development-setup-and-build-process)
-  * [5.2. Qt Creator Configuration](#52-qt-creator-configuration)
-  * [5.3. Release Process](#53-release-process)
-  * [5.4. Software Design](#54-software-design)
-  * [5.5. Code Style Guide](#55-code-style-guide)
-  * [5.6. Documentation Style Guide](#56-documentation-style-guide)
+  * [5.1. Development Setup for the Linux Desktop Version](#51-development-setup-for-the-linux-desktop-version)
+  * [5.2. Development Setup for the Android Version](#52-development-setup-for-the-android-version)
+  * [5.3. Qt Creator Configuration](#53-qt-creator-configuration)
+  * [5.4. Release Process](#54-release-process)
+  * [5.5. Software Design](#55-software-design)
+  * [5.6. Code Style Guide](#56-code-style-guide)
+  * [5.7. Documentation Style Guide](#57-documentation-style-guide)
 
 **[6. License and Credits](#6-license-and-credits)**
 
@@ -41,7 +42,6 @@ This repository contains an open source application to help assess if food is st
 * **Keyboard control.** The application can be fully controlled by keyboard shortcuts. That also works in the mobile variant, such as for Android based netbooks.
 
 * **Desktop touch control.** As a side effect of convergent application development, the user interface is touch control friendly even on the desktop version. That's useful for the considerable amount of notebook computers with touchscreens.
-
 
 
 **Documentation:**
@@ -85,9 +85,9 @@ The following keyboard combinations are available:
 
 ## 5. Development Guide
 
-### 5.1. Development Setup and Build Process
+### 5.1. Development Setup for the Linux Desktop Version
 
-**For desktop application development:**
+**Installing source code and dependencies:**
 
 1. **Install dependencies.** The dependencies are chosen to be matched by the newest Ubuntu LTS releases. So for example, from 2020-04 to 2022-04 ([see](https://ubuntu.com/about/release-cycle)), releases will be installable under Ubuntu 20.04 LTS and you can use the packages from its standard repositories for development. (The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.) Note that the KDE Plasma desktop environment is not a dependency – you don't have to use it to develop with Kirigami, or even have it installed.
 
@@ -95,9 +95,9 @@ The following keyboard combinations are available:
 
     * **Basic development tooling.** Under Ubuntu 20.04 LTS, install with:
 
-     ```
-     sudo apt install build-essential cmake extra-cmake-modules
-     ```
+         ```
+         sudo apt install build-essential cmake extra-cmake-modules
+         ```
 
     * **KDE Kirigami 5.68.0 or higher.** [As provided](https://launchpad.net/ubuntu/focal/amd64/kirigami2-dev) under Ubuntu 20.04 LTS and installed there with:
 
@@ -109,6 +109,11 @@ The following keyboard combinations are available:
 
     * **Qt 5.12.0 or higher.** [As required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0, [corresponding to commit `f47bf906`](https://invent.kde.org/frameworks/kirigami/-/tags). Under Ubuntu 20.04 LTS, it is [installed automatically as a dependency](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2).
 
+    * **Optional: remaining Qt header files.** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
+
+    ```
+    sudo apt install libqt5gamepad5-dev libqt5opengl5-dev libqt5sensors5-dev libqt5serialport5-dev libqt5svg5-dev libqt5websockets5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev qtbase5-dev qtbase5-dev-tools qtdeclarative5-dev qtdeclarative5-dev-tools qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev qtscript5-dev qttools5-dev qttools5-dev-tools qtwayland5-dev-tools qtxmlpatterns5-dev-tools
+    ```
 
 2. **Clone the repository.**
 
@@ -117,59 +122,159 @@ The following keyboard combinations are available:
     ```
 
 
-**Additionally for Android application development:**
-
-1. **Install Breeze icons.** Used for the icons packaged into the Android APK. Under Ubuntu 20.04 LTS, install with:
-
-    ```
-    sudo apt install breeze-icon-theme
-    ```
-
-    This is not strictly necessary. The build system will [clone the Breeze repository](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L63)
-if it's not found. But it's cleaner to install this way, and allows to preview the same icons when compiling the desktop application.
-
-2. **If not on Ubuntu: configure `BREEZEICONS_DIR` in Qt Creator.** CMake variable `BREEZEICONS_DIR` is needed for CMake to find your Breeze icon theme. Otherwise it will clone the Breeze repository. For Ubuntu, this application already defines `BREEZEICONS_DIR` using [this technique](https://stackoverflow.com/a/62202304). If you did not install from the Ubuntu packages, define `BREEZEICONS_DIR` yourself following [these instructions](https://stackoverflow.com/a/62222947).
-
-3. **Configure Qt desktop applications to use Breeze icons.** When developing for Android, compiling and testing changes on the desktop application first is a good way to speed up development. In order to look as much as possible like the Android UI, you want your Qt desktop applications to also use the Breeze icons that get packaged into the Android package.
-
-    This is not guaranteed: Breeze is the default icon theme in KDE Plasma, but if you don't use KDE Plasma then another tool could have selected a different icon theme. And when starting, any Kirigami application like Food Rescue App will simply pick up the Qt icon theme in use.
-
-    The places to change the icon theme are as follows:
-
-    * **If you use Lubuntu (LXQt):** In `lxqt-config-appearance`, select "Icons Theme → Breeze".
-    * **If you use KDE:** Breeze is the default icon theme, but maybe you changed it before. There is a nice command line way to change it back: `lookandfeeltool -a org.kde.breeze.desktop`.
-    * **If you use another desktop environment:** Change the icon theme in the ways your desktop environment wants it to be done. Qt applications should pick up this change.
-    * **If nothing else works:** Install the Qt5 Configuration Tool (`sudo apt install qt5ct`) and in tab "Icon Theme" select "Breeze".
-
-
-**To build the application from the command line:**
+**To build the Linux desktop application from the command line:**
 
 ```
 cd foodrescue-app
-mkdir -p build/CommandLineBuild && cd build/CommandLineBuild
+mkdir -p build/Desktop.CommandLineBuild && cd build/Desktop.CommandLineBuild
 cmake ../..
 cmake --build .
+make install
 ```
 
 As an alternative to `cmake --build .`, you can also simply run `make`, because CMake is a tool that generates GNU Make makefiles.
 
-(TODO: How to build the various targets, such as an Android APK etc.. How to deploy to a phone and run it there.)
+
+**To build the Linux desktop application in Qt Creator:**
+
+1. **Install Qt Creator.** Under Ubuntu, you can:
+
+    ```
+    sudo apt install qtcreator
+    ```
+
+2. **Open the project.** In Qt Creator, go to "File → Open File or Project.." and open the project's `CMakeLists.txt`.
+
+3. **Configure the build targets.** Select the "Projects" tab from the sidebar and configure the project's build targets (TODO: how).
+
+4. **Build and run the application.** In the lower left build control toolbar, select your build target and then click the large green "Run" button.
 
 
-**To build the application in Qt Creator:**
+### 5.2. Development Setup for the Android version
 
-1. "File → Open File or Project.." and open the project's `CMakeLists.txt`. (This is how you open CMake projects with Qt Creator.)
+**Installing source code and dependencies:**
 
-2. Select the "Projects" tab from the sidebar and configure the project's build targets (TODO: how).
+1. **Make the development setup for the desktop version.** Follow all steps from section "[5.1. Development Setup for the Linux Desktop Version](#51-development-setup-for-the-linux-desktop-version)". Make sure you can build and execute a desktop version (not just because this is a nice shortcut to test things during development, even when you want to test and run on Android eventually).
 
-3. In the lower left build control toolbar, select your build target and then click the large green "Run" button.
+2. **Install OpenJDK 8.** This is a dependency of the Android stack and of Qt Creator. Later versions will not work – [see](https://doc.qt.io/qtcreator/creator-developing-android.html#requirements). And when not doing the `update-alternatives` step, command line utilities that do not inherit the Qt Creator Java path (such as `sdkmanager` when started manually) will fail to run.
+
+    ```
+    sudo apt install openjdk-8-jdk
+    sudo update-alternatives --config java
+    ```
+
+3. **Install `sdk-tools-linux-4333796.zip`.** Do not install the new edition of this, called "commandlinetools 1.0" as provided on the [Android Studio download page](https://developer.android.com/studio) ([reasons](https://stackoverflow.com/a/62073804)).
+Download and unpack the package to the place that will later also host the Android SDK:
+
+    ```
+    cd /opt/android-sdk/
+    wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
+    unzip sdk-tools-linux-4333796.zip
+    ```
+
+    Make the `sdkmanager` command accessible system-wide:
+
+    ```
+    sudo ln -s /opt/android-sdk/tools/bin/sdkmanager /usr/local/bin/
+    ```
+
+4. **Install the Android stack.** Use the now-installed `sdkmanager` to download the SDK packages required for Android development ([source](https://doc.qt.io/qtcreator/creator-developing-android.html#requirements)).
+
+    Choose the Android SDK platform that suits your target device, for example `platforms;android-23`. The correct API level number for your Android version can be found [here](https://developer.android.com/studio/releases/platforms). Also, the version of the build tools has to match the version of the Android SDK platform.
+
+    According to the [official Qt Creator installation instructions](https://doc.qt.io/qtcreator/creator-developing-android.html#setting-up-the-development-environment): for Qt 5.12.0 to 5.12.5, which we use here, the correct versions of Android stack packages are installed as follows:
+
+    ```
+    sdkmanager --install "platform-tools" "platforms;android-29" "build-tools;29.0.2" "ndk;19.2.5345600"
+    ```
+
+    Then batch-accept the licences ([see](https://stackoverflow.com/a/4682241)):
+
+    ```
+    yes | sdkmanager --licenses
+    ```
+
+5. **Install Qt for Android.** Needed because the Ubuntu repositories contain only "Qt 5.14.2 (GCC 5.3.1 … 64 bit)", the desktop variant. For Android, we need a variant compiled for ARMv7 / ARMv8. The below is the most comfortable way to install Qt for Android; for other options, [see here]( (https://stackoverflow.com/a/62090264).
+
+    1. **Install [`aqtinstall`](https://github.com/miurahr/aqtinstall/).** This is an unofficial installer to install any platform version of Qt on any platform. This is needed because the version of Qt provided in the Ubuntu repositories does not provide the Qt Maintenance Tool that could be used as an alternative.
+
+    2. **Install Qt for Android.** Use `aqtinstall` to install Qt 5.12.4 for Android. This is the version contained in Ubuntu 20.04 LTS, so matching the version you use for desktop development. Matching versions exactly is not strictly necessary, but avoids surprises and keeping two sets of documentation at hand.
+
+6. **Build Kirigami for Android.** We want to cross-compile an application for Android that depends on Kirigami. Ubuntu repositories do not provide Kirigami built for Android, so we have to do that ourselves. For now, follow [these instructions](https://community.kde.org/Marble/AndroidCompiling#Setting_up_Kirigami). TODO: Better instructions, provided here.
+
+7. **Install Breeze icons.** Used for the icons packaged into the Android APK.
+
+    1. **Install the icon theme.** Under Ubuntu 20.04 LTS, install it with:
+
+        ```
+        sudo apt install breeze-icon-theme
+        ```
+
+        This is not strictly necessary. The build system will [clone the Breeze repository](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L63)
+if it's not found. But it's cleaner to install this way, and allows to preview the same icons when compiling the desktop application.
+
+    2. **If not on Ubuntu: configure `BREEZEICONS_DIR` in Qt Creator.** CMake variable `BREEZEICONS_DIR` is needed for CMake to find your Breeze icon theme. Otherwise it will clone the Breeze repository. For Ubuntu, this application already defines `BREEZEICONS_DIR` using [this technique](https://stackoverflow.com/a/62202304). If you did not install from the Ubuntu packages, define `BREEZEICONS_DIR` yourself following [these instructions](https://stackoverflow.com/a/62222947).
+
+    3. **Configure Qt desktop applications to use Breeze icons.** When developing for Android, compiling and testing changes on the desktop application first is a good way to speed up development. In order to look as much as possible like the Android UI, you want your Qt desktop applications to also use the Breeze icons that get packaged into the Android package.
+
+        This is not guaranteed: Breeze is the default icon theme in KDE Plasma, but if you don't use KDE Plasma then another tool could have selected a different icon theme. And when starting, any Kirigami application like Food Rescue App will simply pick up the Qt icon theme in use.
+
+        The places to change the icon theme are as follows:
+
+        * **If you use Lubuntu (LXQt):** In `lxqt-config-appearance`, select "Icons Theme → Breeze".
+        * **If you use KDE:** Breeze is the default icon theme, but maybe you changed it before. There is a nice command line way to change it back: `lookandfeeltool -a org.kde.breeze.desktop`.
+        * **If you use another desktop environment:** Change the icon theme in the ways your desktop environment wants it to be done. Qt applications should pick up this change.
+        * **If nothing else works:** Install the Qt5 Configuration Tool (`sudo apt install qt5ct`) and in tab "Icon Theme" select "Breeze".
 
 
-### 5.2. Qt Creator configuration
+**To build the Linux desktop application from the command line:**
+
+TODO
+
+
+**To build the Linux desktop application in Qt Creator:**
+
+TODO: Test these steps specifically for Food Rescue App.
+
+1. **Install Qt Creator.** Under Ubuntu, you can do the following. It will install Qt Creator 4.8 under Ubuntu 19.10, which is the version available in the repositories. If you can, better install under Ubuntu 20.04 LTS, where Qt Creator 4.11 is available (ca. 14 months newer; [see](https://packages.ubuntu.com/search?keywords=qtcreator)). The following instructions have been tested under Ubuntu 19.10.
+
+    The `:i386` architecture dependencies are needed on 64 bit architectures; otherwise Qt Creator will not find Android devices to deploy to ([see](https://doc.qt.io/qt-5/android-getting-started.html#linux-64-bit)).
+
+    ```
+    sudo apt-get install qtcreator qtcreator-doc qt5-default libstdc++6:i386 libgcc1:i386 zlib1g:i386 libncurses5:i386
+    ```
+
+2. **Make the Android SDK and NDK writable.** Reason: "Make sure to unpack the Android SDK and NDK to a writeable location that Qt Creator can access later. Otherwise, Qt Creator won't be able to use sdkmanager or find all components even if they were installed manually." ([source](https://doc.qt.io/qt-5/android-getting-started.html)).
+
+    Execute the following command, with the username of the user running Qt Creator usually:
+
+    ```
+    chown username:username -R /opt/android/sdk/ /opt/android-ndk/
+    ```
+
+3. Under "Tools → Options … → Devices → Android", configure the paths to the Android SDK and NDK.
+
+4. Under  "Tools → Options → Kits → Qt versions", configure the paths of your new Qt installations.
+
+5. Connect your Android device by USB cable and under "Tools → Options → Kits → Kits" make sure there is an auto-generated kit for this device.
+
+6. In a new, existing or example Qt project, go in the sidebar to "Projects → Build & Run" and configure the project for the Qt Creator kit corresponding to your Android device.
+
+7. Before deploying to an Android device for testing, enable `adb` debug on the Android device and then follow "[Selecting Android Devices](https://doc.qt.io/qtcreator/creator-developing-android.html#selecting-android-devices)".
+
+
+
+### 5.2. Optimizing Qt Creator
 
 If you use Qt Creator as your IDE, here are ways to make developing for this (and other) applications pleasant and efficient:
 
 1. **If not on Ubuntu: Adapt your `QML_IMPORT_PATH`.** The `QML_IMPORT_PATH` is needed for Qt Creator's code completion to work. Otherwise, it will complain at QML `import` statements but builds would still succeed. This application already defines `QML_IMPORT_PATH` for all required QML files as found in Ubuntu Linux based distributions, using [this technique](https://stackoverflow.com/a/62202304). If you're not on Ubuntu, you may have to add some directories by defining CMake variable `QML_IMPORT_PATH` according to [these instructions](https://stackoverflow.com/a/62222947).
+
+2. **Install the Android examples.** The following will install relevant Qt examples for Android development, leaving out other examples. Note that for each example, three packages are needed: source files, API docs (used for the help system) and HTML docs (used for the example index in the welcome page etc.). We avoid installing packages `qt5-examples`, `qt5-doc` and `qt5-doc-html` as each of these would bring in documentation and other material from unnecessary examples.
+
+    ```
+    sudo apt install qtbase5-examples qtdeclarative5-doc qtdeclarative5-doc-html qtdeclarative5-examples qtquickcontrols2-5-doc qtquickcontrols2-5-doc-html qtquickcontrols2-5-examples qtsensors5-doc qtsensors5-doc-html qtsensors5-examples qtxmlpatterns5-doc qtxmlpatterns5-doc-html qtxmlpatterns5-examples qtconnectivity5-examples qtconnectivity5-doc qtconnectivity5-doc-html qtdatavisualization5-examples qtdatavisualization5-doc qtdatavisualization5-doc-html qtmultimedia5-examples qtmultimedia5-doc qtmultimedia5-doc-html qtsvg5-examples qtsvg5-doc qtsvg5-doc-html qttools5-examples qttools5-doc qttools5-doc-html qtwayland5-examples qtwayland5-doc qtwayland5-doc-html qtxmlpatterns5-examples qtxmlpatterns5-doc qtxmlpatterns5-doc-html
+    ```
 
 
 ### 5.3. Release Process

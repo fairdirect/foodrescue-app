@@ -63,8 +63,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     )
 endif()
 
-message("BREEZEICONS_DIR = \"${BREEZEICONS_DIR}\"")
-
 
 # ################# Compilation and installation ###################################################
 
