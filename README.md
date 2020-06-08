@@ -118,7 +118,7 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
 * **Qt 5.14 support.** Support for Qt 5.14 exists since ECM [commit c9ebd39](https://github.com/KDE/extra-cmake-modules/commit/c9ebd39) – see the commit message there. That commit was on 2020-03-03 and the [release list](https://github.com/KDE/extra-cmake-modules/releases) shows it landed in 5.68.0.
 
-    When trying Qt 5.14 for Android or newer with the Kirigami version that comes with Ubuntu 19.10. During the build process, you would see androiddeployqt fail with the error message "No target architecture defined in json file.". This seems to be due to the same change in Qt that also caused the equivalent [issue #35](https://github.com/LaurentGomila/qt-android-cmake/issues/35) in [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake). So we have to wait for the KDE CMake build scripts to be fixed first. An equivalent bug already got fixed in the CMake scripts for Android deployment that come with Qt Creator (see https://bugreports.qt.io/browse/QTCREATORBUG-23306 ). But it has to be fixed in every set of CMake scripts that attempt Android deployment, and KDE has its own …
+    When trying Qt ≥5.14 for Android with ECM 5.62, you would see `androiddeployqt` fail during the build process with the error message "No target architecture defined in json file". This seems to be due to the same change in Qt that also caused the equivalent issues [#35](https://github.com/LaurentGomila/qt-android-cmake/issues/35) in [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake) and [#23306](https://bugreports.qt.io/browse/QTCREATORBUG-23306) in the CMake scripts for Android deployment that come with Qt Creator. It has to be fixed in every set of CMake scripts that for Android deployment, and ECM is yet another one of these.
 
 * **Qt 5.13 support.** The [commit c9ebd39](https://github.com/KDE/extra-cmake-modules/commit/c9ebd39) message also tells that even in that version, Qt 5.13 has issues with "older NDKs", which we assume here to mean older than NDK 19, which should be compatible with NDK 20 but maybe us not (see below). In the commits until 2020-06-08, there is no indication that these issues were fixed.
 
@@ -129,29 +129,29 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
 #### Build environment and dependencies
 
-1. **Install dependencies.** The dependencies are chosen to be matched by the newest Ubuntu LTS releases. So for example, from 2020-04 to 2022-04 ([see](https://ubuntu.com/about/release-cycle)), releases will be installable under Ubuntu 20.04 LTS and you can use the packages from its standard repositories for development. (The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.) Note that the KDE Plasma desktop environment is not a dependency – you don't have to use it to develop with Kirigami, or even have it installed.
+The dependencies of Food Rescue App are chosen to be matched by the newest current Ubuntu LTS release. So for example, from 2020-04 to 2022-04 ([see](https://ubuntu.com/about/release-cycle)), Food Rescue App releases will be installable under Ubuntu 20.04 LTS and you will be abe to use default repository packages for its development. (The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.) If your distribution provides older versions of the dependencies listed below, or you develop under Windows or Mac OS X, you have to install dependencies manually.
 
-    If your distribution provides older versions of the following dependencies or you develop under Windows or Mac OS X, you have to install dependencies manually.
+Note that the KDE Plasma desktop environment is not a dependency – you don't have to use it to develop with Kirigami, or even have it installed.
 
-    * **Basic development tooling.** Under Ubuntu 20.04 LTS, install with:
+1. **Install basic development tooling.** Under Ubuntu 20.04 LTS, install with:
 
-         ```
-         sudo apt install build-essential cmake extra-cmake-modules
-         ```
+     ```
+     sudo apt install build-essential cmake extra-cmake-modules
+     ```
 
-    * **KDE Kirigami 5.68.0 or higher.** [As provided](https://launchpad.net/ubuntu/focal/amd64/kirigami2-dev) under Ubuntu 20.04 LTS and installed there with:
+2. **Install KDE Kirigami 5.68.0 or higher.** [As provided](https://launchpad.net/ubuntu/focal/amd64/kirigami2-dev) under Ubuntu 20.04 LTS and installed there with:
 
-        ```
-        sudo apt install kirigami2-dev libkf5kirigami2-doc
-        ```
+    ```
+    sudo apt install kirigami2-dev libkf5kirigami2-doc
+    ```
 
-        To install Kirigami 5.68.0 manually, choose the corresponding commit `f47bf906` ([source](https://invent.kde.org/frameworks/kirigami/-/tags)). Avoiding a higher version can be necessary if it does not build with your system's Qt libraries otherwise.
+    If you have to install Kirigami 5.68.0 manually, choose the corresponding commit `f47bf906` ([source](https://invent.kde.org/frameworks/kirigami/-/tags)). Avoiding a higher version can be necessary if it does not build with your system's Qt libraries otherwise.
 
-    * **Qt 5.12.0 to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
+3. **Install Qt 5.12.0 or up to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
 
-        You can also use Qt 5.13 or higher, but if you also want to build the application for Android later, you will need additional steps: for Qt 5.13.x or higher update your extra-cmake-modules package manually (see table above); and for Qt 5.14 or higher additionally [adapt the Android Manifest file](https://stackoverflow.com/a/62108461) of this application.
+    You can also use Qt 5.13 or higher, but if you also want to build the application for Android later, you will need additional steps: for Qt 5.13.x or higher update your extra-cmake-modules package manually (see table above); and for Qt 5.14 or higher additionally [adapt the Android Manifest file](https://stackoverflow.com/a/62108461) of this application.
 
-    * **Optional: remaining Qt header files.** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
+4. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
 
     ```
     sudo apt install libqt5gamepad5-dev libqt5opengl5-dev libqt5sensors5-dev libqt5serialport5-dev libqt5svg5-dev libqt5websockets5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev qtbase5-dev qtbase5-dev-tools qtdeclarative5-dev qtdeclarative5-dev-tools qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev qtscript5-dev qttools5-dev qttools5-dev-tools qtwayland5-dev-tools qtxmlpatterns5-dev-tools
@@ -371,21 +371,27 @@ TODO: Finish the instructions, and test them for Food Rescue App.
     chown username:username -R /opt/android/sdk/ /opt/android-ndk/
     ```
 
-3. **Configure Qt Creator for your environment.**
+3. **Install `CMakeLists.txt.user.template` as a starting point.** This file is provided in the repository as a template for the Qt Creator local project settings file and save you most of the steps listed below. To install it, copy it to `CMakeLists.txt.user` before starting Qt Creator:
+
+    ```
+    cp CMakeLists.txt.user.template CMakeLists.txt.user
+    ```
+
+4. **Configure Qt Creator for your environment.**
 
     1. Under  "Tools → Options… → Kits → Qt versions", configure the paths of your new Qt installations.
 
     2. Under "Tools → Options… → Devices → Android", configure the paths to your Android SDK and NDK.
 
-4. **Make sure there is a kit.** Connect your Android device by USB cable and under "Tools → Options → Kits → Kits" make sure there is an auto-generated kit for this device.
+5. **Make sure there is a kit.** Connect your Android device by USB cable and under "Tools → Options → Kits → Kits" make sure there is an auto-generated kit for this device.
 
-5. **Configure the project's build configuration.** Open the "Food Rescue App" projects by opening its `CMakeLists.txt`. Then via the left sidebar, go to "Projects → Build & Run" and:
+6. **Create the project's build configuration.** Open the "Food Rescue App" projects by opening its `CMakeLists.txt`. Then via the left sidebar, go to "Projects → Build & Run" and:
 
     1. Configure your project for the Qt Creator kit corresponding to your Android device.
 
     2. Under "Build & Run → [kit name] → Edit build configuration: Release → CMake", set the correct CMake variables needed for the build process, equivalent to the settings made during the command line build process. (TODO: How. Especially since some of the command line variables could only be set as environment variables, not via a `cmake -D` switch.)
 
-6. **Build and deploy to Android.**
+7. **Build and deploy to Android.**
 
     1. In the bottom left of the Qt Creator window, click on the dropdown button to select your build configuration, and select your project's new Android release build configuration.
 
@@ -423,7 +429,7 @@ If you use Qt Creator as your IDE, here are ways to make developing for this (an
 TODO
 
 
-### 7. Style Guide
+## 7. Style Guide
 
 ### 7.1. Code Style
 
@@ -459,4 +465,4 @@ TODO
 
 * **[IQAndreas/markdown-licenses](https://github.com/IQAndreas/markdown-licenses).** Provides orginal open source licenses in Markdown format. The `LICENSE.md` file uses one of them.
 
-* **[Qt](https://qt.io/) and [KDE Kirigami](https://kde.org/products/kirigami/) developers.** For making the best convergent application development framework to date.
+* **[Qt](https://qt.io/) and [KDE Kirigami](https://kde.org/products/kirigami/) developers.** For creating the world's best framework for convergent application development 😊
