@@ -1,12 +1,14 @@
 # Food Rescue App
 
-----
 
-🚧 🚧 🚧 **This application is under construction.** 🚧 🚧 🚧
+🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧
 
-The code does not provide a useful application just yet. Check back at 2020-08-31 to find the first full release here.
+**This application is under construction.**
 
-----
+The code does not provide a useful application just yet. Check back at 2020-08-31 to find the first full release here, or a few weeks earlier for beta releases.
+
+🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧
+
 
 **[1. Overview](#1-overview)**<br/>
 **[2. Repository Structure](#2-repository-structure)**<br/>
@@ -65,7 +67,7 @@ TODO
 
 ## 3. Installation
 
-Right now, you would have to compile the software yourself from source ☹️ See sections [5.1. Development Setup](#51-development-setup) and [5.2. Build and Development Process](#52-build-and-development-process) below for that.
+Right now, you would have to compile the software yourself from source ☹️ See chapter [5. Development](#5-development) for that.
 
 Eventually you will be able to install the software comfortably as follows:
 
@@ -92,9 +94,7 @@ The following keyboard combinations are available:
 
 ### 5.1. Version Compatibility Matrix
 
-When only building the desktop version of this application, any Qt >5.12 will fulfill the requirements of Kirigami and should work with the tooling provided under your distribution. When you also want to build the Android application, it gets complicated. For the desktop development setup below under Ubuntu 20.04 LTS, we select software versions also compatible with Android development. If you want to select your own versions, see the explanations below.
-
-While the Android platform and Qt library interfaces are mature and almost always backwards compatible, this is not true for the build process. New versions of Android NDK and Qt often introduce changes that require updates in the build process of tools that use them. For KDE, that build process is handled by KDE ECM (extra-cmake-modules). For Ubuntu 20.04 LTS, it is safest to go with the versions of tools mentioned in the instructions below. If you need other versions, the following table shows what versions of dependent tools you need for a chosen combination of Android NDK and Qt:
+When only building the desktop version of this application, any Qt >5.12 will fulfill the requirements of Kirigami and should work with the tooling provided by your Linux distribution. When you also want to build the Android application, it gets complicated. For Ubuntu 20.04 LTS, it is the safest to follow the development setup instructions in this document to end up with the right versions (the desktop development setup already chooses versions that can also be used for Android development). If you need other versions, the table below shows the version of [extra-cmake-modules](https://invent.kde.org/frameworks/extra-cmake-modules) ("ECM") you need for a chosen combination of Android NDK and Qt.
 
 
 |                         | **NDK 18**    | **NDK 19**    | **NDK 20**    | **NDK 21** |
@@ -105,18 +105,20 @@ While the Android platform and Qt library interfaces are mature and almost alway
 | **Qt 5.15 for Android** | ?             | ?             | ?             | ?          |
 
 
-**Notes and Sources:**
-
-* To check the versions you have:
+To find out the versions you have installed:
 
    ```
    apt-cache show extra-cmake-modules | grep "Version:"
    # TODO: version check for Android NDK and Qt
    ```
 
+What makes the versions in the table necessary:
+
+While the Android platform and Qt library interfaces are mature and almost always backwards compatible, this is not true for the build process. New versions of Android NDK and Qt often introduce changes that necessitate changing build tools that rely on them. For Kirigami, the Android build process is mostly handled by [KDE extra-cmake-modules](https://invent.kde.org/frameworks/extra-cmake-modules) ("ECM").
+
 * **Qt 5.14 support.** Support for Qt 5.14 exists since ECM [commit c9ebd39](https://github.com/KDE/extra-cmake-modules/commit/c9ebd39) – see the commit message there. That commit was on 2020-03-03 and the [release list](https://github.com/KDE/extra-cmake-modules/releases) shows it landed in 5.68.0.
 
-    When trying Qt 5.14 for Android or newer with the Kirigami version that comes with Ubuntu 19.10. During the build process, you would see androiddeployqt fail with the error message "No target architecture defined in json file.". This seems to be due to the same change in Qt that also caused an equivalent bug in qt-android-cmake (issue #35, https://github.com/LaurentGomila/qt-android-cmake/issues/35). So we have to wait for the KDE CMake build scripts to be fixed first. An equivalent bug already got fixed in the CMake scripts for Android deployment that come with Qt Creator (see https://bugreports.qt.io/browse/QTCREATORBUG-23306 ). But it has to be fixed in every set of CMake scripts that attempt Android deployment, and KDE has its own …
+    When trying Qt 5.14 for Android or newer with the Kirigami version that comes with Ubuntu 19.10. During the build process, you would see androiddeployqt fail with the error message "No target architecture defined in json file.". This seems to be due to the same change in Qt that also caused the equivalent [issue #35](https://github.com/LaurentGomila/qt-android-cmake/issues/35) in [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake). So we have to wait for the KDE CMake build scripts to be fixed first. An equivalent bug already got fixed in the CMake scripts for Android deployment that come with Qt Creator (see https://bugreports.qt.io/browse/QTCREATORBUG-23306 ). But it has to be fixed in every set of CMake scripts that attempt Android deployment, and KDE has its own …
 
 * **Qt 5.13 support.** The [commit c9ebd39](https://github.com/KDE/extra-cmake-modules/commit/c9ebd39) message also tells that even in that version, Qt 5.13 has issues with "older NDKs", which we assume here to mean older than NDK 19, which should be compatible with NDK 20 but maybe us not (see below). In the commits until 2020-06-08, there is no indication that these issues were fixed.
 
@@ -145,7 +147,7 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
         To install Kirigami 5.68.0 manually, choose the corresponding commit `f47bf906` ([source](https://invent.kde.org/frameworks/kirigami/-/tags)). Avoiding a higher version can be necessary if it does not build with your system's Qt libraries otherwise.
 
-    * **Qt 5.12.0 to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2). Ubuntu 20.04 provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
+    * **Qt 5.12.0 to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
 
         You can also use Qt 5.13 or higher, but if you also want to build the application for Android later, you will need additional steps: for Qt 5.13.x or higher update your extra-cmake-modules package manually (see table above); and for Qt 5.14 or higher additionally [adapt the Android Manifest file](https://stackoverflow.com/a/62108461) of this application.
 
@@ -156,7 +158,9 @@ While the Android platform and Qt library interfaces are mature and almost alway
     ```
 
 
-#### Closing and building from the command line
+#### Cloning and building from the command line
+
+You can also build this the Android application from inside Qt Creator. See chapter [5.4. Qt Creator configuration](54-qt-creator-configuration).
 
 1. **Get the application source code** by cloning its repository:
 
@@ -177,9 +181,6 @@ While the Android platform and Qt library interfaces are mature and almost alway
     ```
 
     As an alternative to `cmake --build .`, you can also simply run `make`, because CMake is a tool that generates GNU Make makefiles.
-
-You can also build this the Android application from inside QT Creator. See chapter [5.3 Qt Creator configuration](53-qt-creator-configuration).
-
 
 
 ### 5.3. Android Version Development Setup
@@ -290,7 +291,9 @@ if it's not found. But it's cleaner to install this way, and allows to preview t
         * **If nothing else works:** Install the Qt5 Configuration Tool (`sudo apt install qt5ct`) and in tab "Icon Theme" select "Breeze".
 
 
-#### Closing and building from the command line
+#### Cloning and building from the command line
+
+You can also build this the Android application from inside Qt Creator. See chapter [5.4. Qt Creator configuration](54-qt-creator-configuration).
 
 The following instructions create an APK package successfully, but the application fails to start under Android. TODO: Fix the instructions to provide a working build.
 
@@ -324,18 +327,12 @@ The following instructions create an APK package successfully, but the applicati
     ```
 
 
-You can also build this the Android application from inside QT Creator. See chapter [5.3 Qt Creator configuration](53-qt-creator-configuration).
-
-
-
 ### 5.4. Qt Creator Configuration
-
-Note that the instructions were made with Qt Creator 4.12.1, while Ubuntu 20.04 LTS has version 4.11.0 ([see](https://launchpad.net/ubuntu/focal/+package/qtcreator)). There could be differences, as 4.12.0 introduced some major changes in the Android build setup forms. If you also want version 4.12.1, install it with [`aqtinstall`](https://github.com/miurahr/aqtinstall/) (TODO: how).
 
 
 #### Building the Food Rescue App Linux desktop application
 
-1. **Install Qt Creator.** Under Ubuntu, you can:
+1. **Install Qt Creator.** Under Ubuntu 20.04 LTS, you can:
 
     ```
     sudo apt install qtcreator qtcreator-doc
@@ -348,26 +345,22 @@ Note that the instructions were made with Qt Creator 4.12.1, while Ubuntu 20.04 
 4. **Build and run the application.** In the lower left build control toolbar, select your build target and then click the large green "Run" button.
 
 
-### Building Kirigami for Android
-
-We could not yet build Kirigami for Android with Qt Creator.
-
-TODO: Instructions.
-
-
-
 #### Building the Food Rescue App Android application
 
-We could not yet build Food Rescue App for Android with Qt Creator.
+We could not yet build Food Rescue App for Android with Qt Creator. The instructions below are still incomplete.
 
-TODO: Finalize the instructions when the build starts to work. Test the existing steps specifically for Food Rescue App.
+TODO: Finish the instructions, and test them for Food Rescue App.
 
-1. **Install Qt Creator.** Under Ubuntu, you can do the following. It will install Qt Creator 4.8 under Ubuntu 19.10, which is the version available in the repositories. If you can, better install under Ubuntu 20.04 LTS, where Qt Creator 4.11 is available (ca. 14 months newer; [see](https://packages.ubuntu.com/search?keywords=qtcreator)). The following instructions have been tested under Ubuntu 19.10.
-
-    The `:i386` architecture dependencies are needed on 64 bit architectures; otherwise Qt Creator will not find Android devices to deploy to ([see](https://doc.qt.io/qt-5/android-getting-started.html#linux-64-bit)).
+1. **Install Qt Creator.** ⚠️ ⚠️ Exceptionally, the instructions here use Qt Creator 4.12.1, not the Ubuntu 20.04 LTS provided version. Because Qt Creator 4.12 introduced major improvements in the Android build process. You can install Qt Creator 4.12.1 with [`aqtinstall`](https://github.com/miurahr/aqtinstall/) as follows:
 
     ```
-    sudo apt-get install qtcreator qtcreator-doc libstdc++6:i386 libgcc1:i386 zlib1g:i386 libncurses5:i386
+    # TODO: installation instructions
+    ```
+
+    If you rather want to use Qt Creator from the Ubuntu repositories, you can do the following instead. It will give you Qt Creator 4.11.0 under Ubuntu 20.04 LTS ([see](https://launchpad.net/ubuntu/focal/+package/qtcreator)) and Qt Creator 4.8 under Ubuntu 19.10 (ca. 14 months older, [see](https://packages.ubuntu.com/search?keywords=qtcreator)). The packages with `i386` architecture are needed on 64 bit systems; otherwise Qt Creator would not find Android devices to deploy to ([see](https://doc.qt.io/qt-5/android-getting-started.html#linux-64-bit)).
+
+    ```
+    sudo apt install qtcreator qtcreator-doc libstdc++6:i386 libgcc1:i386 zlib1g:i386 libncurses5:i386
     ```
 
 2. **Make the Android SDK and NDK writable.** Reason: "Make sure to unpack the Android SDK and NDK to a writeable location that Qt Creator can access later. Otherwise, Qt Creator won't be able to use sdkmanager or find all components even if they were installed manually." ([source](https://doc.qt.io/qt-5/android-getting-started.html)).
@@ -378,18 +371,37 @@ TODO: Finalize the instructions when the build starts to work. Test the existing
     chown username:username -R /opt/android/sdk/ /opt/android-ndk/
     ```
 
-3. Under "Tools → Options … → Devices → Android", configure the paths to the Android SDK and NDK.
+3. **Configure Qt Creator for your environment.**
 
-4. Under  "Tools → Options → Kits → Qt versions", configure the paths of your new Qt installations.
+    1. Under  "Tools → Options… → Kits → Qt versions", configure the paths of your new Qt installations.
 
-5. Connect your Android device by USB cable and under "Tools → Options → Kits → Kits" make sure there is an auto-generated kit for this device.
+    2. Under "Tools → Options… → Devices → Android", configure the paths to your Android SDK and NDK.
 
-6. In a new, existing or example Qt project, go in the sidebar to "Projects → Build & Run" and configure the project for the Qt Creator kit corresponding to your Android device.
+4. **Make sure there is a kit.** Connect your Android device by USB cable and under "Tools → Options → Kits → Kits" make sure there is an auto-generated kit for this device.
 
-7. Before deploying to an Android device, enable `adb` debug mode on the Android device and then follow "[Selecting Android Devices](https://doc.qt.io/qtcreator/creator-developing-android.html#selecting-android-devices)".
+5. **Configure the project's build configuration.** Open the "Food Rescue App" projects by opening its `CMakeLists.txt`. Then via the left sidebar, go to "Projects → Build & Run" and:
+
+    1. Configure your project for the Qt Creator kit corresponding to your Android device.
+
+    2. Under "Build & Run → [kit name] → Edit build configuration: Release → CMake", set the correct CMake variables needed for the build process, equivalent to the settings made during the command line build process. (TODO: How. Especially since some of the command line variables could only be set as environment variables, not via a `cmake -D` switch.)
+
+6. **Build and deploy to Android.**
+
+    1. In the bottom left of the Qt Creator window, click on the dropdown button to select your build configuration, and select your project's new Android release build configuration.
+
+    2. Before the first deploy, enable `adb` debug mode on the Android device.
+
+    3. Click the large green arrow button to start the build and deployment process. It should first open a window to let you choose your Android device. If not, follow "[Selecting Android Devices](https://doc.qt.io/qtcreator/creator-developing-android.html#selecting-android-devices)".
 
 
-**Optimizing your configuration.** If you use Qt Creator as your IDE, here are ways to make developing for this (and other) applications pleasant and efficient:
+#### Building Kirigami for Android
+
+We could not yet build Kirigami for Android with Qt Creator. Since it's a library that you only need to build once, setting up Qt Creator for this task also makes little sense. You'll be fine with the build instructions for the command line, see above.
+
+
+#### Improving your Qt Creator setup
+
+If you use Qt Creator as your IDE, here are ways to make developing for this (and other) applications pleasant and efficient:
 
 1. **If not on Ubuntu: Adapt your `QML_IMPORT_PATH`.** The `QML_IMPORT_PATH` is needed for Qt Creator's code completion to work. Otherwise, it will complain at QML `import` statements but builds would still succeed. This application already defines `QML_IMPORT_PATH` for all required QML files as found in Ubuntu Linux based distributions, using [this technique](https://stackoverflow.com/a/62202304). If you're not on Ubuntu, you may have to add some directories by defining CMake variable `QML_IMPORT_PATH` according to [these instructions](https://stackoverflow.com/a/62222947).
 
