@@ -7,7 +7,14 @@
 
 #include <QQmlApplicationEngine>
 
-
+// Export main() as part of a library interface. Needed on Android.
+//   Q_DECL_EXPORT is a Qt MOC macro that exposes main() as part of the interface of a
+//   library; see https://stackoverflow.com/q/13911387. Building and executing works
+//   without this for desktop software. But on Android, a native application is loaded
+//   as a library from some Java bootstrap code, so it's needed there. Otherwise, the
+//   build process fails with "Could not find a main() symbol". See
+//   https://phabricator.kde.org/D12120
+Q_DECL_EXPORT
 int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);

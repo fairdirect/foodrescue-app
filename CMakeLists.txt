@@ -23,12 +23,15 @@ feature_summary(
     FATAL_ON_MISSING_REQUIRED_PACKAGES
 )
 
-# Application depends on the Qt required by the Kirigami version found in Ubuntu 20.04 LTS.
-# See README.md for the reasoning and source.
+# Set the minimum required Qt version.
+#   Application depends on the Qt required by "the Kirigami found in Ubuntu 20.04 LTS", which is
+#   5.12.0. Supplying a higher version is fine; Ubuntu 20.04 LTS comes with Qt 5.12.5 for example.
+#
+#   See README.md for the reasoning and source.
 set(REQUIRED_QT_VERSION 5.12.0)
 
 # Application depends on KDE Framework version found in Ubuntu 20.04 LTS.
-# See README.md for the reasoning and source.
+#   See README.md for the reasoning and source.
 set(KF5_DEP_VERSION 5.68.0)
 
 # If building for Android and Breeze icons are installed as on Ubuntu, set the path.
@@ -125,7 +128,7 @@ endif()
 
 # Find Kirigami and other relevant KDE components.
 find_package(KF5Kirigami2 REQUIRED)
-find_package(KF5I18n) # TODO: Remove in case KDE i18n is not being used.
+# find_package(KF5I18n) # TODO: Add when starting to use i18n.
 
 # Include specific QML modules. (Example; enable when needed.)
 # ecm_find_qmlmodule(QtGraphicalEffects 1.0)

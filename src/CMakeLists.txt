@@ -11,20 +11,33 @@ qt5_add_resources(RESOURCES
     resources.qrc
 )
 
-# Libraries to statically link into the Android executable.
-#   Desktop Linux systems will supply these system-wide as dynamic libraries.
-#   TODO: What happens on iOS, Windows and Mac OS X?
+# Dynamic libraries to include into the Android APK package.
+#   Not meant for libraries that are automatically included by being referred to from the
+#   executable: "This can be used to include plugins that are not directly liked to executable, for
+#   example OpenSSL libs for QtNetwork SSL/HTTPS support." (https://phabricator.kde.org/D13198).
+#
+#   Not meant for desktop Linux systems, which will supply these libraries system-wide via package
+#   dependencies. TODO: What happens on iOS, Windows and Mac OS X?
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     # Require the package that provides the Kirigami library we want to include.
     find_package(KF5Kirigami2 ${KF5_DEP_VERSION} REQUIRED)
 
-    set(foodrescue_EXTRA_LIBS
-        # TODO: Static linking with QQC2 should not be needed, as it should be a dynamic
-        # library coming in the APK. But if not listed here, the lib is omitted from the APK.
+    # The following works on Ubuntu 19.10. With newer versions of ECM ("extra cmake modules"),
+    # the variable name might have to be foodrescue_EXTRA_LIBS. When it does not work, the
+    # error message will be "could not find libKF5Kirigami2.so in [build dir]/bin
+    # ../../export/lib/  /opt/qt/5.12.4/android_armv7".
+    set(ANDROID_EXTRA_LIBS
+        # TODO: Including QQC2 this way should not be needed, as it is directly linked from the
+        # executable. Try if without this, the library still lands in the APK.
         Qt5::QuickControls2
-        Qt5::AndroidExtras
+        # TODO: Including Kirigami this way should not be needed, as it is directly linked from the
+        # executable. However, without this the linker cannot find he Kirigami library.
         KF5::Kirigami2
-        KF5::I18n # TODO: Remove if not using KDE i18n.
+        # TODO: Is this used at all? And if so, do we need to include it via extra libs?
+        Qt5::AndroidExtras
+        # TODO: Including KDE I18n this way should not be needed, as it is directly linked from the
+        # executable. Try if without this, the library still lands in the APK.
+        # KF5::I18n # TODO: Add when starting to use KDE i18n.
     )
 endif()
 
