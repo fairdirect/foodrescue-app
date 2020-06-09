@@ -89,6 +89,8 @@ The following keyboard combinations are available:
 * **Close the application.** Ctrl + Q (Kirigami default)
 * **Select menu item.** Alt + highlighted letter while menu drawer is open
 
+TODO: Complete usage instructions.
+
 
 ## 5. Development
 
@@ -149,7 +151,7 @@ Note that the KDE Plasma desktop environment is not a dependency – you don't h
 
 3. **Install Qt 5.12.0 or up to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
 
-    You can also use Qt 5.13 or higher, but if you also want to build the application for Android later, you will need additional steps: for Qt 5.13.x or higher update your extra-cmake-modules package manually (see table above); and for Qt 5.14 or higher additionally [adapt the Android Manifest file](https://stackoverflow.com/a/62108461) of this application.
+    In principle, you could also install Qt 5.13 or higher. Qt 5.13 or higher for desktop Linux applications as installed here works fine out of the box. However, it is advisable to keep the Qt versions for desktop Linux and Android the same to avoid surprises. And when installing Qt 5.13 or higher for Android, additional steps will be needed, as detailed in chapter [5.3. Android Version Development Setup](https://github.com/fairdirect/foodrescue-app#53-android-version-development-setup) below.
 
 4. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
 
@@ -227,11 +229,13 @@ Download and unpack the package to the place that will later also host the Andro
     yes | sdkmanager --licenses
     ```
 
-5. **Install Qt for Android.** Needed because the Ubuntu repositories contain only "Qt 5.12.5 (GCC 5.3.1 … 64 bit)", the desktop variant. For Android, we need a variant compiled for ARMv7 / ARMv8. The below is the most comfortable way to install Qt for Android; for other options, [see here]( (https://stackoverflow.com/a/62090264).
+5. **Install Qt for Android.** Needed because the Ubuntu repositories contain only the desktop variant "Qt 5.12.5 (GCC 5.3.1 … 64 bit)". For Android, we need a variant compiled for ARMv7 / ARMv8 architecture instead. The below is the most comfortable way to install Qt for Android; for other options, [see here]( (https://stackoverflow.com/a/62090264).
 
     1. **Install [`aqtinstall`](https://github.com/miurahr/aqtinstall/).** This is an unofficial installer to install any platform version of Qt on any platform. This is needed because the version of Qt provided in the Ubuntu repositories does not provide the Qt Maintenance Tool that could be used as an alternative.
 
-    2. **Install Qt for Android.** Use `aqtinstall` to install Qt 5.12.5 for Android. This is the version contained in Ubuntu 20.04 LTS, matching the version you use for desktop development. Matching versions exactly is not strictly necessary, but avoids surprises and keeping two sets of documentation at hand. Also, that version works with the Android stack installed above, while you might have surprises with different combinations.
+    2. **Install Qt for Android.** Use `aqtinstall` to install Qt 5.12.5 for Android. This is the version contained in Ubuntu 20.04 LTS, matching the version you use for desktop development. Matching versions exactly is not strictly necessary, but avoids surprises and keeping two sets of documentation at hand.
+
+        You can also install Qt 5.13 for Android or higher, but will need additional steps: for Qt 5.13.x or higher, you have to update your `extra-cmake-modules` package manually to 5.68.0 (see chapter [5.1. Version Compatibility Matrix](#51-version-compatibility-matrix)); and for Qt 5.14 or higher additionally you have to [adapt the Android Manifest file](https://stackoverflow.com/a/62108461) of this application. For Qt 5.15, additional steps may be necessary as that has not been tested yet. The next version after Qt 5.15 will probably be Qt 6, to which Kirigami and this application would have to be ported first.
 
 6. **Build Kirigami for Android.** We want to cross-compile an application for Android that depends on Kirigami. Ubuntu repositories do not provide Kirigami built for Android, so we have to do that ourselves. Instructions are mostly [from here](https://community.kde.org/Marble/AndroidCompiling#Setting_up_Kirigami).
 
