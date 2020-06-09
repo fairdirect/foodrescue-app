@@ -1,5 +1,9 @@
 # Food Rescue App
 
+🍒🍌🥕🥑🍐🍅🍈🍓🥜🌮🥚🍞🍒🍌🥕🥑🍐🍅🍈🍓🥜🌮🍞🍒🍌🥕🥑🍐🍅🍈🍓🥜🍞🍒🍌🥕🥑🍐🍅🍈🍓🍞🍒
+
+&nbsp;
+
 
 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧
 
@@ -17,12 +21,13 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
 **[5. Development](#5-development)**
 
   * [5.1. Version Compatibility Matrix](#51-version-compatibility-matrix)
-  * [5.2. Desktop Version Development Setup](#52-desktop-version-development-setup)
-  * [5.3. Android Version Development Setup](#53-android-version-development-setup)
-  * [5.4. Qt Creator Configuration](#54-qt-creator-configuration)
+  * [5.2. Desktop Development Setup](#52-desktop-development-setup)
+  * [5.3. Desktop Build Process](#53-desktop-build-process)
+  * [5.4. Android Development Setup](#54-android-development-setup)
+  * [5.5. Android Build Process](#55-android-build-process)
+  * [5.6. Qt Creator Setup](#56-qt-creator-setup)
 
 **[6. Release Process](#6-release-process)**<br/>
-
 **[7. Style Guide](#7-style-guide)**
 
   * [7.1. Code Style](#71-code-style)
@@ -34,7 +39,7 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
 ------
 
 
-## 1. Overview
+# 1. Overview
 
 This repository contains an open source application to help assess if food is still edible or not. The actual content shown inside this application is contained and processed in repository [foodrescue-content](https://github.com/fairdirect/foodrescue-content).
 
@@ -60,12 +65,12 @@ This repository contains an open source application to help assess if food is st
 * **Other documentation.** Extensive project documentation about planned features, used technologies, frequent tasks and related projects and initiatives is available as a Dynalist document ["Food Rescue App Documentation"](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA). The same content is also available as an exported version under `doc/doc.html` in this repository. But the export is still rough and does not support proper navigation in the document, so at this time the Dynalist live document is preferable.
 
 
-## 2. Repository Structure
+# 2. Repository Structure
 
 TODO
 
 
-## 3. Installation
+# 3. Installation
 
 Right now, you would have to compile the software yourself from source ☹️ See chapter [5. Development](#5-development) for that.
 
@@ -82,7 +87,7 @@ Eventually you will be able to install the software comfortably as follows:
 * **For Mac OS X.** Download a DMG package and install from there.
 
 
-## 4. Usage
+# 4. Usage
 
 The following keyboard combinations are available:
 
@@ -92,9 +97,12 @@ The following keyboard combinations are available:
 TODO: Complete usage instructions.
 
 
-## 5. Development
+# 5. Development
 
-### 5.1. Version Compatibility Matrix
+The following chapters provide a setup to build Food Rescue App under Ubuntu Linux 20.04 LTS. The instructions are mostly the same under Ubuntu 19.10 and under other Ubuntu flavors and other [Debian (Testing) based Linux distributions](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian_%28Testing%29_based). But if you are setting up your development environment under Windows or Mac OS X, you are so far on your own; you can however learn the required versions of Android SDK, NDK, Qt, KDE ECM and Kirigami from the instructions below.
+
+
+## 5.1. Version Compatibility Matrix
 
 When only building the desktop version of this application, any Qt >5.12 will fulfill the requirements of Kirigami and should work with the tooling provided by your Linux distribution. When you also want to build the Android application, it gets complicated. For Ubuntu 20.04 LTS, it is the safest to follow the development setup instructions in this document to end up with the right versions (the desktop development setup already chooses versions that can also be used for Android development). If you need other versions, the table below shows the version of [extra-cmake-modules](https://invent.kde.org/frameworks/extra-cmake-modules) ("ECM") you need for a chosen combination of Android NDK and Qt.
 
@@ -118,18 +126,16 @@ What makes the versions in the table necessary:
 
 While the Android platform and Qt library interfaces are mature and almost always backwards compatible, this is not true for the build process. New versions of Android NDK and Qt often introduce changes that necessitate changing build tools that rely on them. For Kirigami, the Android build process is mostly handled by [KDE extra-cmake-modules](https://invent.kde.org/frameworks/extra-cmake-modules) ("ECM").
 
-* **Qt 5.14 support.** Support for Qt 5.14 exists since ECM [commit c9ebd39](https://github.com/KDE/extra-cmake-modules/commit/c9ebd39) – see the commit message there. That commit was on 2020-03-03 and the [release list](https://github.com/KDE/extra-cmake-modules/releases) shows it landed in 5.68.0.
+* **Qt 5.14 support.** Support for Qt 5.14 exists since ECM [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) – see the commit message there. That commit was on 2020-03-03 and the [Git tag list](https://invent.kde.org/frameworks/extra-cmake-modules/-/tags) shows it landed in 5.68.0.
 
     When trying Qt ≥5.14 for Android with ECM 5.62, you would see `androiddeployqt` fail during the build process with the error message "No target architecture defined in json file". This seems to be due to the same change in Qt that also caused the equivalent issues [#35](https://github.com/LaurentGomila/qt-android-cmake/issues/35) in [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake) and [#23306](https://bugreports.qt.io/browse/QTCREATORBUG-23306) in the CMake scripts for Android deployment that come with Qt Creator. It has to be fixed in every set of CMake scripts that for Android deployment, and ECM is yet another one of these.
 
-* **Qt 5.13 support.** The [commit c9ebd39](https://github.com/KDE/extra-cmake-modules/commit/c9ebd39) message also tells that even in that version, Qt 5.13 has issues with "older NDKs", which we assume here to mean older than NDK 19, which should be compatible with NDK 20 but maybe us not (see below). In the commits until 2020-06-08, there is no indication that these issues were fixed.
+* **Qt 5.13 support.** The [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) message also tells that even in that version, Qt 5.13 has issues with "older NDKs", which we assume here to mean older than NDK 19, which should be compatible with NDK 20 but maybe us not (see below). In the commits until 2020-06-08, there is no indication that these issues were fixed.
 
-* **Android NDK 19 and 20 support.** Support for Android NDK 20 exists since the same ECM commit [commit c9ebd39](https://github.com/KDE/extra-cmake-modules/commit/c9ebd39) rep. version 5.68.0 – see the commit message. Since some of the changes that make Android NDK 20 incompatible with previous ECM versions are also present in NDK 19 ([see](https://github.com/LaurentGomila/qt-android-cmake/blob/5a62962/AddQtAndroidApk.cmake#L172)), we infer that ECM 5.69.0 or newer is needed for NDK 19. Since it wasn't tested with NDK 19 and there might be incompatible changes between NDK 19 and 20, NDK 19 could also be unsupported right now.
+* **Android NDK 19 and 20 support.** Support for Android NDK 20 exists since the same ECM commit [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) rep. version 5.68.0 – see the commit message. Since some of the changes that make Android NDK 20 incompatible with previous ECM versions are also present in NDK 19 ([see](https://github.com/LaurentGomila/qt-android-cmake/blob/5a62962/AddQtAndroidApk.cmake#L172)), we infer that ECM 5.69.0 or newer is needed for NDK 19. Since it wasn't tested with NDK 19 and there might be incompatible changes between NDK 19 and 20, NDK 19 could also be unsupported right now.
 
 
-### 5.2. Desktop Version Development Setup
-
-#### Build environment and dependencies
+## 5.2. Desktop Development Setup
 
 The dependencies of Food Rescue App are chosen to be matched by the newest current Ubuntu LTS release. So for example, from 2020-04 to 2022-04 ([see](https://ubuntu.com/about/release-cycle)), Food Rescue App releases will be installable under Ubuntu 20.04 LTS and you will be abe to use default repository packages for its development. (The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.) If your distribution provides older versions of the dependencies listed below, or you develop under Windows or Mac OS X, you have to install dependencies manually.
 
@@ -151,7 +157,7 @@ Note that the KDE Plasma desktop environment is not a dependency – you don't h
 
 3. **Install Qt 5.12.0 or up to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
 
-    In principle, you could also install Qt 5.13 or higher. Qt 5.13 or higher for desktop Linux applications as installed here works fine out of the box. However, it is advisable to keep the Qt versions for desktop Linux and Android the same to avoid surprises. And when installing Qt 5.13 or higher for Android, additional steps will be needed, as detailed in chapter [5.3. Android Version Development Setup](https://github.com/fairdirect/foodrescue-app#53-android-version-development-setup) below.
+    In principle, you could also install Qt 5.13 or higher. Qt 5.13 or higher for desktop Linux applications as installed here works fine out of the box. However, it is advisable to keep the Qt versions for desktop Linux and Android the same to avoid surprises. And when installing Qt 5.13 or higher for Android, additional steps will be needed, as detailed in chapter [5.4. Android Development Setup](#54-android-development-setup) below.
 
 4. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
 
@@ -160,9 +166,9 @@ Note that the KDE Plasma desktop environment is not a dependency – you don't h
     ```
 
 
-#### Cloning and building from the command line
+## 5.3. Desktop Build Process
 
-You can also build this the Android application from inside Qt Creator. See chapter [5.4. Qt Creator configuration](54-qt-creator-configuration).
+You can also build this the Android application from inside Qt Creator. See chapter [5.6. Qt Creator Setup](#56-qt-creator-setup).
 
 1. **Get the application source code** by cloning its repository:
 
@@ -185,9 +191,7 @@ You can also build this the Android application from inside Qt Creator. See chap
     As an alternative to `cmake --build .`, you can also simply run `make`, because CMake is a tool that generates GNU Make makefiles.
 
 
-### 5.3. Android Version Development Setup
-
-#### Build environment and dependencies
+## 5.4. Android Development Setup
 
 1. **Make the development setup for the desktop version.** Follow all steps from chapter "[5.2. Desktop Version Development Setup](#52-desktop-version-development-setup)". Make sure you can build and execute a desktop version; you can also do that during Android development to quickly test code that is not Android-specific.
 
@@ -295,7 +299,7 @@ if it's not found. But it's cleaner to install this way, and allows to preview t
         * **If nothing else works:** Install the Qt5 Configuration Tool (`sudo apt install qt5ct`) and in tab "Icon Theme" select "Breeze".
 
 
-#### Cloning and building from the command line
+## 5.5. Android Build Process
 
 You can also build this the Android application from inside Qt Creator. See chapter [5.4. Qt Creator configuration](54-qt-creator-configuration).
 
@@ -331,10 +335,9 @@ The following instructions create an APK package successfully, but the applicati
     ```
 
 
-### 5.4. Qt Creator Configuration
+## 5.6. Qt Creator Setup
 
-
-#### Building the Food Rescue App Linux desktop application
+### Building the Food Rescue App Linux desktop application
 
 1. **Install Qt Creator.** Under Ubuntu 20.04 LTS, you can:
 
@@ -349,7 +352,7 @@ The following instructions create an APK package successfully, but the applicati
 4. **Build and run the application.** In the lower left build control toolbar, select your build target and then click the large green "Run" button.
 
 
-#### Building the Food Rescue App Android application
+### Building the Food Rescue App Android application
 
 We could not yet build Food Rescue App for Android with Qt Creator. The instructions below are still incomplete.
 
@@ -404,12 +407,12 @@ TODO: Finish the instructions, and test them for Food Rescue App.
     3. Click the large green arrow button to start the build and deployment process. It should first open a window to let you choose your Android device. If not, follow "[Selecting Android Devices](https://doc.qt.io/qtcreator/creator-developing-android.html#selecting-android-devices)".
 
 
-#### Building Kirigami for Android
+### Building Kirigami for Android
 
 We could not yet build Kirigami for Android with Qt Creator. Since it's a library that you only need to build once, setting up Qt Creator for this task also makes little sense. You'll be fine with the build instructions for the command line, see above.
 
 
-#### Improving your Qt Creator setup
+### Improving your Qt Creator setup
 
 If you use Qt Creator as your IDE, here are ways to make developing for this (and other) applications pleasant and efficient:
 
@@ -428,14 +431,14 @@ If you use Qt Creator as your IDE, here are ways to make developing for this (an
    ```
 
 
-### 6. Release Process
+## 6. Release Process
 
 TODO
 
 
-## 7. Style Guide
+# 7. Style Guide
 
-### 7.1. Code Style
+## 7.1. Code Style
 
 The guiding idea is to write code that reads almost like natural language. That affects variable and method naming, source code layout and also choice of the logical flow and distributing algorithmic complexity so that one can understand everything while reading through once.
 
@@ -448,17 +451,17 @@ TODO
 * **Visual order.** Order code elements as much as possible in the order they will appear in the user interface (top to bottom, left to right). If that means mixing contained QML types and QML attributes, so be it.
 
 
-### 7.2. Documentation Style
+## 7.2. Documentation Style
 
 **Outsource to Stack Exchange.** To keep this README and other documentation short and to avoid mentioning the same instructions in multiple places, publish re-usable Q&A style instructions as answers to suitable questions on [StackOverflow](https://stackoverflow.com/) or if necessary one of its sister sites. And include just the hyperlink into the project documentation. This also lets others profit from your re-usable pieces of knowledge. Stack Exchange is reasonably stable, so it can be assumed that the links will rot slower than this software itself.
 
 
-### 7.3. Software Design
+## 7.3. Software Design
 
 TODO
 
 
-## 8. License and Credits
+# 8. License and Credits
 
 **Licenses.** This repository exclusively contains material under free software licencses and open content licenses. Unless otherwise noted in a specific file, all files are licensed under the MIT license. A copy of the license text is provided in [LICENSE.md](https://github.com/fairdirect/foodrescue-app/blob/master/LICENSE.md).
 
