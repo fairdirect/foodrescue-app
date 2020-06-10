@@ -5,3 +5,6 @@
 # Ignore build and installation output, as configured in CMakeLists.txt.user.template.
 /build/
 /export/
+
+# Ignore directory used for temporar files while debugging.
+/debug/

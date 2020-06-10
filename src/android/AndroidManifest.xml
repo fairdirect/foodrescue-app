@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <manifest package="org.fairdirect.foodrescue" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.3" android:versionCode="7" android:installLocation="auto">
 
-    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="Food Rescue App">
+    <application android:hardwareAccelerated="true" android:name="org.fairdirect.foodrescue" android:label="Food Rescue App">
 
-        <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="Food Rescue App" android:theme="@style/AppTheme" android:screenOrientation="unspecified" android:windowSoftInputMode="adjustResize" android:launchMode="singleTop">
+        <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.fairdirect.foodrescue.MainActivity" android:label="Food Rescue App" android:theme="@style/AppTheme" android:screenOrientation="unspecified" android:windowSoftInputMode="adjustResize" android:launchMode="singleTop">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

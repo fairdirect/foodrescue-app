@@ -20,7 +20,7 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
 **[4. Usage](#4-usage)**<br/>
 **[5. Development](#5-development)**
 
-  * [5.1. Version Compatibility Matrix](#51-version-compatibility-matrix)
+  * [5.1. Dependencies Overview](#51-dependencies-overview)
   * [5.2. Desktop Development Setup](#52-desktop-development-setup)
   * [5.3. Desktop Build Process](#53-desktop-build-process)
   * [5.4. Android Development Setup](#54-android-development-setup)
@@ -34,7 +34,8 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
   * [7.2. Documentation Style](#72-documentation-style)
   * [7.3. Software Design](#73-software-design)
 
-**[8. License and Credits](#7-license-and-credits)**
+**[8. Contribution Guide](#8-contribution-guide)**<br/>
+**[9. License and Credits](#9-license-and-credits)**
 
 ------
 
@@ -102,18 +103,17 @@ TODO: Complete usage instructions.
 The following chapters provide a setup to build Food Rescue App under Ubuntu Linux 20.04 LTS. The instructions are mostly the same under Ubuntu 19.10 and under other Ubuntu flavors and other [Debian (Testing) based Linux distributions](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian_%28Testing%29_based). But if you are setting up your development environment under Windows or Mac OS X, you are so far on your own; you can however learn the required versions of Android SDK, NDK, Qt, KDE ECM and Kirigami from the instructions below.
 
 
-## 5.1. Version Compatibility Matrix
+## 5.1. Dependencies Overview
 
-When only building the desktop version of this application, any Qt >5.12 will fulfill the requirements of Kirigami and should work with the tooling provided by your Linux distribution. When you also want to build the Android application, it gets complicated. For Ubuntu 20.04 LTS, it is the safest to follow the development setup instructions in this document to end up with the right versions (the desktop development setup already chooses versions that can also be used for Android development). If you need other versions, the table below shows the version of [extra-cmake-modules](https://invent.kde.org/frameworks/extra-cmake-modules) ("ECM") you need for a chosen combination of Android NDK and Qt.
+The dependencies of Food Rescue App are chosen to be matched by the newest current Ubuntu LTS release. So for example, Food Rescue App releases between 2020-04 and 2022-04 ([see](https://ubuntu.com/about/release-cycle)) will be installable under Ubuntu 20.04 LTS and you will be able to use default Ubuntu 20.04 LTS repository packages for its development. If your distribution provides older versions of the dependencies listed below, or you develop under Windows or Mac OS X, you have to install dependencies manually. There are a few exceptions from this rule of sticking to Ubuntu LTS packages:
+
+* The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.
+* In cases where a version of Food Rescue App needs a package in a newer version than provided in the current Ubuntu LTS release, it will use the package versions provided in [Kubuntu Backports](https://launchpad.net/~kubuntu-ppa/+archive/ubuntu/backports). These might be not the latest releases either, but are easy to add on top of a normal Ubuntu distribution by adding a PPA. In contrast, KDE Neon is a Ubuntu LTS based distribution providing the most cutting edge versions, but adding that on top of a usual Ubuntu installation is messy and can lead to dependency hell.
 
 
-|                         | **NDK 18**    | **NDK 19**    | **NDK 20**    | **NDK 21** |
-|-------------------------|---------------|---------------|---------------|------------|
-| **Qt 5.12 for Android** | ECM ≥5.62.0 ? | ECM ≥5.68.0 ? | ECM ≥5.68.0 ? | ?          |
-| **Qt 5.13 for Android** | n/a           | ECM ≥5.68.0 ? | ECM ≥5.68.0   | ?          |
-| **Qt 5.14 for Android** | ECM ≥5.68.0   | ECM ≥5.68.0 ? | ECM ≥5.68.0   | ?          |
-| **Qt 5.15 for Android** | ?             | ?             | ?             | ?          |
+#### Dependencies for Android development
 
+When only building the desktop version of this application, any Qt >5.12 will fulfill the requirements of Kirigami and should work with the tooling provided by your Linux distribution. When you also want to build the Android application, it gets complicated. For Ubuntu 20.04 LTS, it is the safest to follow the development setup instructions in this document to end up with the right versions (the desktop development setup already chooses versions that can also be used for Android development). If you need other versions, see the table below.
 
 To find out the versions you have installed:
 
@@ -122,32 +122,58 @@ To find out the versions you have installed:
    # TODO: version check for Android NDK and Qt
    ```
 
+To find the version of [extra-cmake-modules](https://invent.kde.org/frameworks/extra-cmake-modules) ("ECM") you need for a chosen combination of Android NDK and Qt:
+
+|                         | **NDK 18**    | **NDK 19**    | **NDK 20**    | **NDK 21** |
+|-------------------------|---------------|---------------|---------------|------------|
+| **Qt 5.12 for Android** | ECM ≥5.62.0   | n/a           | n/a           | n/a        |
+| **Qt 5.13 for Android** | n/a           | n/a           | n/a           | n/a        |
+| **Qt 5.14 for Android** | ECM ≥5.68.0   | n/a           | n/a           | n/a        |
+| **Qt 5.15 for Android** | ?             | n/a           | n/a           | n/a        |
+
 What makes the versions in the table necessary:
 
 While the Android platform and Qt library interfaces are mature and almost always backwards compatible, this is not true for the build process. New versions of Android NDK and Qt often introduce changes that necessitate changing build tools that rely on them. For Kirigami, the Android build process is mostly handled by [KDE extra-cmake-modules](https://invent.kde.org/frameworks/extra-cmake-modules) ("ECM").
 
-* **Qt 5.14 support.** Support for Qt 5.14 exists since ECM [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) – see the commit message there. That commit was on 2020-03-03 and the [Git tag list](https://invent.kde.org/frameworks/extra-cmake-modules/-/tags) shows it landed in 5.68.0.
+* **Android NDK 19 and 20 support.** Support for Android NDK 20 exists since ECM [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39), corresponding to version 5.68.0. Since some of the changes that make Android NDK 20 incompatible with previous ECM versions are also present in NDK 19 ([see](https://github.com/LaurentGomila/qt-android-cmake/blob/5a62962/AddQtAndroidApk.cmake#L172)), we infer that ECM 5.68.0 or newer is needed for NDK 19 as well. However there is an additional issue (TODO: link) that makes ECM incompatible with Android NDK ≥19. As of 2020-06-10, there is no fix, as even the now-current version ECM 5.71.0 exhibits this issue.
 
-    When trying Qt ≥5.14 for Android with ECM 5.62, you would see `androiddeployqt` fail during the build process with the error message "No target architecture defined in json file". This seems to be due to the same change in Qt that also caused the equivalent issues [#35](https://github.com/LaurentGomila/qt-android-cmake/issues/35) in [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake) and [#23306](https://bugreports.qt.io/browse/QTCREATORBUG-23306) in the CMake scripts for Android deployment that come with Qt Creator. It has to be fixed in every set of CMake scripts that for Android deployment, and ECM is yet another one of these.
+* **Qt 5.13 support.** The [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) message tells that even in that version, Qt 5.13 has issues with "older NDKs", which we assume here to mean versions before Android NDK 19. In the commits until 2020-06-08, there is no indication that these issues were fixed.
 
-* **Qt 5.13 support.** The [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) message also tells that even in that version, Qt 5.13 has issues with "older NDKs", which we assume here to mean older than NDK 19, which should be compatible with NDK 20 but maybe us not (see below). In the commits until 2020-06-08, there is no indication that these issues were fixed.
-
-* **Android NDK 19 and 20 support.** Support for Android NDK 20 exists since the same ECM commit [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) rep. version 5.68.0 – see the commit message. Since some of the changes that make Android NDK 20 incompatible with previous ECM versions are also present in NDK 19 ([see](https://github.com/LaurentGomila/qt-android-cmake/blob/5a62962/AddQtAndroidApk.cmake#L172)), we infer that ECM 5.69.0 or newer is needed for NDK 19. Since it wasn't tested with NDK 19 and there might be incompatible changes between NDK 19 and 20, NDK 19 could also be unsupported right now.
+* **Qt 5.14 support.** When trying Qt ≥5.14 for Android with ECM 5.62, you would see `androiddeployqt` fail during the build process with the error message "No target architecture defined in json file". This seems to be due to the same change in Qt that also caused the equivalent issues [#35](https://github.com/LaurentGomila/qt-android-cmake/issues/35) in [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake) and [#23306](https://bugreports.qt.io/browse/QTCREATORBUG-23306) in the CMake scripts for Android deployment that come with Qt Creator. It has to be fixed in every set of CMake scripts that for Android deployment, and ECM is yet another one of these. It was fixed with ECM [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) – see the commit message there. That commit was on 2020-03-03 and the [Git tag list](https://invent.kde.org/frameworks/extra-cmake-modules/-/tags) shows it landed in 5.68.0.
 
 
 ## 5.2. Desktop Development Setup
 
-The dependencies of Food Rescue App are chosen to be matched by the newest current Ubuntu LTS release. So for example, from 2020-04 to 2022-04 ([see](https://ubuntu.com/about/release-cycle)), Food Rescue App releases will be installable under Ubuntu 20.04 LTS and you will be abe to use default repository packages for its development. (The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.) If your distribution provides older versions of the dependencies listed below, or you develop under Windows or Mac OS X, you have to install dependencies manually.
-
-Note that the KDE Plasma desktop environment is not a dependency – you don't have to use it to develop with Kirigami, or even have it installed.
-
 1. **Install basic development tooling.** Under Ubuntu 20.04 LTS, install with:
 
      ```
-     sudo apt install build-essential cmake extra-cmake-modules
+     sudo apt install build-essential cmake
      ```
 
-2. **Install KDE Kirigami 5.68.0 or higher.** [As provided](https://launchpad.net/ubuntu/focal/amd64/kirigami2-dev) under Ubuntu 20.04 LTS and installed there with:
+2. **Install ECM.** Under Ubuntu 20.04 LTS, you can install them with:
+
+    ```
+    sudo apt install extra-cmake-modules
+    ```
+
+    However, if you want to work with Qt ≥5.14 and / or Android NDK ≥19, you need ECM ≥5.68.0. In that case, install them with:
+
+    ```
+    git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
+    cd extra-cmake-modules
+
+    # Adapt to the commit of a stable version ≥5.68.0, here 5.70.0. As seen on
+    # https://invent.kde.org/frameworks/extra-cmake-modules/-/tags
+    git checkout fca97c03
+
+    mkdir build && cd build && cmake ..
+    make
+
+    # Adapt to the version you checked out, here 5.70.0.
+    sudo checkinstall --pkgname extra-cmake-modules --pkgversion 5.70.0 make install
+    ```
+
+3. **Install KDE Kirigami 5.68.0 or higher.** [As provided](https://launchpad.net/ubuntu/focal/amd64/kirigami2-dev) under Ubuntu 20.04 LTS and installed there with:
 
     ```
     sudo apt install kirigami2-dev libkf5kirigami2-doc
@@ -155,11 +181,13 @@ Note that the KDE Plasma desktop environment is not a dependency – you don't h
 
     If you have to install Kirigami 5.68.0 manually, choose the corresponding commit `f47bf906` ([source](https://invent.kde.org/frameworks/kirigami/-/tags)). Avoiding a higher version can be necessary if it does not build with your system's Qt libraries otherwise.
 
-3. **Install Qt 5.12.0 or up to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
+    Note that KDE Kirigami is a lightweight library independent of the KDE Plasma desktop environment – it has no dependencies beyond Qt, and you don't need KDE Plasma installed to use it or develop for it.
+
+4. **Install Qt 5.12.0 or up to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
 
     In principle, you could also install Qt 5.13 or higher. Qt 5.13 or higher for desktop Linux applications as installed here works fine out of the box. However, it is advisable to keep the Qt versions for desktop Linux and Android the same to avoid surprises. And when installing Qt 5.13 or higher for Android, additional steps will be needed, as detailed in chapter [5.4. Android Development Setup](#54-android-development-setup) below.
 
-4. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
+5. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
 
     ```
     sudo apt install libqt5gamepad5-dev libqt5opengl5-dev libqt5sensors5-dev libqt5serialport5-dev libqt5svg5-dev libqt5websockets5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev qtbase5-dev qtbase5-dev-tools qtdeclarative5-dev qtdeclarative5-dev-tools qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev qtscript5-dev qttools5-dev qttools5-dev-tools qtwayland5-dev-tools qtxmlpatterns5-dev-tools
@@ -219,15 +247,18 @@ Download and unpack the package to the place that will later also host the Andro
 
 4. **Install the Android stack.** Use the now-installed `sdkmanager` to download the SDK packages required for Android development ([source](https://doc.qt.io/qtcreator/creator-developing-android.html#requirements)).
 
-    Choose the Android SDK platform that suits your target device, for example `platforms;android-23`. The correct API level number for your Android version can be found [here](https://developer.android.com/studio/releases/platforms). Also, the version of the build tools has to match the version of the Android SDK platform.
+    Choose an Android SDK platform (like `platforms;android-29`) that provides at least the API level of your device. Choosing a newer SDK here is no problem, as restricting created APK packages to require a lower API level for installation is possible. The API level number supported by your Android testing device can be found [here](https://developer.android.com/studio/releases/platforms).
 
-    According to the [official Qt Creator installation instructions](https://doc.qt.io/qtcreator/creator-developing-android.html#setting-up-the-development-environment): for Qt 5.12.0 to 5.12.5, which we use here, the correct versions of Android stack packages are installed with the commands below. The requirement for Android NDK 19.2.5345600 is somehow hardcoded into this Qt version, and supplying a different version would lead to errors during the build process (`Command does not exist: /opt/android-sdk/ndk/19.2.5345600/toolchains/llvm/prebuilt//bin/llvm-readobj`).
+
+    The version of the build tools has to correspond to the version of the Android SDK platform, but will not be the same version. For example in the versions chosen below, indeed, build tools 28.0.2 are required to go together with Android platform SDK 29. The requirements can be found on [this page](https://developer.android.com/studio/releases/platforms).
+
+    According to the [official Qt Creator installation instructions](https://doc.qt.io/qtcreator/creator-developing-android.html#setting-up-the-development-environment), for Qt 5.12.0 to 5.12.5 (which we use here), the correct versions of Android stack packages are installed with the commands below. Except, we stick with Android NDK 18 due to an open issue (TODO: link) in KDE's `extra-cmake-modules` with finding the C++ standard library when using Android NDK ≥19.
 
     ```
-    sdkmanager --install "platform-tools" "platforms;android-29" "build-tools;28.0.2" "ndk;19.2.5345600"
+    sdkmanager --install "platform-tools" "platforms;android-29" "build-tools;28.0.2" "ndk;18.1.5063045"
     ```
 
-    Note that, indeed, build tools 28.0.2 are required to go together with Android platform SDK 29. It's all a mess :( Then batch-accept the licences ([see](https://stackoverflow.com/a/4682241)):
+    Then batch-accept the licences ([see](https://stackoverflow.com/a/4682241)):
 
     ```
     yes | sdkmanager --licenses
@@ -298,6 +329,10 @@ if it's not found. But it's cleaner to install this way, and allows to preview t
         * **If you use another desktop environment:** Change the icon theme in the ways your desktop environment wants it to be done. Qt applications should pick up this change.
         * **If nothing else works:** Install the Qt5 Configuration Tool (`sudo apt install qt5ct`) and in tab "Icon Theme" select "Breeze".
 
+8. **Adapt the makefile.** Due to open issues with the build process, right now you have to adapt `src/CMakeLists.txt` to your system as follows:
+
+    * In `set(foodrescue_EXTRA_LIBS …)` adapt the path to `libQt5Concurrent.so` for your system.
+
 
 ## 5.5. Android Build Process
 
@@ -318,6 +353,8 @@ The following instructions create an APK package successfully, but the applicati
     export ANDROID_NDK=/opt/android-sdk/ndk/19.2.5345600
     export ANDROID_ARCH_ABI=armeabi-v7a
     export ANDROID_PLATFORM=23 # TODO: Check if this is required.
+
+    mkdir -p build/Android.ConsoleBuild && cd build/Android.ConsoleBuild
 
     cmake ../.. -DQTANDROID_EXPORTED_TARGET=foodrescue -DANDROID_APK_DIR=./src -DECM_DIR=/usr/local/share/ECM/cmake -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake -DECM_ADDITIONAL_FIND_ROOT_PATH=/opt/qt/5.12.4/android_armv7 -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 -DCMAKE_INSTALL_PREFIX=/path/to/kirigami/export -DKF5Kirigami2_DIR=/path/to/kirigami/export/lib/cmake/KF5Kirigami2
     ```
@@ -461,7 +498,12 @@ TODO
 TODO
 
 
-# 8. License and Credits
+# 8. Contribution Guide
+
+TODO
+
+
+# 9. License and Credits
 
 **Licenses.** This repository exclusively contains material under free software licencses and open content licenses. Unless otherwise noted in a specific file, all files are licensed under the MIT license. A copy of the license text is provided in [LICENSE.md](https://github.com/fairdirect/foodrescue-app/blob/master/LICENSE.md).
 

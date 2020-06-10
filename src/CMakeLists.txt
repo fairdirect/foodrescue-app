@@ -12,6 +12,9 @@ qt5_add_resources(RESOURCES
 )
 
 # Dynamic libraries to include into the Android APK package.
+#   Libraries can be identified via the library name you'd give to "g++ -l…" or as absolute paths.
+#   Library names are preferable as they work across systems.
+#
 #   Not meant for libraries that are automatically included by being referred to from the
 #   executable: "This can be used to include plugins that are not directly liked to executable, for
 #   example OpenSSL libs for QtNetwork SSL/HTTPS support." (https://phabricator.kde.org/D13198).
@@ -22,22 +25,28 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     # Require the package that provides the Kirigami library we want to include.
     find_package(KF5Kirigami2 ${KF5_DEP_VERSION} REQUIRED)
 
-    # The following works on Ubuntu 19.10. With newer versions of ECM ("extra cmake modules"),
-    # the variable name might have to be foodrescue_EXTRA_LIBS. When it does not work, the
-    # error message will be "could not find libKF5Kirigami2.so in [build dir]/bin
-    # ../../export/lib/  /opt/qt/5.12.4/android_armv7".
-    set(ANDROID_EXTRA_LIBS
+    # This variable is used below in target_link_libraries(…).
+    set(foodrescue_EXTRA_LIBS
         # TODO: Including QQC2 this way should not be needed, as it is directly linked from the
         # executable. Try if without this, the library still lands in the APK.
         Qt5::QuickControls2
-        # TODO: Including Kirigami this way should not be needed, as it is directly linked from the
-        # executable. However, without this the linker cannot find he Kirigami library.
+
+        # TODO: Should not be needed, but without this the library is not in the APK and we get
+        # "dlopen failed: library libQt5Concurrent.so not found" when the Android app starts.
+        # TODO: How to give the library in the named format? Qt5::Concurrent does not work.
+        /opt/qt/5.12.4/android_armv7/lib/libQt5Concurrent.so
+
+        # TODO: Should not be needed, but without this the library is not in the APK and we get
+        # "dlopen failed: library libKF5Kirigami2.so not found" when the Android app starts.
         KF5::Kirigami2
+
         # TODO: Is this used at all? And if so, do we need to include it via extra libs?
         Qt5::AndroidExtras
+
+        # TODO: Add when starting to use KDE i18n.
         # TODO: Including KDE I18n this way should not be needed, as it is directly linked from the
         # executable. Try if without this, the library still lands in the APK.
-        # KF5::I18n # TODO: Add when starting to use KDE i18n.
+        # KF5::I18n
     )
 endif()
 
