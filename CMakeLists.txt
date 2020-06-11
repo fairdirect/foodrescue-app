@@ -34,12 +34,26 @@ set(REQUIRED_QT_VERSION 5.12.0)
 #   See README.md for the reasoning and source.
 set(KF5_DEP_VERSION 5.68.0)
 
-# If building for Android and Breeze icons are installed as on Ubuntu, set the path.
-#   If not installed, the build process will do a git clone.
+# If building for Android and Breeze icons are installed under ./lib/breeze-icons/, set the path.
+#   If not installed, the build process will do a git clone to "breeze-icons" in the build
+#   directory.
+#
 #   For documentation of the technique here and instructions to make a local change for your
 #   system only, see https://stackoverflow.com/a/62202304
-if(CMAKE_SYSTEM_NAME STREQUAL "Android" AND IS_DIRECTORY "/usr/share/icons/breeze")
-    list(APPEND            BREEZEICONS_DIR "/usr/share/icons/breeze")
+#
+#   TODO: Later we want to use the breeze icons provided by the Ubuntu package under
+#   /usr/share/icons/breeze. However, the folder structure there is different than what
+#   _find_breeze_icon() expects. Once that is fixed, the code below should first look for the
+#   Ubuntu package and only afterwards for ./lib/breeze-icons. For the code to fix, see:
+#   https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L17
+#
+get_filename_component(
+    PROJECT_BREEZEICONS_DIR # Target variable to set.
+    "lib/breeze-icons"      # Path relative to the project's source (!!) directory.
+    REALPATH                # Convert to an absolute path and resolve any symlinks.
+)
+if(CMAKE_SYSTEM_NAME STREQUAL "Android" AND IS_DIRECTORY "${PROJECT_BREEZEICONS_DIR}")
+    list(APPEND            BREEZEICONS_DIR "${PROJECT_BREEZEICONS_DIR}")
 
     # To prevent adding duplicates at each run of CMake, remove the duplicates again.
     list(REMOVE_DUPLICATES BREEZEICONS_DIR)

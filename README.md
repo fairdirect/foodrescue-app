@@ -28,6 +28,10 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
   * [5.6. Qt Creator Setup](#56-qt-creator-setup)
 
 **[6. Release Process](#6-release-process)**<br/>
+
+  * [6.1. Desktop Linux](#61-desktop-linus)
+  * [6.2. Android](#62-android)
+
 **[7. Style Guide](#7-style-guide)**
 
   * [7.1. Code Style](#71-code-style)
@@ -328,24 +332,29 @@ Download and unpack the package to the place that will later also host the Andro
         make install
         ```
 
-7. **Install Breeze icons.** Used for the icons packaged into the Android APK.
+7. **Install Breeze icons.** Used for the icons packaged into the Android APK. This is not strictly necessary as the build system will [clone the Breeze repository](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L63)
+if it's not found. However, it would clone it into the build directory, and that would happen again whenever clearing the build directory, leading to slow builds.
 
-    1. **Install the icon theme.** Under Ubuntu 20.04 LTS, install it with:
+    1. **Clone the breeze-icons repository.** Sadly you cannot use the Ubuntu-supplied package of Breeze icons (yet) because the build system expects a different folder structure inside. We do a shallow clone of only the last commit's state (`--depth 1`) as that is all we need.
+
+        ```
+        cd lib
+        git clone --depth 1 https://invent.kde.org/frameworks/breeze-icons.git
+        ```
+
+        The build system will find the icons in `./lib/breeze-icons` without further configuration being necessary.
+
+    2. **Configure Qt desktop applications to use Breeze icons.** When developing for Android, compiling and testing changes on the desktop application first is a good way to speed up development. In order to look as much as possible like the Android UI, you want your Qt desktop applications to also use the Breeze icons that get packaged into the Android package.
+
+        This is not guaranteed: Breeze is the default icon theme in KDE Plasma, but if you don't use KDE Plasma then another tool could have selected a different icon theme. And when starting, any Kirigami application like Food Rescue App will simply pick up the Qt icon theme in use.
+
+        So first make sure you have the Breeze icon theme installed:
 
         ```
         sudo apt install breeze-icon-theme
         ```
 
-        This is not strictly necessary. The build system will [clone the Breeze repository](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L63)
-if it's not found. But it's cleaner to install this way, and allows to preview the same icons when compiling the desktop application.
-
-    2. **If not on Ubuntu: configure `BREEZEICONS_DIR` in Qt Creator.** CMake variable `BREEZEICONS_DIR` is needed for CMake to find your Breeze icon theme. Otherwise it will clone the Breeze repository. For Ubuntu, this application already defines `BREEZEICONS_DIR` using [this technique](https://stackoverflow.com/a/62202304). If you did not install from the Ubuntu packages, define `BREEZEICONS_DIR` yourself following [these instructions](https://stackoverflow.com/a/62222947).
-
-    3. **Configure Qt desktop applications to use Breeze icons.** When developing for Android, compiling and testing changes on the desktop application first is a good way to speed up development. In order to look as much as possible like the Android UI, you want your Qt desktop applications to also use the Breeze icons that get packaged into the Android package.
-
-        This is not guaranteed: Breeze is the default icon theme in KDE Plasma, but if you don't use KDE Plasma then another tool could have selected a different icon theme. And when starting, any Kirigami application like Food Rescue App will simply pick up the Qt icon theme in use.
-
-        The places to change the icon theme are as follows:
+        Then make it the default. The places to change the icon theme are as follows:
 
         * **If you use Lubuntu (LXQt):** In `lxqt-config-appearance`, select "Icons Theme → Breeze".
         * **If you use KDE:** Breeze is the default icon theme, but maybe you changed it before. There is a nice command line way to change it back: `lookandfeeltool -a org.kde.breeze.desktop`.
@@ -392,9 +401,10 @@ The following instructions create an APK package successfully, but the applicati
 
     TODO: Document the meaning and possible values of the remaining parameters.
 
-3. **Build the application.** (You could also just `make` first to see if the compilation step is successful.)
+3. **Build the application.** You could also just `make` first to see if the compilation step is successful. Note that `make install` is necessary before every `make create-apk` as otherwise newly added files like icons would not land in the Android APK package. Only the files found in `${CMAKE_INSTALL_PREFIX}` when `make create-apk` runs will make it to the APK package! (This should be considered a bug in the build dependencies and we'll try to get it fixed.)
 
     ```
+    make install
     make create-apk
     ```
 
@@ -509,7 +519,19 @@ If you use Qt Creator as your IDE, here are ways to make developing for this (an
 
 ## 6. Release Process
 
+The default build type is "Debug". To create a release build that is ready for packaging and uploading, follow the process below:
+
+
+#### 6.1. Desktop Linux
+
 TODO
+
+
+#### 6.2. Android
+
+To control the build type, use `cmake` variable [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/v3.0/variable/CMAKE_BUILD_TYPE.html).
+
+But even with `-DCMAKE_BUILD_TYPE=Release` or `-DCMAKE_BUILD_TYPE=Release` passed to the `cmake` call, the generated Android APK package will sill be named `foodrescue_build_apk-debug.apk`. This is because a release package will only be generated when you provide a certificate for signing – which can be considered a bug in `androiddeployqt` ([details](https://stackoverflow.com/a/28509035)).
 
 
 # 7. Style Guide

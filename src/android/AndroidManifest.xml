@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
 
-<!-- If you ever want to rename the application, adapt only these attributes:
-  manifest[package]
-  manifest.application[android:label]
-  manifest.application.activity[android:label]
--->
+<!-- If you ever want to rename the application, see: https://stackoverflow.com/a/62330621 -->
 
-<manifest package="org.fairdirect.foodrescue" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.1" android:versionCode="1" android:installLocation="auto">
+<!-- For versionName and versionCode, we use this scheme:
+  versionCode = major_version * 10000 + minor_version * 100 + packaging_version
+  See also: https://developer.android.com/studio/publish/versioning  -->
+<manifest package="org.fairdirect.foodrescue" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.1" android:versionCode="100" android:installLocation="auto">
 
 
     <!-- android:icon loads icon "icon.png" or "icon.svg" (as available) from folder @drawable,
@@ -16,7 +15,7 @@
         <!-- android:configChanges lists changes in the app's environment that the app will
           adapt to itself rather than relying on Android restarting it. Here, this is managed
           by the Qt framework for us, and it works. -->
-        <!-- TODO: Add android:theme="@style/AppTheme" once starting to theme the application. -->
+        <!-- TODO: Add android:theme="@style/AppTheme" once we have a theme file. -->
         <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="foodrescue" android:screenOrientation="unspecified" android:windowSoftInputMode="adjustResize" android:launchMode="singleTop">
 
             <intent-filter>

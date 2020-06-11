@@ -75,6 +75,7 @@ endif()
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     # Require the package providing kirigami_package_breeze_icons().
     find_package(KF5Kirigami2 REQUIRED)
+
     # TODO: Why don't we have to do include(KF5Kirigami2Macros) before using
     # kirigami_package_breeze_icons()?
 
