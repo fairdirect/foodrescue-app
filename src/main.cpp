@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     QQmlApplicationEngine engine;
 
     // Use different main files on desktop vs. mobile platform.
-    // FIXME: Switch to the "qrc:/something" URLs if possible. So far not working.
+    // TODO: Switch to the "qrc:/something" URLs if possible. So far not working.
     const QUrl desktopQML(QStringLiteral("qrc:///qml/BaseApp.qml"));
     const QUrl mobileQML(QStringLiteral("qrc:///qml/MobileApp.qml"));
     const bool QQC_MOBILE_SET(qEnvironmentVariableIsSet("QT_QUICK_CONTROLS_MOBILE"));
