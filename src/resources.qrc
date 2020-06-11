@@ -9,6 +9,5 @@
         <file>android/res/drawable-hdpi/icon.png</file>
         <file>android/res/drawable-ldpi/icon.png</file>
         <file>android/res/drawable-mdpi/icon.png</file>
-        <file>android/AndroidManifest.xml</file>
     </qresource>
 </RCC>
