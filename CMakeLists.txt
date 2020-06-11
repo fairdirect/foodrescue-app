@@ -54,7 +54,10 @@ endif()
 
 # Directories where Qt Creator can find QML files of Kirigami etc..
 #
-#   Needed to make Qt Creator code completion happy. Not needed for builds to succeed.
+#   Needed to make Qt Creator code completion happy. Not needed for builds to succeed. In fact,
+#   QML_IMPORT_PATH is ignored by the build process and only used by Qt Creator. See:
+#   https://bugreports.qt.io/browse/QTBUG-55259 . So there is no need to adapt it by target
+#   platform, just to give Qt Creator one set of directories to resolve QML imports.
 #
 #   For documentation of the technique here and instructions to make a local change for your
 #   system only, see https://stackoverflow.com/a/62202304
@@ -117,8 +120,6 @@ find_package(
     REQUIRED
     NO_MODULE
     COMPONENTS Core Qml Gui Svg QuickControls2
-    # TODO: If the above causes issues, replace with previous version:
-    # COMPONENTS Core Quick Gui Svg QuickControls2
 )
 
 # Require the package providing library Qt5::AndroidExtras, as needed in src/CMakeLists.txt.

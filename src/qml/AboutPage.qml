@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12 as Controls
 import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.4 as Kirigami
+import org.kde.kirigami 2.10 as Kirigami
 
 // Page for "☰ → About this App".
 // Shows required licence information and other meta info.

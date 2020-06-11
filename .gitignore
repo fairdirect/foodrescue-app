@@ -8,3 +8,10 @@
 
 # Ignore directory used for temporar files while debugging.
 /debug/
+
+# Ignore external libraries.
+# But don't ignore the folder as it's part of the repo layout.
+/lib/*
+# To not ignore the folder, re-include the README file. Because Git needs at least one file in a folder to 
+# include it in the repo; see https://stackoverflow.com/q/115983
+!/lib/README.md
