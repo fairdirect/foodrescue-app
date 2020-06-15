@@ -46,7 +46,6 @@ set(KF5_DEP_VERSION 5.68.0)
 #   _find_breeze_icon() expects. Once that is fixed, the code below should first look for the
 #   Ubuntu package and only afterwards for ./lib/breeze-icons. For the code to fix, see:
 #   https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L17
-#
 get_filename_component(
     PROJECT_BREEZEICONS_DIR # Target variable to set.
     "lib/breeze-icons"      # Path relative to the project's source (!!) directory.
