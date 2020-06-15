@@ -18,13 +18,29 @@ Kirigami.ApplicationWindow {
     id: root
 
     // Main content area.
-    pageStack.initialPage: mainPageComponent
     Component {
         id: mainPageComponent
-        MainPage {} // See MainPage.qml.
+        MainPage { } // See MainPage.qml.
     }
 
-    // Left sidebar drawer with the menu.
+    pageStack.initialPage: mainPageComponent
+
+    Component.onCompleted: {
+        // Top-bar style "ToolBar" is not possible on mobile devices according to the
+        // Kirigami Gallery App.
+        //   Documentation: PageRow::globalToolBar, see https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1PageRow.html#a8d9e50b817d9d28e9322f9a6ac75fc8d
+        //   TOOD: Try to enable "ToolBar" style for tablets at least.
+        if (Kirigami.Settings.isMobile)
+            root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.Breadcrumb
+        else
+            root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.ToolBar
+
+        // TODO: Fix that by default, the button style in the globalToolBar is
+        // "Controls.Button.TextBesideIcon". We want "Controls.Button.IconOnly". See:
+        // ActionToolBar::display, https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1ActionToolBar.html#afe0cc7a3a7ee0522820d1225bed7cfc8
+    }
+
+    // Left sidebar drawer with the main menu.
     globalDrawer: Kirigami.GlobalDrawer {
         title: "Food Rescue"
 
@@ -35,12 +51,11 @@ Kirigami.ApplicationWindow {
 
             // TODO: Add a separator line here, to separate from any menu items above.
             Kirigami.Action {
-                text: "Warnings"
-                icon.name: "dialog-warning"
+                text: "History"
             },
 
             Kirigami.Action {
-                separator: true
+                text: "Bookmarks"
             },
 
             Kirigami.Action {
@@ -49,15 +64,34 @@ Kirigami.ApplicationWindow {
             },
 
             Kirigami.Action {
-                text: "Help"
-                icon.name: "help-about"
+                separator: true
             },
 
             Kirigami.Action {
-                text: "About and License"
+                text: "Help"
+            },
+
+            Kirigami.Action {
+                text: "Feedback"
+            },
+
+            Kirigami.Action {
+                text: "About"
+                icon.name: "help-about"
+
                 onTriggered: {
                     pageStack.layers.push(
                         Qt.resolvedUrl("AboutPage.qml")
+                    );
+                }
+            },
+
+            Kirigami.Action {
+                text: "License Notes"
+                icon.name: "help-about"
+                onTriggered: {
+                    pageStack.layers.push(
+                        Qt.resolvedUrl("LicensePage.qml")
                     );
                 }
             }
