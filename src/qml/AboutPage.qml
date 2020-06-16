@@ -1,9 +1,9 @@
 import QtQuick 2.6
-import org.kde.kirigami 2.6 as Kirigami
+import org.kde.kirigami 2.6
 
 // Page for "☰ → About".
 // Shows application meta info and the copyright notice.
-Kirigami.AboutPage {
+AboutPage {
 
     aboutData: {
         // Values in visual order in the "About" dialog.

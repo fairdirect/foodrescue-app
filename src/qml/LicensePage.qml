@@ -1,16 +1,16 @@
 import QtQuick 2.12
-import QtQuick.Controls 2.12 as Controls
+import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.10 as Kirigami
+import org.kde.kirigami 2.10
 
 // Page for "☰ → License Notes".
 // Shows required licence information.
-Kirigami.ScrollablePage {
+ScrollablePage {
     id: page
     title: "License Notes"
 
     Text {
-        id: off_attribution
+        id: licenseNotes
 
         // License notes text.
         //   (The Open Food Facts license note is as required by OdBL sections 4.2 and 4.3.)

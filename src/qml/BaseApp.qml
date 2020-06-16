@@ -2,7 +2,7 @@
 // See README.md for the reasoning. Correspondingly, requiring QtQuick versions up to 2.12 is
 // allowed as per https://doc.qt.io/qt-5/qtquickcontrols-index.html#versions
 import QtQuick 2.12
-import QtQuick.Controls 2.12 as Controls
+import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
 
 // The application depends on the Kirigami version provided in Ubuntu 20.04 LTS.
@@ -10,12 +10,15 @@ import QtQuick.Layouts 1.2
 // TOOD Increase the version number to the version provided by Ubuntu 20.04 (by trial&error).
 //   Ubuntu 19.10 provides 2.10, and Ubuntu 20.04 LTS may provide a higher version. Also
 //   change this in all other QML files of the project.
-import org.kde.kirigami 2.10 as Kirigami
+import org.kde.kirigami 2.10
 
 // Container for every control element the app has.
 //   (Used as-is on desktop. For mobile, wrapped via MobileApp.qml.)
-Kirigami.ApplicationWindow {
+ApplicationWindow {
     id: root
+
+    // The window title.
+    title: "Food Rescue App"
 
     // Main content area.
     Component {
@@ -30,10 +33,10 @@ Kirigami.ApplicationWindow {
         // Kirigami Gallery App.
         //   Documentation: PageRow::globalToolBar, see https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1PageRow.html#a8d9e50b817d9d28e9322f9a6ac75fc8d
         //   TOOD: Try to enable "ToolBar" style for tablets at least.
-        if (Kirigami.Settings.isMobile)
-            root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.Breadcrumb
+        if (Settings.isMobile)
+            root.pageStack.globalToolBar.style = ApplicationHeaderStyle.Breadcrumb
         else
-            root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.ToolBar
+            root.pageStack.globalToolBar.style = ApplicationHeaderStyle.ToolBar
 
         // TODO: Fix that by default, the button style in the globalToolBar is
         // "Controls.Button.TextBesideIcon". We want "Controls.Button.IconOnly". See:
@@ -41,7 +44,7 @@ Kirigami.ApplicationWindow {
     }
 
     // Left sidebar drawer with the main menu.
-    globalDrawer: Kirigami.GlobalDrawer {
+    globalDrawer: GlobalDrawer {
         title: "Food Rescue"
 
         // TODO: Replace the icon with a circular, SVG version.
@@ -50,32 +53,32 @@ Kirigami.ApplicationWindow {
         actions: [
 
             // TODO: Add a separator line here, to separate from any menu items above.
-            Kirigami.Action {
+            Action {
                 text: "History"
             },
 
-            Kirigami.Action {
+            Action {
                 text: "Bookmarks"
             },
 
-            Kirigami.Action {
+            Action {
                 text: "Settings"
                 icon.name: "configure"
             },
 
-            Kirigami.Action {
+            Action {
                 separator: true
             },
 
-            Kirigami.Action {
+            Action {
                 text: "Help"
             },
 
-            Kirigami.Action {
+            Action {
                 text: "Feedback"
             },
 
-            Kirigami.Action {
+            Action {
                 text: "About"
                 icon.name: "help-about"
 
@@ -86,7 +89,7 @@ Kirigami.ApplicationWindow {
                 }
             },
 
-            Kirigami.Action {
+            Action {
                 text: "License Notes"
                 icon.name: "help-about"
                 onTriggered: {

@@ -132,7 +132,7 @@ find_package(
     Qt5 ${REQUIRED_QT_VERSION}
     REQUIRED
     NO_MODULE
-    COMPONENTS Core Qml Gui Svg QuickControls2
+    COMPONENTS Core Gui Qml QuickControls2 Svg Sql
 )
 
 # Require the package providing library Qt5::AndroidExtras, as needed in src/CMakeLists.txt.

@@ -3,6 +3,7 @@
 # Application C++ source files to compile.
 set(foodrescue_SRCS
     main.cpp
+    ContentDatabase.cpp
 )
 
 # Qt Resource Collection (.qrc) files.
@@ -102,6 +103,7 @@ target_link_libraries(foodrescue
     Qt5::Quick
     Qt5::Qml
     Qt5::Svg
+    Qt5::Sql
     ${foodrescue_EXTRA_LIBS}
 )
 

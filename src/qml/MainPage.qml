@@ -3,6 +3,9 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.10
 
+// Import our custom QML components ("ContentDatabase" etc.), exported in main.cpp.
+import local 1.0 as Local
+
 // Page shown at startup of the application.
 // Shows the main area of the application, which contains every control element except the sidebar
 // drawer and any layers / drawers added on top.
@@ -17,6 +20,10 @@ ScrollablePage {
     Layout.fillWidth: true
     keyboardNavigationEnabled: true
     horizontalScrollBarPolicy: ScrollBar.AlwaysOff
+
+    Local.ContentDatabase {
+        id: database
+    }
 
     // Define the page toolbar's contents.
     //   A toolbar can have left / main / right / context buttons. The read-only property
@@ -55,7 +62,7 @@ ScrollablePage {
             Layout.fillWidth: true
 
             TextField {
-                id: address_bar
+                id: addressBar
                 Layout.fillWidth: true
                 focus: true
 
@@ -63,21 +70,21 @@ ScrollablePage {
                 Keys.onReleased: {
                     console.log("key release event")
                     if(text.length > 0){
-                         mButtonSearch.enabled = true
+                         goButton.enabled = true
                     }
                     else {
-                        mButtonSearch.enabled = false
+                        goButton.enabled = false
                     }
                 }
             }
 
             Button {
-                id: mButtonSearch
+                id: goButton
                 text: "Go"
                 enabled: false
                 onClicked: {
                     console.log("button click event")
-                    // mOutputText.text = mydb.search(mInputText.text)
+                    browserContent.text = database.search(addressBar.text)
                 }
             }
 
@@ -86,7 +93,7 @@ ScrollablePage {
         }
 
         Text {
-            id: browser_content
+            id: browserContent
 
             text: '
                 <html>
