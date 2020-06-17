@@ -8,6 +8,7 @@
 #include <QQmlApplicationEngine>
 #include <QDebug>
 #include "ContentDatabase.h"
+#include "utilities.h"
 
 // Export main() as part of a library interface. Needed on Android.
 //   Q_DECL_EXPORT is a Qt MOC macro that exposes main() as part of the interface of a
@@ -30,9 +31,7 @@ int main(int argc, char *argv[]) {
 
     // Create and initialize the Food Rescue SQLite3 database connection.
     ContentDatabase db;
-    db.databaseConnect();
-    db.databaseInit();
-    db.databasePopulate();
+    db.connect();
 
     // Make the Food Rescue database available for use in QML.
     // TODO: Better than registering the type to be instantiated in QML, provide the above "db"

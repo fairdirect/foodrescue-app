@@ -15,11 +15,9 @@ class ContentDatabase : public QObject {
 public:
     explicit ContentDatabase (QObject* parent = 0);
 
-    Q_INVOKABLE QString search(QString mInputText);
+    void connect();
 
-    void databaseConnect();
-    void databaseInit();
-    void databasePopulate();
+    Q_INVOKABLE QString search(QString mInputText);
 };
 
 #endif // CONTENTDATABASE_H

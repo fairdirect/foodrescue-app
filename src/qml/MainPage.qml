@@ -7,8 +7,8 @@ import org.kde.kirigami 2.10
 import local 1.0 as Local
 
 // Page shown at startup of the application.
-// Shows the main area of the application, which contains every control element except the sidebar
-// drawer and any layers / drawers added on top.
+//   Shows the main area of the application, which contains every control element except the
+//   sidebar drawer and any layers / drawers added on top.
 ScrollablePage {
 
     id: page
@@ -66,7 +66,15 @@ ScrollablePage {
                 Layout.fillWidth: true
                 focus: true
 
-                placeholderText: "barcode or category"
+                placeholderText: "barcode number"
+
+                // When the user finishes editing the text field.
+                //   (On desktop, this requires pressing "Return". Moving focus does not count.)
+                onAccepted: {
+                    console.log("text field 'accepted' event")
+                    browserContent.text = database.search(addressBar.text)
+                }
+
                 Keys.onReleased: {
                     console.log("key release event")
                     if(text.length > 0){
