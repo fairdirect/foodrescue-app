@@ -2,14 +2,14 @@
 
 # Do not allow in-source builds.
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
-   message(FATAL_ERROR "foodrescue-app requires an out of source build. Please create a separate build directory and run 'cmake path_to_kirigami [options]' there.")
+   message(FATAL_ERROR "This application requires an out-of-source build. Please create a separate build directory and run 'cmake path_to_kirigami [options]' there.")
 endif()
 
 
 # ################# Project configuration #############################################################
 
 # Require CMake ≥3.3 to get the IN_LIST operator.
-# Required before up here before any use of the required language features.
+#   Required up here, before any usage of the affected language features.
 cmake_minimum_required(VERSION 3.0)
 
 # Project name and version. Also enables "CXX" language
@@ -132,7 +132,16 @@ find_package(
     Qt5 ${REQUIRED_QT_VERSION}
     REQUIRED
     NO_MODULE
-    COMPONENTS Core Gui Qml QuickControls2 Svg Sql
+    COMPONENTS
+        Core
+        Gui
+        Qml
+        QuickControls2
+        Svg
+        Sql
+        Multimedia # Needed by the barcode scanner.
+        Concurrent # Needed by the barcode scanner.
+        Quick      # Needed by the barcode scanner.
 )
 
 # Require the package providing library Qt5::AndroidExtras, as needed in src/CMakeLists.txt.

@@ -7,8 +7,11 @@
 
 #include <QQmlApplicationEngine>
 #include <QDebug>
+
 #include "ContentDatabase.h"
 #include "utilities.h"
+#include "QZXingNu.h"
+#include "QZXingNuFilter.h"
 
 // Export main() as part of a library interface. Needed on Android.
 //   Q_DECL_EXPORT is a Qt MOC macro that exposes main() as part of the interface of a
@@ -28,6 +31,17 @@ int main(int argc, char *argv[]) {
         // Our QuickControls2 style for desktops requires a QApplication.
         QApplication app(argc, argv);
     #endif
+
+    // Make the barcode component available for use with Qt meta-objects and in QML.
+    qRegisterMetaType<QZXingNu::QZXingNuDecodeResult>("QZXingNuDecodeResult");
+    qRegisterMetaType<QZXingNu::DecodeStatus>("DecodeStatus");
+    qRegisterMetaType<QZXingNu::BarcodeFormat>("BarcodeFormat");
+    qRegisterMetaType<QZXingNu::QZXingNuDecodeResult>("QZXingNuDecodeResult");
+    qmlRegisterUncreatableMetaObject(
+        QZXingNu::staticMetaObject, "com.github.swex.QZXingNu", 1, 0, "QZXingNu", "Error: only enums allowed"
+    );
+    qmlRegisterType<QZXingNu::QZXingNuFilter>("com.github.swex.QZXingNu", 1, 0, "QZXingNuFilter");
+    qmlRegisterType<QZXingNu::QZXingNu>("com.github.swex.QZXingNu", 1, 0, "QZXingNu");
 
     // Create and initialize the Food Rescue SQLite3 database connection.
     ContentDatabase db;

@@ -52,7 +52,15 @@ ApplicationWindow {
 
         actions: [
 
-            // TODO: Add a separator line here, to separate from any menu items above.
+            Action {
+                text: "Scan"
+                onTriggered: {
+                    pageStack.layers.push(
+                        Qt.resolvedUrl("Scanner.qml")
+                    );
+                }
+            },
+
             Action {
                 text: "History"
             },

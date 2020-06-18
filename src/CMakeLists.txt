@@ -3,7 +3,10 @@
 # Application C++ source files to compile.
 set(foodrescue_SRCS
     main.cpp
+    utilities.cpp
     ContentDatabase.cpp
+    QZXingNu.cpp
+    QZXingNuFilter.cpp
 )
 
 # Qt Resource Collection (.qrc) files.
@@ -90,8 +93,27 @@ endif()
 
 # ################# Compilation and installation ###################################################
 
+# Tell the compiler where to find the header files of the ZXingCore library.
+#   The swex/zxing-cpp fork used here does not support the find(ZXingCore) mechanism. So this is
+#   unfortunately the only option right now. See https://github.com/swex/zxing-cpp/
+#
+#   Do NOT put this into this project's source tree for inclusion with
+#   add_subdirectory(…). That provides a different environment for compilation, resulting in a
+#   failure to compile zxing-cpp.
+include_directories(/home/matthias/Projects/Fairdirect.Food_Rescue_App/Repo.qzxingnu)
+
+# Tell the linker where it can find the ZXingCore library mentioned below.
+#   The swex/zxing-cpp fork used here does not support the find(ZXingCore) mechanism. So this is
+#   unfortunately the only option right now. See https://github.com/swex/zxing-cpp/
+link_directories(
+    /home/matthias/Projects/Fairdirect.Food_Rescue_App/Repo.qzxingnu/build/My_Desktop_Kit_for_Kirigami.Release/zxing-cpp/core
+)
+
 # Define executable to generate, and its required inputs.
-#   (Represented as "[hammer icon] foodrescue" in the Qt Creator project outline.)
+#   Represented as "[hammer icon] foodrescue" in the Qt Creator project outline.
+#
+#   Order is important: this has to come after all include_directories() and link_directories()
+#   relevant for this command.
 add_executable(foodrescue ${foodrescue_SRCS} ${RESOURCES})
 
 # Link all required libraries with the executable.
@@ -104,6 +126,10 @@ target_link_libraries(foodrescue
     Qt5::Qml
     Qt5::Svg
     Qt5::Sql
+    Qt5::Multimedia  # Needed for the barcode scanner.
+    Qt5::Gui         # Needed for the barcode scanner.
+    Qt5::Concurrent  # Needed for the barcode scanner.
+    ZXingCore        # Needed for the barcode scanner.
     ${foodrescue_EXTRA_LIBS}
 )
 
