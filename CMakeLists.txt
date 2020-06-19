@@ -91,8 +91,17 @@ set(QML_IMPORT_PATH ${QML_IMPORT_PATH}
 set(CMAKE_AUTOMOC ON)
 set(AUTOMOC_MOC_OPTIONS "-Muri=org.kde.kirigami")
 
-# TODO: What's this?
-add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
+# Set compilation flags.
+add_definitions(
+    # Needed for linking with the ZXing library starting from a certain commit between
+    # 1.0.7 and 1.0.8. Because ZXing code throws exceptions.
+    -fexceptions
+
+    # Helps to catch implicit conversion of filenames to URLs by making it illegal, so you can
+    # write code to properly convert to a file:// URL or something. See documentation at:
+    # https://doc.qt.io/qt-5/qurl.html#QT_NO_URL_CAST_FROM_STRING
+    -DQT_NO_URL_CAST_FROM_STRING
+)
 
 # Enable C++11 features for clang and gcc.
 set(CMAKE_CXX_STANDARD 11)
@@ -125,7 +134,7 @@ include(ECMPoQmTools)
 include(ECMQMLModules)
 
 
-# ################# Application dependencies (packages, QML modules) ###############################
+# ################# Application dependencies (CMake packages, QML modules) #########################
 
 # Find the Qt installation.
 find_package(
@@ -152,6 +161,14 @@ endif()
 # Find Kirigami and other relevant KDE components.
 find_package(KF5Kirigami2 REQUIRED)
 # find_package(KF5I18n) # TODO: Add when starting to use i18n.
+
+# Find ZXing (C++ ported version).
+#   Source: https://github.com/nu-book/zxing-cpp .
+#   Latest tested version that works: commit ed55911. See its CMakeLists.txt for version numbers.
+#
+#   CMake package name is ZXing, even though the CMake project name at that revision is ZXingCpp.
+#   Because, the file CMake is looking for exists as ./build/ZXingConfig.cmake.
+# find_package(ZXing)
 
 # Include specific QML modules. (Example; enable when needed.)
 # ecm_find_qmlmodule(QtGraphicalEffects 1.0)

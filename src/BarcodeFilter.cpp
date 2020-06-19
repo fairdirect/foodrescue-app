@@ -5,12 +5,12 @@
 #include <QtConcurrent>
 #include <functional>
 #include <memory>
-#include <zxing-cpp/core/src/BarcodeFormat.h>
-#include <zxing-cpp/core/src/DecodeHints.h>
-#include <zxing-cpp/core/src/GenericLuminanceSource.h>
-#include <zxing-cpp/core/src/HybridBinarizer.h>
-#include <zxing-cpp/core/src/MultiFormatReader.h>
-#include <zxing-cpp/core/src/Result.h>
+#include <core/src/BarcodeFormat.h>
+#include <core/src/DecodeHints.h>
+#include <core/src/GenericLuminanceSource.h>
+#include <core/src/HybridBinarizer.h>
+#include <core/src/MultiFormatReader.h>
+#include <core/src/Result.h>
 
 #include "BarcodeFilter.h"
 #include "BarcodeScanner.h"

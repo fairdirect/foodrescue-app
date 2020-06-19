@@ -106,14 +106,12 @@ endif()
 #   Do NOT put this into this project's source tree for inclusion with
 #   add_subdirectory(…). That provides a different environment for compilation, resulting in a
 #   failure to compile zxing-cpp.
-include_directories(/home/matthias/Projects/Fairdirect.Food_Rescue_App/Repo.qzxingnu)
+include_directories(/home/matthias/Projects/Fairdirect.Food_Rescue_App/Repo.zxing-cpp)
 
 # Tell the linker where it can find the ZXingCore library mentioned below.
 #   The swex/zxing-cpp fork used here does not support the find(ZXingCore) mechanism. So this is
 #   unfortunately the only option right now. See https://github.com/swex/zxing-cpp/
-link_directories(
-    /home/matthias/Projects/Fairdirect.Food_Rescue_App/Repo.qzxingnu/build/My_Desktop_Kit_for_Kirigami.Release/zxing-cpp/core
-)
+link_directories(/home/matthias/Projects/Fairdirect.Food_Rescue_App/Repo.zxing-cpp/build/core)
 
 # Define executable to generate, and its required inputs.
 #   Represented as "[hammer icon] foodrescue" in the Qt Creator project outline.
@@ -135,7 +133,7 @@ target_link_libraries(foodrescue
     Qt5::Multimedia  # Needed for the barcode scanner.
     Qt5::Gui         # Needed for the barcode scanner.
     Qt5::Concurrent  # Needed for the barcode scanner.
-    ZXingCore        # Needed for the barcode scanner.
+    ZXing            # Needed for the barcode scanner.
     ${foodrescue_EXTRA_LIBS}
 )
 
