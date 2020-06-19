@@ -10,6 +10,6 @@
         <file>android/res/drawable-ldpi/icon.png</file>
         <file>android/res/drawable-mdpi/icon.png</file>
         <file>qml/AboutPage.qml</file>
-        <file>qml/Scanner.qml</file>
+        <file>qml/ScannerPage.qml</file>
     </qresource>
 </RCC>

@@ -8,10 +8,10 @@
 #include <QQmlApplicationEngine>
 #include <QDebug>
 
+#include "BarcodeScanner.h"
+#include "BarcodeFilter.h"
 #include "ContentDatabase.h"
 #include "utilities.h"
-#include "QZXingNu.h"
-#include "QZXingNuFilter.h"
 
 // Export main() as part of a library interface. Needed on Android.
 //   Q_DECL_EXPORT is a Qt MOC macro that exposes main() as part of the interface of a
@@ -33,15 +33,17 @@ int main(int argc, char *argv[]) {
     #endif
 
     // Make the barcode component available for use with Qt meta-objects and in QML.
-    qRegisterMetaType<QZXingNu::QZXingNuDecodeResult>("QZXingNuDecodeResult");
-    qRegisterMetaType<QZXingNu::DecodeStatus>("DecodeStatus");
-    qRegisterMetaType<QZXingNu::BarcodeFormat>("BarcodeFormat");
-    qRegisterMetaType<QZXingNu::QZXingNuDecodeResult>("QZXingNuDecodeResult");
+    qRegisterMetaType<Barcode::Format>("BarcodeFormat");
+    // TODO: Perhaps rename the QML types to "BarcodeDecodeStatus" etc.. But since they are
+    //   typically not used in QML in client code, it does not matter much.
+    qRegisterMetaType<Barcode::DecodeStatus>("DecodeStatus");
+    qRegisterMetaType<Barcode::DecodeResult>("DecodeResult");
+
     qmlRegisterUncreatableMetaObject(
-        QZXingNu::staticMetaObject, "com.github.swex.QZXingNu", 1, 0, "QZXingNu", "Error: only enums allowed"
+        Barcode::staticMetaObject, "local", 1, 0, "BarcodeFormat", "Error: only enums allowed"
     );
-    qmlRegisterType<QZXingNu::QZXingNuFilter>("com.github.swex.QZXingNu", 1, 0, "QZXingNuFilter");
-    qmlRegisterType<QZXingNu::QZXingNu>("com.github.swex.QZXingNu", 1, 0, "QZXingNu");
+    qmlRegisterType<BarcodeFilter>("local", 1, 0, "BarcodeFilter");
+    qmlRegisterType<BarcodeScanner>("local", 1, 0, "BarcodeScanner");
 
     // Create and initialize the Food Rescue SQLite3 database connection.
     ContentDatabase db;

@@ -89,6 +89,10 @@ Eventually you will be able to install the software comfortably as follows:
 
 # 3. Usage
 
+Some tips for using the application:
+
+* Place the barcode near or at the top of the camera viewfinder. Since the application starts looking for barcodes at the top, this will lead to the fastest results of finding a barcode.
+
 The following keyboard combinations are available:
 
 * **Close the application.** Ctrl + Q (Kirigami default)

@@ -1,12 +1,18 @@
 # ################# Lists to maintain manually #####################################################
 
 # Application C++ source files to compile.
+#   If you have a .cpp file that includes a corresponding .h file, only add the .cpp file.
+#   If you have a .h file without a corresponding .cpp file, add that .h file. Otherwise,
+#   Qt's MOC will not know about that .h file (even though it's included from other files!)
+#   and fail to generate a *_moc.cpp file for it. That would lead to hard to debug errors,
+#   such as "undefined reference to "Something::staticMetaObject".
 set(foodrescue_SRCS
     main.cpp
     utilities.cpp
     ContentDatabase.cpp
-    QZXingNu.cpp
-    QZXingNuFilter.cpp
+    BarcodeScanner.cpp
+    BarcodeFilter.cpp
+    Barcode.h
 )
 
 # Qt Resource Collection (.qrc) files.

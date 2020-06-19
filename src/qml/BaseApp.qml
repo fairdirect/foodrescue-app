@@ -56,7 +56,7 @@ ApplicationWindow {
                 text: "Scan"
                 onTriggered: {
                     pageStack.layers.push(
-                        Qt.resolvedUrl("Scanner.qml")
+                        Qt.resolvedUrl("ScannerPage.qml")
                     );
                 }
             },

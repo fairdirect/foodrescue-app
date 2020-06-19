@@ -1,5 +1,3 @@
-#include "QZXingNuFilter.h"
-#include "QZXingNu.h"
 #include <QFutureWatcher>
 #include <QPointer>
 #include <QVariant>
@@ -14,26 +12,35 @@
 #include <zxing-cpp/core/src/MultiFormatReader.h>
 #include <zxing-cpp/core/src/Result.h>
 
-namespace QZXingNu {
+#include "BarcodeFilter.h"
+#include "BarcodeScanner.h"
 
-//as qt_imageFromVideoFrame is not public and stopped working for me in 5.13.1 I took frame2image convert code from from https://github.com/ftylitak/qzxing
+/**
+ * Code to convert video frames to images.
+ *
+ * The code originates from qzxing, another QML wrapper for the ZXing barcode scanner; see
+ * https://github.com/ftylitak/qzxing . Previously, the Qt function qt_imageFromVideoFrame was
+ * used. But it does not belong to the public Qt interface and stopped working in Qt 5.13.1.
+ *
+ * Placed into an anonmymous namespace to prevent usage outside of this file.
+ */
 namespace {
     struct CaptureRect;
+
     static QImage* rgbDataToGrayscale(const uchar* data, const CaptureRect& captureRect,
         const int alpha, const int red,
         const int green, const int blue,
         const bool isPremultiplied = false);
-    bool isRectValid(const QRect& rect)
-    {
+
+    bool isRectValid(const QRect& rect) {
         return rect.x() >= 0 && rect.y() >= 0 && rect.isValid();
     }
 
-    uchar gray(uchar r, uchar g, uchar b)
-    {
+    uchar gray(uchar r, uchar g, uchar b) {
         return (306 * (r & 0xFF) + 601 * (g & 0xFF) + 117 * (b & 0xFF) + 0x200) >> 10;
     }
-    uchar yuvToGray(uchar Y, uchar U, uchar V)
-    {
+
+    uchar yuvToGray(uchar Y, uchar U, uchar V) {
         const int C = int(Y) - 16;
         const int D = int(U) - 128;
         const int E = int(V) - 128;
@@ -43,8 +50,7 @@ namespace {
             qBound(0, ((298 * C + 516 * D + 128) >> 8), 255));
     }
 
-    uchar yuvToGray2(uchar y, uchar u, uchar v)
-    {
+    uchar yuvToGray2(uchar y, uchar u, uchar v) {
         double rD = y + 1.4075 * (v - 128);
         double gD = y - 0.3455 * (u - 128) - (0.7169 * (v - 128));
         double bD = y + 1.7790 * (u - 128);
@@ -65,9 +71,7 @@ namespace {
             , endX(startX + targetWidth)
             , startY(isValid ? captureRect.y() : 0)
             , targetHeight(isValid ? captureRect.height() : sourceHeight)
-            , endY(startY + targetHeight)
-        {
-        }
+            , endY(startY + targetHeight) { }
 
         bool isValid;
         char pad[3]; // avoid warning about padding
@@ -83,6 +87,7 @@ namespace {
         int targetHeight;
         int endY;
     };
+
     struct VideoFrameData {
         QByteArray data;
         QSize size;
@@ -99,8 +104,8 @@ namespace {
         }
     };
 
-    QImage* convertFrameToImage(QVideoFrame* input)
-    {
+    QImage* convertFrameToImage(QVideoFrame* input) {
+
         VideoFrameData simpleFrame(input);
 
         const int width = input->size().width();
@@ -247,20 +252,20 @@ namespace {
 
 }
 
-class QZXingNuFilterRunnable : public QObject, public QVideoFilterRunnable {
 
-    QZXingNuFilter *m_filter = nullptr;
+class BarcodeFilterRunnable : public QObject, public QVideoFilterRunnable {
+
+    BarcodeFilter *m_filter = nullptr;
 
 public:
-    explicit QZXingNuFilterRunnable(QZXingNuFilter *filter, QObject *parent = nullptr)
+    explicit BarcodeFilterRunnable(BarcodeFilter *filter, QObject *parent = nullptr)
         : QObject(parent)
-        , m_filter(filter)
-    {
-    }
+        , m_filter(filter) { }
 
     QVideoFrame run(QVideoFrame *input, const QVideoSurfaceFormat & /*surfaceFormat*/,
-                    RunFlags /*flags*/) override
-    {
+        RunFlags /*flags*/
+    ) override {
+
         static auto ourIdealThreadCount = m_filter->m_threadPool->maxThreadCount();
         if (m_filter == nullptr) {
             qWarning() << "filter null";
@@ -276,10 +281,10 @@ public:
         auto image_ptr = convertFrameToImage(input);
         m_filter->m_decodersRunning++;
 
-        auto bound = std::bind(&QZXingNu::decodeImage, m_filter->m_qzxingNu, std::placeholders::_1);
-        auto watcher = new QFutureWatcher<QZXingNuDecodeResult>();
-        QPointer<QZXingNuFilter> filterPointer(m_filter);
-        QObject::connect(watcher, &QFutureWatcher<QZXingNuDecodeResult>::finished, this,
+        auto bound = std::bind(&BarcodeScanner::decodeImage, m_filter->m_scanner, std::placeholders::_1);
+        auto watcher = new QFutureWatcher<Barcode::DecodeResult>();
+        QPointer<BarcodeFilter> filterPointer(m_filter);
+        QObject::connect(watcher, &QFutureWatcher<Barcode::DecodeResult>::finished, this,
             [watcher, image_ptr, filterPointer]() {
                 if (!filterPointer.isNull()) {
                     filterPointer->m_decodersRunning--;
@@ -294,47 +299,47 @@ public:
     }
 };
 
-QZXingNuFilter::QZXingNuFilter(QObject* parent)
+
+BarcodeFilter::BarcodeFilter(QObject* parent)
     : QAbstractVideoFilter(parent)
-    , m_threadPool(new QThreadPool(this))
-{
+    , m_threadPool(new QThreadPool(this)) {
+
     m_threadPool->setMaxThreadCount(QThread::idealThreadCount() > 1
             ? QThread::idealThreadCount() - 1
             : QThread::idealThreadCount());
-    connect(this, &QZXingNuFilter::qzxingNuChanged, this, [this]() {
-        connect(m_qzxingNu, &QZXingNu::decodeResultChanged, this, &QZXingNuFilter::setDecodeResult);
+    connect(this, &BarcodeFilter::scannerChanged, this, [this]() {
+        connect(m_scanner, &BarcodeScanner::decodeResultChanged, this, &BarcodeFilter::setDecodeResult);
     });
-    connect(this, &QZXingNuFilter::decodeResultChanged, this,
+    connect(this, &BarcodeFilter::decodeResultChanged, this,
             [this]() { emit tagFound(m_decodeResult.text); });
 }
 
-QVideoFilterRunnable *QZXingNuFilter::createFilterRunnable()
-{
-    return new QZXingNuFilterRunnable(this);
+
+QVideoFilterRunnable *BarcodeFilter::createFilterRunnable() {
+    return new BarcodeFilterRunnable(this);
 }
 
-QZXingNu *QZXingNuFilter::qzxingNu() const
-{
-    return m_qzxingNu;
+
+BarcodeScanner *BarcodeFilter::scanner() const {
+    return m_scanner;
 }
 
-QZXingNuDecodeResult QZXingNuFilter::decodeResult() const
-{
+
+Barcode::DecodeResult BarcodeFilter::decodeResult() const {
     return m_decodeResult;
 }
 
-void QZXingNuFilter::setQzxingNu(QZXingNu *qzxingNu)
-{
-    if (m_qzxingNu == qzxingNu)
+
+void BarcodeFilter::setScanner(BarcodeScanner *scanner) {
+    if (m_scanner == scanner)
         return;
 
-    m_qzxingNu = qzxingNu;
-    emit qzxingNuChanged(m_qzxingNu);
+    m_scanner = scanner;
+    emit scannerChanged(m_scanner);
 }
 
-void QZXingNuFilter::setDecodeResult(QZXingNuDecodeResult decodeResult)
-{
+
+void BarcodeFilter::setDecodeResult(Barcode::DecodeResult decodeResult) {
     m_decodeResult = decodeResult;
     emit decodeResultChanged(m_decodeResult);
 }
-} // namespace QZXingNu

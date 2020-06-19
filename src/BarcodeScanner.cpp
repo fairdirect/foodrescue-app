@@ -1,5 +1,3 @@
-#include "QZXingNu.h"
-#include "QZXingNuFilter.h"
 #include <QCoreApplication>
 #include <QtQml/QQmlEngine>
 #include <zxing-cpp/core/src/BarcodeFormat.h>
@@ -9,7 +7,8 @@
 #include <zxing-cpp/core/src/MultiFormatReader.h>
 #include <zxing-cpp/core/src/Result.h>
 
-namespace QZXingNu {
+#include "BarcodeScanner.h"
+#include "BarcodeFilter.h"
 
 using ZXingFormats = std::vector<ZXing::BarcodeFormat>;
 using ZXing::DecodeHints;
@@ -18,8 +17,7 @@ using ZXing::HybridBinarizer;
 using ZXing::MultiFormatReader;
 using ZXing::Result;
 
-static QVector<QPointF> toQVectorOfQPoints(const std::vector<ZXing::ResultPoint>& points)
-{
+static QVector<QPointF> toQVectorOfQPoints(const std::vector<ZXing::ResultPoint>& points) {
     QVector<QPointF> result;
     for (const auto& point : points) {
         result.append(QPointF(point.x(), point.y()));
@@ -27,17 +25,16 @@ static QVector<QPointF> toQVectorOfQPoints(const std::vector<ZXing::ResultPoint>
     return result;
 }
 
-static QZXingNuDecodeResult toQZXingNuDecodeResult(const ZXing::Result& result)
-{
-    return { static_cast<DecodeStatus>(result.status()),
-        static_cast<BarcodeFormat>(result.format()),
+static Barcode::DecodeResult toDecodeResult(const ZXing::Result& result) {
+    return { static_cast<Barcode::DecodeStatus>(result.status()),
+        static_cast<Barcode::Format>(result.format()),
         QString::fromStdWString(result.text()),
         QByteArray(result.rawBytes().charPtr(), result.rawBytes().length()),
         toQVectorOfQPoints(result.resultPoints()),
         result.isValid() };
 }
-static ZXingFormats zxingFormats(const QVector<int>& from)
-{
+
+static ZXingFormats zxingFormats(const QVector<int>& from) {
     ZXingFormats result;
     result.reserve(static_cast<ZXingFormats::size_type>(from.size()));
     std::transform(from.begin(), from.end(), std::back_inserter(result),
@@ -45,34 +42,27 @@ static ZXingFormats zxingFormats(const QVector<int>& from)
     return result;
 }
 
-QZXingNu::QZXingNu(QObject* parent)
-    : QObject(parent)
-{
-    connect(this, &QZXingNu::queueDecodeResult, this, &QZXingNu::setDecodeResult);
+BarcodeScanner::BarcodeScanner(QObject* parent) : QObject(parent) {
+    connect(this, &BarcodeScanner::queueDecodeResult, this, &BarcodeScanner::setDecodeResult);
 }
 
-QVector<int> QZXingNu::formats() const
-{
+QVector<int> BarcodeScanner::formats() const {
     return m_formats;
 }
 
-bool QZXingNu::tryHarder() const
-{
+bool BarcodeScanner::tryHarder() const {
     return m_tryHarder;
 }
 
-bool QZXingNu::tryRotate() const
-{
+bool BarcodeScanner::tryRotate() const {
     return m_tryRotate;
 }
 
-QZXingNuDecodeResult QZXingNu::decodeResult() const
-{
+Barcode::DecodeResult BarcodeScanner::decodeResult() const {
     return m_decodeResult;
 }
 
-QZXingNuDecodeResult QZXingNu::decodeImage(const QImage& image)
-{
+Barcode::DecodeResult BarcodeScanner::decodeImage(const QImage& image) {
     // reentrant
     auto luminanceSource = std::make_shared<GenericLuminanceSource>(image.width(), image.height(), image.bits(), image.bytesPerLine());
     DecodeHints hints;
@@ -81,17 +71,16 @@ QZXingNuDecodeResult QZXingNu::decodeImage(const QImage& image)
     hints.setTryHarder(m_tryHarder);
     hints.setTryRotate(m_tryRotate);
     MultiFormatReader reader(hints);
-    auto result = reader.read(HybridBinarizer(luminanceSource));
-    if (result.isValid()) {
-        auto qzxingResult = toQZXingNuDecodeResult(result);
-        emit queueDecodeResult(qzxingResult);
-        return qzxingResult;
+    auto readResult = reader.read(HybridBinarizer(luminanceSource));
+    if (readResult.isValid()) {
+        auto result = toDecodeResult(readResult);
+        emit queueDecodeResult(result);
+        return result;
     }
     return {};
 }
 
-void QZXingNu::setFormats(QVector<int> formats)
-{
+void BarcodeScanner::setFormats(QVector<int> formats) {
     if (m_formats == formats)
         return;
 
@@ -99,8 +88,7 @@ void QZXingNu::setFormats(QVector<int> formats)
     emit formatsChanged(m_formats);
 }
 
-void QZXingNu::setTryHarder(bool tryHarder)
-{
+void BarcodeScanner::setTryHarder(bool tryHarder) {
     if (m_tryHarder == tryHarder)
         return;
 
@@ -108,8 +96,7 @@ void QZXingNu::setTryHarder(bool tryHarder)
     emit tryHarderChanged(m_tryHarder);
 }
 
-void QZXingNu::setTryRotate(bool tryRotate)
-{
+void BarcodeScanner::setTryRotate(bool tryRotate) {
     if (m_tryRotate == tryRotate)
         return;
 
@@ -117,9 +104,7 @@ void QZXingNu::setTryRotate(bool tryRotate)
     emit tryRotateChanged(m_tryRotate);
 }
 
-void QZXingNu::setDecodeResult(QZXingNuDecodeResult decodeResult)
-{
+void BarcodeScanner::setDecodeResult(Barcode::DecodeResult decodeResult) {
     m_decodeResult = decodeResult;
     emit decodeResultChanged(m_decodeResult);
 }
-} // namespace QZXingNu
