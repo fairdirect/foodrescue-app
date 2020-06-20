@@ -1,3 +1,20 @@
+/**
+ * Barcode scanner component, originally from https://github.com/swex/QZXingNu
+ *
+ * Authors and copyright:
+ *   © Alexey Mednyy (https://github.com/swex) 2018-2020
+ *   © Matthias Ansorg (https://github.com/tanius) 2020
+ *
+ * The authors license this file to you under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License. You may obtain a copy of the
+ * License at: http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied.  See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef BARCODE_H
 #define BARCODE_H
 
@@ -24,6 +41,7 @@ Q_NAMESPACE
 
 // TODO: This class is the same as ZXing::BarcodeFormat. Why can't we use that? Because like this,
 //   things break when ZXing::BarcodeFormat changes the assigned values. Which happened before.
+// TODO: Provide proper attribution to ZXing here, as this is code copied from them.
 enum class Format {
     // The values are an implementation detail. The c++ use-case (ZXFlags) could have been designed to such that, it
     // would not have been necessary to explicitly set the values to single bit constants. This has been done to ease

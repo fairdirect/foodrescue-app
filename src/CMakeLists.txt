@@ -21,42 +21,38 @@ qt5_add_resources(RESOURCES
     resources.qrc
 )
 
-# Dynamic libraries to include into the Android APK package.
-#   Libraries can be identified via the library name you'd give to "g++ -l…" or as absolute paths.
-#   Library names are preferable as they work across systems.
+# Dynamic libraries to link with the Android executable only (as they are only needed there).
 #
-#   Not meant for libraries that are automatically included by being referred to from the
-#   executable: "This can be used to include plugins that are not directly liked to executable, for
-#   example OpenSSL libs for QtNetwork SSL/HTTPS support." (https://phabricator.kde.org/D13198).
+#   These libraries are then linked with the executable below, see at:
+#   target_link_libraries(foodrescue … ${foodrescue_EXTRA_LIBS})
 #
-#   Not meant for desktop Linux systems, which will supply these libraries system-wide via package
-#   dependencies. TODO: What happens on iOS, Windows and Mac OS X?
+#   This mechanism is different from ANDROID_EXTRA_LIBS (https://phabricator.kde.org/D13198) which
+#   is meant to include libraries into the APK that are NOT directly linked with the executable.
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
     # Require the package that provides the Kirigami library we want to include.
     find_package(KF5Kirigami2 ${KF5_DEP_VERSION} REQUIRED)
 
     # This variable is used below in target_link_libraries(…).
     set(foodrescue_EXTRA_LIBS
-        # TODO: Including QQC2 this way should not be needed, as it is directly linked from the
-        # executable. Try if without this, the library still lands in the APK.
+        # TODO: Why is this only needed on Android? It should be necessary for the whole application.
+        # If so, it should be moved to target_link_libraries(foodrescue …) below.
         Qt5::QuickControls2
 
+        # TODO: Why is this only needed on Android? It should be necessary for the whole application.
+        # If so, it should be moved to target_link_libraries(foodrescue …) below.
         # TODO: Should not be needed, but without this the library is not in the APK and we get
         # "dlopen failed: library libQt5Concurrent.so not found" when the Android app starts.
-        # TODO: How to give the library in the named format? Qt5::Concurrent does not work.
+        # TODO: Give this library in the namespace naming format. Probably Qt5::Concurrent, but it
+        # does not work yet. Probably because find_package(Qt5 …) needs a component added, which
+        # might not be named "Concurrent".
         /opt/qt/5.12.4/android_armv7/lib/libQt5Concurrent.so
 
-        # TODO: Should not be needed, but without this the library is not in the APK and we get
-        # "dlopen failed: library libKF5Kirigami2.so not found" when the Android app starts.
+        # TODO: Why is this only needed on Android? It should be necessary for the whole application.
+        # If so, it should be moved to target_link_libraries(foodrescue …) below.
         KF5::Kirigami2
 
-        # TODO: Is this used at all? And if so, do we need to include it via extra libs?
+        # TODO: Is this used at all?
         Qt5::AndroidExtras
-
-        # TODO: Add when starting to use KDE i18n.
-        # TODO: Including KDE I18n this way should not be needed, as it is directly linked from the
-        # executable. Try if without this, the library still lands in the APK.
-        # KF5::I18n
     )
 endif()
 
@@ -106,11 +102,15 @@ endif()
 #   relevant for this command.
 add_executable(foodrescue ${foodrescue_SRCS} ${RESOURCES})
 
-# Link all required libraries with the executable.
+# List of libraries that have to be linked with the executable, whether dynamically or statically.
+#
+#   This provides the compiler with include dir paths and the linker with library paths.
+#
+#   Use ONLY names with double colons "::" in this list. That makes sure you use targets provided
+#   by find_package(…) above. Otherwise there is a fallback mechanism that will fails when the
+#   library is installed in a custom location (as necessary for Android for example). Details:
+#   https://github.com/nu-book/zxing-cpp/issues/132
 target_link_libraries(foodrescue
-    # TODO: Why are some Qt libraries here and some in ${foodrescue_EXTRA_LIBS}? No Qt
-    # library should need bundling for desktop targets, so all should be extra libs (only
-    # included for Android builds), no?
     Qt5::Core
     Qt5::Quick
     Qt5::Qml
@@ -119,7 +119,8 @@ target_link_libraries(foodrescue
     Qt5::Multimedia  # Needed for the barcode scanner.
     Qt5::Gui         # Needed for the barcode scanner.
     Qt5::Concurrent  # Needed for the barcode scanner.
-    ZXing            # Needed for the barcode scanner.
+    ZXing::ZXing     # Needed for the barcode scanner.
+    # KF5::I18n      # TODO: Add when starting to use KDE i18n.
     ${foodrescue_EXTRA_LIBS}
 )
 
