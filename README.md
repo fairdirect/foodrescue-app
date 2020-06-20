@@ -199,7 +199,11 @@ While the Android platform and Qt library interfaces are mature and almost alway
     sudo checkinstall --pkgname extra-cmake-modules --pkgversion 5.70.0 make install
     ```
 
-3. **Install KDE Kirigami 5.68.0 or higher.** [As provided](https://launchpad.net/ubuntu/focal/amd64/kirigami2-dev) under Ubuntu 20.04 LTS and installed there with:
+3. **Install Qt 5.12.0 or up to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2) (see below). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
+
+    In principle, you could also install Qt 5.13 or higher. Qt 5.13 or higher for desktop Linux applications as installed here works fine out of the box. However, it is advisable to keep the Qt versions for desktop Linux and Android the same to avoid surprises. And when installing Qt 5.13 or higher for Android, additional steps will be needed, as detailed in chapter [5.4. Android Development Setup](#54-android-development-setup) below.
+
+4. **Install KDE Kirigami 5.68.0 or higher.** [As provided](https://launchpad.net/ubuntu/focal/amd64/kirigami2-dev) under Ubuntu 20.04 LTS and installed there with:
 
     ```
     sudo apt install kirigami2-dev libkf5kirigami2-doc
@@ -209,11 +213,23 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
     Note that KDE Kirigami is a lightweight library independent of the KDE Plasma desktop environment – it has no dependencies beyond Qt, and you don't need KDE Plasma installed to use it or develop for it.
 
-4. **Install Qt 5.12.0 or up to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
+5. **Install [ZXing-CPP](https://github.com/nu-book/zxing-cpp) 1.0.8.** This has to be compiled from source because there is no Ubuntu package. Also, it has to be installed system-wide due to [ZXing-CPP issue #132](https://github.com/nu-book/zxing-cpp/issues/132). Version ed55911 is the last version that has been tested with this application, so we use that just to be sure.
 
-    In principle, you could also install Qt 5.13 or higher. Qt 5.13 or higher for desktop Linux applications as installed here works fine out of the box. However, it is advisable to keep the Qt versions for desktop Linux and Android the same to avoid surprises. And when installing Qt 5.13 or higher for Android, additional steps will be needed, as detailed in chapter [5.4. Android Development Setup](#54-android-development-setup) below.
+    ```
+    cd /some/out-of-source/path/
+    git clone --depth 1 https://github.com/nu-book/zxing-cpp.git
+    git checkout ed55911
+    cd zxing-cpp
+    mkdir build && cd build
+    cmake ..
+    make
+    sudo make install
+    sudo ldconfig
+    ```
 
-5. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
+    Instead of the last step `sudo make install`, you can also use `sudo checkinstall make install`. It creates a simple Ubuntu package and installs that, making it much easier to remove the installed files again when necessary.
+
+6. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
 
     ```
     sudo apt install libqt5gamepad5-dev libqt5opengl5-dev libqt5sensors5-dev libqt5serialport5-dev libqt5svg5-dev libqt5websockets5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev qtbase5-dev qtbase5-dev-tools qtdeclarative5-dev qtdeclarative5-dev-tools qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev qtscript5-dev qttools5-dev qttools5-dev-tools qtwayland5-dev-tools qtxmlpatterns5-dev-tools
@@ -336,7 +352,9 @@ Download and unpack the package to the place that will later also host the Andro
         make install
         ```
 
-7. **Install Breeze icons.** Used for the icons packaged into the Android APK. This is not strictly necessary as the build system will [clone the Breeze repository](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L63)
+7. **Install [ZXing-CPP](https://github.com/nu-book/zxing-cpp) 1.0.8.** TODO. For now, follow along the installation instructions for the desktop development environment but compile for Android.
+
+8. **Install Breeze icons.** Used for the icons packaged into the Android APK. This is not strictly necessary as the build system will [clone the Breeze repository](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/KF5Kirigami2Macros.cmake#L63)
 if it's not found. However, it would clone it into the build directory, and that would happen again whenever clearing the build directory, leading to slow builds.
 
     1. **Clone the breeze-icons repository.** Sadly you cannot use the Ubuntu-supplied package of Breeze icons (yet) because the build system expects a different folder structure inside. We do a shallow clone of only the last commit's state (`--depth 1`) as that is all we need.
@@ -365,7 +383,7 @@ if it's not found. However, it would clone it into the build directory, and that
         * **If you use another desktop environment:** Change the icon theme in the ways your desktop environment wants it to be done. Qt applications should pick up this change.
         * **If nothing else works:** Install the Qt5 Configuration Tool (`sudo apt install qt5ct`) and in tab "Icon Theme" select "Breeze".
 
-8. **Adapt the makefile.** Due to open issues with the build process, right now you have to adapt `src/CMakeLists.txt` to your system as follows:
+9. **Adapt the makefile.** Due to open issues with the build process, right now you have to adapt `src/CMakeLists.txt` to your system as follows:
 
     * In `set(foodrescue_EXTRA_LIBS …)` adapt the path to `libQt5Concurrent.so` for your system.
 

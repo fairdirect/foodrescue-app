@@ -99,20 +99,6 @@ endif()
 
 # ################# Compilation and installation ###################################################
 
-# Tell the compiler where to find the header files of the ZXingCore library.
-#   The swex/zxing-cpp fork used here does not support the find(ZXingCore) mechanism. So this is
-#   unfortunately the only option right now. See https://github.com/swex/zxing-cpp/
-#
-#   Do NOT put this into this project's source tree for inclusion with
-#   add_subdirectory(…). That provides a different environment for compilation, resulting in a
-#   failure to compile zxing-cpp.
-include_directories(/home/matthias/Projects/Fairdirect.Food_Rescue_App/Repo.zxing-cpp)
-
-# Tell the linker where it can find the ZXingCore library mentioned below.
-#   The swex/zxing-cpp fork used here does not support the find(ZXingCore) mechanism. So this is
-#   unfortunately the only option right now. See https://github.com/swex/zxing-cpp/
-link_directories(/home/matthias/Projects/Fairdirect.Food_Rescue_App/Repo.zxing-cpp/build/core)
-
 # Define executable to generate, and its required inputs.
 #   Represented as "[hammer icon] foodrescue" in the Qt Creator project outline.
 #

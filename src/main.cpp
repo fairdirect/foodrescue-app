@@ -11,7 +11,6 @@
 #include "BarcodeScanner.h"
 #include "BarcodeFilter.h"
 #include "ContentDatabase.h"
-#include "utilities.h"
 
 // Export main() as part of a library interface. Needed on Android.
 //   Q_DECL_EXPORT is a Qt MOC macro that exposes main() as part of the interface of a

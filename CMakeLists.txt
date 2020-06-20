@@ -162,13 +162,20 @@ endif()
 find_package(KF5Kirigami2 REQUIRED)
 # find_package(KF5I18n) # TODO: Add when starting to use i18n.
 
-# Find ZXing (C++ ported version).
-#   Source: https://github.com/nu-book/zxing-cpp .
-#   Latest tested version that works: commit ed55911. See its CMakeLists.txt for version numbers.
+# Find ZXing C++ (a C++ reimplementation of popular barcode scanner library ZXing).
+#   Source: https://github.com/nu-book/zxing-cpp.
 #
-#   CMake package name is ZXing, even though the CMake project name at that revision is ZXingCpp.
-#   Because, the file CMake is looking for exists as ./build/ZXingConfig.cmake.
-# find_package(ZXing)
+#   The library does not yet expose its version numbers to CMake as of 2020-06-19, so
+#   we can't do find_package(ZXing 1.0.8). Instead, version requirements are thus:
+#
+#   Minimum version: zxing-cpp commit 96ac75b (because the new BarcodeFormat enum values defined
+#   here are duplicated in our own source).
+#
+#   Latest tested version: zxing-cpp commit ed55911.
+#
+#   Due to a bug in ZXing, find_package() will only work if you installed ZXing system-wide. See:
+#   https://github.com/nu-book/zxing-cpp/issues/132
+find_package(ZXing REQUIRED)
 
 # Include specific QML modules. (Example; enable when needed.)
 # ecm_find_qmlmodule(QtGraphicalEffects 1.0)
