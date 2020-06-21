@@ -162,6 +162,7 @@ Kirigami.ScrollablePage {
         id: scannerOverlay
 
         onBarcodeFound: {
+            addressBar.text = code
             browserContent.text = database.search(code)
         }
     }

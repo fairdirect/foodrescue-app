@@ -45,9 +45,9 @@ Kirigami.OverlaySheet {
             //   Else the camera would consume energy and have its LED on all the time.
             camera.start()
         }
-
-        // Stopping the camera is in onTagFound. Doing it here would keep it enabled long enough
-        // to maybe recognize another barcode.
+        else
+            // In addition to onTagFound, to stop it also when manually closing OverlaySheet.
+            camera.stop()
     }
 
     ColumnLayout {
@@ -68,13 +68,15 @@ Kirigami.OverlaySheet {
             onTagFound: {
                 tagsFound++
                 lastTag = tag
+                // Stopping the camera now is needed because if done when closing the sheet would
+                // keep it enabled long enough to sometimes recognize more barcodes.
                 camera.stop()
                 scannerOverlay.barcodeFound(tag)
                 scannerOverlay.close()
             }
             scanner: Local.BarcodeScanner {
                 // TODO: Make sure we include all necessary formats.
-                formats: [Local.BarcodeFormat.EAN_13]
+                formats: [Local.BarcodeFormat.EAN_13, Local.BarcodeFormat.EAN_8]
                 tryHarder: true
                 tryRotate: true // Also try recognizing barcodes in a 90° rotated image.
                 onDecodeResultChanged: console.log(decodeResult)
