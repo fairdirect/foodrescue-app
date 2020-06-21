@@ -1,10 +1,9 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
+import QtQuick.Controls 1.4 as QQC1
 import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.10 as Kirigami
-
-// Import our custom QML components ("ContentDatabase" etc.), exported in main.cpp.
-import local 1.0 as Local
+import local 1.0 as Local // Our custom QML components, as exported in main.cpp.
 
 // Page shown at startup of the application.
 //   Shows the main area of the application, which contains every control element except the
@@ -168,5 +167,4 @@ Kirigami.ScrollablePage {
 
     // Overlay sheet for the barcode scanner. See ScannerOverlay.qml.
     ScannerOverlay { id: scannerOverlay }
-
 }

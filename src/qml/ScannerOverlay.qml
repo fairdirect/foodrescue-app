@@ -27,18 +27,23 @@ import local 1.0 as Local // Our custom QML components, exported in main.cpp.
 // showing a scrollbar. To avoid the scrollbar, limit content height.
 
 Kirigami.OverlaySheet {
-
-    // Make the overlay "global", covering the whole application window and not just one page.
-    parent: applicationWindow().overlay
-
     property int tagsFound: 0
     property string lastTag: ""
 
-    // We need an internal layout just because "Layout" properties are not directly available
-    // on OverlaySheet.
-    ColumnLayout {
+    // Make the overlay "global", covering the whole window and not just one page column.
+    parent: applicationWindow().overlay
 
-        // Limit layout height to enable "Layout.fillHeight: true" for the video.
+    // Keep camera active only while visible.
+    //   Else the camera would consume energy and have its LED on even after closing OverlaySheet.
+    onSheetOpenChanged: {
+        if(sheetOpen)
+            camera.start()
+        else
+            camera.stop()
+    }
+
+    ColumnLayout {
+        // Limit layout height to enable "Layout.fillHeight: true" for child VideoOutput.
         //   77% window height is the maximum possible for an overlay sheet without content
         //   scrolling in, and with a bottom margin the same size as the side margins.
         //
@@ -66,12 +71,26 @@ Kirigami.OverlaySheet {
         VideoOutput {
             id: videoOutput
 
-            Layout.fillHeight: true // Take all height not taken by other items already.
+            // Take all width and height not taken by sibling items.
             Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            autoOrientation: true
+            fillMode: VideoOutput.PreserveAspectFit
+            filters: [barcodeFilter]
+            focus : visible // Capture keys only while visible.
 
             source: Camera {
                 id: camera
+
+                // Prevent camera (as indicated by its LED) from switching on at application start.
+                //   Because OverlaySheet is instantiated when its parent object is instantiated,
+                //   and the default state is Camera.ActiveState.
+                cameraState: Camera.UnloadedState
+
                 focus {
+                    // TODO: Only change focusMode if supported, to avoid messages like
+                    // "Focus mode selection is not supported".
                     focusMode: CameraFocus.FocusContinuous
                     focusPointMode: CameraFocus.FocusPointAuto
                 }
@@ -80,28 +99,19 @@ Kirigami.OverlaySheet {
                         QtMultimedia.availableCameras[camerasComboBox.currentIndex].deviceId : ""
                 }
                 onDeviceIdChanged: {
-                    console.log("avaliable resolutions: " + supportedViewfinderResolutions(
-                                    ))
                     focus.focusMode = CameraFocus.FocusContinuous
                     focus.focusPointMode = CameraFocus.FocusPointAuto
+                    console.log("available resolutions: " + supportedViewfinderResolutions())
                 }
                 captureMode: Camera.CaptureViewfinder
-                onCameraStateChanged: {
-
-                }
                 onLockStatusChanged: {
-                    if (tagDiscoveredInSession) {
+                    if (tagDiscoveredInSession)
                         return
-                    }
-                    if (lockStatus === Camera.Locked) {
+                    if (lockStatus === Camera.Locked)
                         camera.unlock()
-                    }
                 }
                 onError: console.log("camera error:" + errorString)
             }
-            autoOrientation: true
-            fillMode: VideoOutput.PreserveAspectFit
-            filters: [barcodeFilter]
         }
 
         // Camera chooser widget (shown if more than one camera exists).
@@ -127,6 +137,6 @@ Kirigami.OverlaySheet {
             id: resultOutput
             text: "Barcodes found: " + tagsFound + (lastTag ? " Last barcode: " + lastTag : "")
         }
-
     }
+
 }
