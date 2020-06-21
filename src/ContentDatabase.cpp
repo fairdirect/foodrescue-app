@@ -41,9 +41,13 @@ void ContentDatabase::connect() {
 
     if(!db.open()) {
         // TODO: Rather throw an exception.
-        qWarning() << "MainWindow::DatabaseConnect: ERROR: " << db.lastError().text();
+        qWarning() << "ContentDatabase::connect: ERROR: " << db.lastError().text();
         return;
     }
+
+    // TODO: Throw an error if the database does not have the expected table structure. That helps
+    // to surprise if the database file had been accidentally deleted and then automatically
+    // re-creatd by db.open() above (which is what happens if the file is not found).
 }
 
 
@@ -60,10 +64,11 @@ QString ContentDatabase::search(QString barcode) {
         "    INNER JOIN topic_categories ON topics.id = topic_categories.topic_id "
         "    INNER JOIN product_categories ON topic_categories.topic_id = product_categories.category_id "
         "    INNER JOIN products ON product_categories.product_id = products.id "
-        "WHERE products.code = ?"
+        "WHERE products.code = :code"
     );
-    query.addBindValue(barcode.toLongLong());
+    query.bindValue(":code", barcode.toLongLong());
     // TODO: Check if the conversion was successful. See: https://doc.qt.io/qt-5/qstring.html#toLongLong
+
     qDebug() << "ContentDatabase::search: Value bound to: " << barcode.toLongLong();
 
     if(!query.exec())

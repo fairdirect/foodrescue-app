@@ -51,14 +51,6 @@ Kirigami.ScrollablePage {
         // contextualActions: [ ]
     }
 
-    // Close the scanner sheet with Android's "Back" button, also with Alt+Left and PageLeft keys.
-    onBackRequested: {
-        if (sheet.sheetOpen) {
-            event.accepted = true;
-            sheet.close();
-        }
-    }
-
     ColumnLayout {
         // Since a Kirigami Page is a Layout, don't use anchors here. Instead:
         Layout.fillWidth: true
@@ -166,5 +158,11 @@ Kirigami.ScrollablePage {
     }
 
     // Overlay sheet for the barcode scanner. See ScannerOverlay.qml.
-    ScannerOverlay { id: scannerOverlay }
+    ScannerOverlay {
+        id: scannerOverlay
+
+        onBarcodeFound: {
+            browserContent.text = database.search(code)
+        }
+    }
 }

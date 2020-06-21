@@ -93,9 +93,11 @@ Some tips for using the application:
 
 * Good and even lighting is important for fast barcode recognition.
 
-* Barcode scanning works only when the barcode lines are vertical on your screen, or slanted up to about 15° from vertical. When the lines are 45° or horizontal, no barcode is recognized. The more vertical the lines, the better.
+* Barcode scanning works only when the barcode lines are either vertical or horizontal on your screen, or slanted up to about 15° from that. When the lines are 45°, no barcodes are recognized.
 
 * It does not matter if the barcode's image is slightly distorted, means if the barcode's corners have somewhat different distances from the camera.
+
+* Extreme contrast between the barcode and a large surrounding area will lead the camera to overexpose or underexpose the barcode. In that case, try moving the barcode closer to the camera so less of the surrounding area is visible.
 
 The following keyboard combinations are available:
 

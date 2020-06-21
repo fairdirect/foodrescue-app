@@ -27,19 +27,27 @@ import local 1.0 as Local // Our custom QML components, exported in main.cpp.
 // showing a scrollbar. To avoid the scrollbar, limit content height.
 
 Kirigami.OverlaySheet {
+    id: scannerOverlay
+
     property int tagsFound: 0
     property string lastTag: ""
+    signal barcodeFound(string code)
 
     // Make the overlay "global", covering the whole window and not just one page column.
     parent: applicationWindow().overlay
 
-    // Keep camera active only while visible.
-    //   Else the camera would consume energy and have its LED on even after closing OverlaySheet.
     onSheetOpenChanged: {
-        if(sheetOpen)
+        if(sheetOpen) {
+            tagsFound = 0
+            lastTag = ""
+
+            // Keep camera active only while visible.
+            //   Else the camera would consume energy and have its LED on all the time.
             camera.start()
-        else
-            camera.stop()
+        }
+
+        // Stopping the camera is in onTagFound. Doing it here would keep it enabled long enough
+        // to maybe recognize another barcode.
     }
 
     ColumnLayout {
@@ -60,10 +68,15 @@ Kirigami.OverlaySheet {
             onTagFound: {
                 tagsFound++
                 lastTag = tag
+                camera.stop()
+                scannerOverlay.barcodeFound(tag)
+                scannerOverlay.close()
             }
             scanner: Local.BarcodeScanner {
                 // TODO: Make sure we include all necessary formats.
                 formats: [Local.BarcodeFormat.EAN_13]
+                tryHarder: true
+                tryRotate: true // Also try recognizing barcodes in a 90° rotated image.
                 onDecodeResultChanged: console.log(decodeResult)
             }
         }

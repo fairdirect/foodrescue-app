@@ -54,10 +54,17 @@ static Barcode::DecodeResult toDecodeResult(const ZXing::Result& result) {
 static ZXingFormats zxingFormats(const QVector<int>& from) {
     ZXingFormats result;
     result.reserve(static_cast<ZXingFormats::size_type>(from.size()));
-    std::transform(from.begin(), from.end(), std::back_inserter(result),
-        [](int a) { return static_cast<ZXing::BarcodeFormat>(a); });
+    std::transform(
+        from.begin(),
+        from.end(),
+        std::back_inserter(result),
+        [](int a) { return static_cast<ZXing::BarcodeFormat>(a); }
+    );
     return result;
 }
+
+
+// BarcodeScanner implementation.
 
 BarcodeScanner::BarcodeScanner(QObject* parent) : QObject(parent) {
     connect(this, &BarcodeScanner::queueDecodeResult, this, &BarcodeScanner::setDecodeResult);
@@ -79,8 +86,8 @@ Barcode::DecodeResult BarcodeScanner::decodeResult() const {
     return m_decodeResult;
 }
 
+// Reentrant implementation, allows decoding with multiple threads in parallel.
 Barcode::DecodeResult BarcodeScanner::decodeImage(const QImage& image) {
-    // reentrant
     auto luminanceSource = std::make_shared<GenericLuminanceSource>(image.width(), image.height(), image.bits(), image.bytesPerLine());
     DecodeHints hints;
     auto convertFormats = [this]() { return zxingFormats(m_formats); };
