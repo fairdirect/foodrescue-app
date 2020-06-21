@@ -16,29 +16,40 @@
  */
 
 import QtQuick 2.12
-import QtQuick.Window 2.12
+import QtQuick.Controls 2.12
+import QtQuick.Layouts 1.2
 import QtMultimedia 5.12
-import QtQuick.Controls 2.5
-import QtQuick.Layouts 1.12
-import org.kde.kirigami 2.10
+import org.kde.kirigami 2.10 as Kirigami
+import local 1.0 as Local // Our custom QML components, exported in main.cpp.
 
-// Import our custom QML components ("ContentDatabase" etc.), exported in main.cpp.
-import local 1.0 as Local
+// Sizing: The width of an OverlaySheet can be limited with Layout.preferredWidth and the content will
+// adapt. But its height cannot be adapted – it is always as high as the content, potentially
+// showing a scrollbar. To avoid the scrollbar, limit content height.
 
-Page {
+Kirigami.OverlaySheet {
 
-    visible: true
-//    width: 640
-//    height: 480
-//    title: Qt.application.name
-
-    Layout.fillHeight: true
-    Layout.fillWidth: true
+    // Make the overlay "global", covering the whole application window and not just one page.
+    parent: applicationWindow().overlay
 
     property int tagsFound: 0
     property string lastTag: ""
+
+    // We need an internal layout just because "Layout" properties are not directly available
+    // on OverlaySheet.
     ColumnLayout {
-        anchors.fill: parent
+
+        // Limit layout height to enable "Layout.fillHeight: true" for the video.
+        //   77% window height is the maximum possible for an overlay sheet without content
+        //   scrolling in, and with a bottom margin the same size as the side margins.
+        //
+        //   TODO: Layout.maximumHeight does not work here. Why?
+        //   TODO: Enable more height by making the larger top margin of OverlaySheet smaller.
+        height: applicationWindow().height * 0.77
+
+        // Spacings between video, camera list, status bar.
+        spacing: Kirigami.Units.largeSpacing * 5
+
+        // Invisible item providing the barcode recognition behavior.
         Local.BarcodeFilter {
             id: barcodeFilter
             onTagFound: {
@@ -54,10 +65,10 @@ Page {
 
         VideoOutput {
             id: videoOutput
-            fillMode: VideoOutput.PreserveAspectCrop
-            Layout.fillHeight: true
+
+            Layout.fillHeight: true // Take all height not taken by other items already.
             Layout.fillWidth: true
-            filters: [barcodeFilter]
+
             source: Camera {
                 id: camera
                 focus {
@@ -89,8 +100,11 @@ Page {
                 onError: console.log("camera error:" + errorString)
             }
             autoOrientation: true
+            fillMode: VideoOutput.PreserveAspectFit
+            filters: [barcodeFilter]
         }
 
+        // Camera chooser widget (shown if more than one camera exists).
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: false
@@ -107,9 +121,12 @@ Page {
                 currentIndex: 0
             }
         }
+
+        // Status bar, good for debugging.
         Label {
             id: resultOutput
-            text: "tags found: " + tagsFound + (lastTag ? " last tag: " + lastTag : "")
+            text: "Barcodes found: " + tagsFound + (lastTag ? " Last barcode: " + lastTag : "")
         }
+
     }
 }

@@ -91,19 +91,34 @@ Eventually you will be able to install the software comfortably as follows:
 
 Some tips for using the application:
 
-* Place the barcode near or at the top of the camera viewfinder. Since the application starts looking for barcodes at the top, this will lead to the fastest results of finding a barcode.
+* Good and even lighting is important for fast barcode recognition.
+
+* Barcode scanning works only when the barcode lines are vertical on your screen, or slanted up to about 15° from vertical. When the lines are 45° or horizontal, no barcode is recognized. The more vertical the lines, the better.
+
+* It does not matter if the barcode's image is slightly distorted, means if the barcode's corners have somewhat different distances from the camera.
 
 The following keyboard combinations are available:
 
 * **Close the application.** Ctrl + Q (Kirigami default)
 * **Select menu item.** Alt + highlighted letter while menu drawer is open
+* **Page back / forward.** Alt + Arrow Left / Alt + Arrow Right. You can also use the hardware keys "Page Back" and "Page Forward" if you have them. Not found often, but for example some Lenovo ThinkPad models have these above the Arrow Left / Arrow Right keys.
+* **Move focus.** Tab moves the keyboard focus to the next element, Shift + Tab moves it to the previous element.
+* **Click on focused element.** The Space bar key is like clicking on the element currently having the keyboard focus.
+* **Close overlay sheet.** There is no default key binding for this. Esc does not work. Some applications bind the "Alt + Left" and "Page Back" keys to this, for example the Kirigami Gallery demo application.
+* TODO: Complete this list. There should be an official list somewhere.
 
 TODO: Complete usage instructions.
 
 
 # 4. Repository Layout
 
-Here is a quick overview of what you'll find where and why in this repository.
+Here is a quick overview of what you'll find where and why.
+
+**General source layout:** We make use of the Ubuntu operating system packages as much as possible to provide dependencies (libraries and header files).
+
+Some dependencies cannot be installed that way, including all cross-compiled libraries for Android etc.. These other dependencies are self-compiled, placed into their own independent directories just like this application itself, all having their own "CMake buildsystem" as they say. Sadly, some exceptions are necessary so that some libraries have to be placed into this application's source tree; see the documentation for the `lib/` folder below.
+
+In all the above cases, dependencies are connected to this application only via the CMake `find_package(…)` mechanism. That's the most compact and cross-platorm compatible way to manage dependencies in CMake.
 
 **In the repository:**
 
@@ -126,8 +141,6 @@ Here is a quick overview of what you'll find where and why in this repository.
 * **📄 `README.md`:** This README.
 
 * **📄 `metadata-*`:** Application metadata for various environments. Informs a desktop environment where to put the application into the start menu, what icon to use etc..
-
-**Outside of the repository:** You will have other repositories and / or installation directories for external libraries that cannot be provided by the operating system's package manager. That includes all libraries compiled for Android because they are not binary compatible with the host system libraries. These libraries are then imported for building Food Rescue App using the CMake `find_package(…)` mechanism.
 
 
 # 5. Development Guide
@@ -589,6 +602,8 @@ The guiding idea is to write code that reads almost like natural language. That 
 TODO
 
 **Specific code style hints for QML:**
+
+* **Import namespaces.** All Qt5 provided QML is imported without a namespace – this is the "default stuff" that should be available directly. Everything else should be imported using a namespace, because only then it's clear where to look up documentation of an element found in the source code. (Also Kirigami uses some of the same names as Qt QML, which would add to the confusion without namespaces; e.g. Action, Label.) So all Kirigami QML imports are `import … as Kirigami` and all QML elements defined in the C++ part of this same application are imported as `import … as Local`.
 
 * **Visual order.** Order code elements as much as possible in the order they will appear in the user interface (top to bottom, left to right). If that means mixing contained QML types and QML attributes, so be it.
 

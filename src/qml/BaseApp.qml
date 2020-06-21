@@ -53,15 +53,6 @@ ApplicationWindow {
         actions: [
 
             Action {
-                text: "Scan"
-                onTriggered: {
-                    pageStack.layers.push(
-                        Qt.resolvedUrl("ScannerPage.qml")
-                    );
-                }
-            },
-
-            Action {
                 text: "History"
             },
 

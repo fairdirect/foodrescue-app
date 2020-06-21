@@ -1,15 +1,15 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.10
+import org.kde.kirigami 2.10 as Kirigami
 
 // Import our custom QML components ("ContentDatabase" etc.), exported in main.cpp.
 import local 1.0 as Local
 
 // Page shown at startup of the application.
 //   Shows the main area of the application, which contains every control element except the
-//   sidebar drawer and any layers / drawers added on top.
-ScrollablePage {
+//   sidebar drawer and any layers / sheets / drawers added on top.
+Kirigami.ScrollablePage {
 
     id: page
 
@@ -29,7 +29,7 @@ ScrollablePage {
     //   A toolbar can have left / main / right / context buttons. The read-only property
     //   org::kde::kirigami::Page::globalToolBarItem refers to this toolbar.
     actions {
-        left: Action {
+        left: Kirigami.Action {
             iconName: "go-previous"
             text: "Page Back"
             onTriggered: {
@@ -40,7 +40,7 @@ ScrollablePage {
         // No main action needed so far.
         // main: Kirigami.Action { }
 
-        right: Action {
+        right: Kirigami.Action {
             iconName: "go-next"
             text: "Page Forward"
             onTriggered: {
@@ -50,6 +50,14 @@ ScrollablePage {
 
         // No contextual actions so far.
         // contextualActions: [ ]
+    }
+
+    // Close the scanner sheet with Android's "Back" button, also with Alt+Left and PageLeft keys.
+    onBackRequested: {
+        if (sheet.sheetOpen) {
+            event.accepted = true;
+            sheet.close();
+        }
     }
 
     ColumnLayout {
@@ -96,7 +104,13 @@ ScrollablePage {
                 }
             }
 
-            // TODO: Add "Barcode" button here.
+            Button {
+                id: scannerButton
+                text: "Scan"
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: scannerOverlay.open()
+            }
+
             // TODO: Add "Bookmarks" button here.
         }
 
@@ -151,4 +165,8 @@ ScrollablePage {
             }
         }
     }
+
+    // Overlay sheet for the barcode scanner. See ScannerOverlay.qml.
+    ScannerOverlay { id: scannerOverlay }
+
 }
