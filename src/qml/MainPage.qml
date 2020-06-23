@@ -67,36 +67,24 @@ Kirigami.ScrollablePage {
                 placeholderText: "barcode number"
 
                 // Disable predictive text input to make textEdited() signals work under Android.
-                //   See: https://stackoverflow.com/a/62526369
+                //   A workaround for multiple Qt bugs. See: https://stackoverflow.com/a/62526369
                 inputMethodHints: Qt.ImhSensitiveData
 
                 onTextChanged: {
                     console.log("addressBar: 'textChanged()' signal")
-                    if(text.length > 0) {
-                         goButton.enabled = true
-                    }
-                    else {
-                        goButton.enabled = false
-                    }
+                    goButton.enabled = text.length > 0 ? true : false
                 }
 
                 // When the user finishes editing the text field.
                 //   (On desktop, this requires pressing "Return". Moving focus does not count.)
-                onAccepted: {
-                    console.log("adressBar: 'accepted()' signal")
-                    browserContent.text = database.search(addressBar.text)
-                }
-
+                onAccepted: browserContent.text = database.search(addressBar.text)
             }
 
             Button {
                 id: goButton
                 text: "Go"
                 enabled: false
-                onClicked: {
-                    console.log("button click event")
-                    browserContent.text = database.search(addressBar.text)
-                }
+                onClicked: browserContent.text = database.search(addressBar.text)
             }
 
             Button {
@@ -152,7 +140,7 @@ Kirigami.ScrollablePage {
             onLinkActivated: Qt.openUrlExternally(link)
 
             // Show a hand cursor when mousing over hyperlinks.
-            // Source: https://blog.shantanu.io/2015/02/15/creating-working-hyperlinks-in-qtquick-text/
+            //   Source: "Creating working hyperlinks in Qt Quick Text", https://blog.shantanu.io/?p=135
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.NoButton // Don't eat clicks on the Text.
