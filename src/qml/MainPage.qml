@@ -1,6 +1,5 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
-import QtQuick.Controls 1.4 as QQC1
 import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.10 as Kirigami
 import local 1.0 as Local // Our custom QML components, as exported in main.cpp.
@@ -67,22 +66,27 @@ Kirigami.ScrollablePage {
 
                 placeholderText: "barcode number"
 
-                // When the user finishes editing the text field.
-                //   (On desktop, this requires pressing "Return". Moving focus does not count.)
-                onAccepted: {
-                    console.log("text field 'accepted' event")
-                    browserContent.text = database.search(addressBar.text)
-                }
+                // Disable predictive text input to make textEdited() signals work under Android.
+                //   See: https://stackoverflow.com/a/62526369
+                inputMethodHints: Qt.ImhSensitiveData
 
-                Keys.onReleased: {
-                    console.log("key release event")
-                    if(text.length > 0){
+                onTextEdited: {
+                    console.log("addressBar: 'textEdited()' signal")
+                    if(text.length > 0) {
                          goButton.enabled = true
                     }
                     else {
                         goButton.enabled = false
                     }
                 }
+
+                // When the user finishes editing the text field.
+                //   (On desktop, this requires pressing "Return". Moving focus does not count.)
+                onAccepted: {
+                    console.log("adressBar: 'accepted()' signal")
+                    browserContent.text = database.search(addressBar.text)
+                }
+
             }
 
             Button {

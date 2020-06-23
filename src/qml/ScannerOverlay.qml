@@ -2,8 +2,8 @@
  * Barcode scanner component, originally from https://github.com/swex/QZXingNu
  *
  * Authors and copyright:
- *   © Alexey Mednyy (https://github.com/swex) 2018-2020
- *   © Matthias Ansorg (https://github.com/tanius) 2020
+ *   © 2018-2020  Alexey Mednyy    (https://github.com/swex)
+ *   © 2020       Matthias Ansorg  (https://github.com/tanius)
  *
  * The authors license this file to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy of the
