@@ -70,8 +70,8 @@ Kirigami.ScrollablePage {
                 //   See: https://stackoverflow.com/a/62526369
                 inputMethodHints: Qt.ImhSensitiveData
 
-                onTextEdited: {
-                    console.log("addressBar: 'textEdited()' signal")
+                onTextChanged: {
+                    console.log("addressBar: 'textChanged()' signal")
                     if(text.length > 0) {
                          goButton.enabled = true
                     }
