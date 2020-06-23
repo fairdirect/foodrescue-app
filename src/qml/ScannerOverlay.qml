@@ -36,18 +36,20 @@ Kirigami.OverlaySheet {
     // Make the overlay "global", covering the whole window and not just one page column.
     parent: applicationWindow().overlay
 
+    // TODO: Try moving the camera.stop() to onClose or similar, because showing the camera
+    //   video output (and looking for barcodes) during the sheet closing animation is really slow.
+    //   Mostly relevant for mobile platforms.
     onSheetOpenChanged: {
-        if(sheetOpen) {
-            tagsFound = 0
-            lastTag = ""
-
-            // Keep camera active only while visible.
-            //   Else the camera would consume energy and have its LED on all the time.
+        // Activate the camera only while visible.
+        //   Else it would consume energy and have its LED on permanently because OverlaySheet types
+        //   are instantiated at the same time as their parent object. Relies on an initial camera
+        //   state of Camera.UnloadedState.
+        if(sheetOpen)
             camera.start()
-        }
         else
-            // In addition to onTagFound, to stop it also when manually closing OverlaySheet.
-            camera.stop()
+            camera.stop() // Triggered when manually closing scannerOverlay. See also onTagFound.
+
+        if(sheetOpen) { tagsFound = 0; lastTag = ""; }
     }
 
     ColumnLayout {
@@ -62,7 +64,18 @@ Kirigami.OverlaySheet {
         // Spacings between video, camera list, status bar.
         spacing: Kirigami.Units.largeSpacing * 5
 
-        // Invisible item providing the barcode recognition behavior.
+        // Barcode search algorithm, provided by ZXing-C++. Invisible.
+        Local.BarcodeScanner {
+            id: barcodeScanner
+
+            // TODO: Make sure we include all necessary formats.
+            formats: [Local.BarcodeFormat.EAN_13, Local.BarcodeFormat.EAN_8]
+            tryHarder: true
+            tryRotate: true // Also tries recognizing barcodes in a 90° rotated image.
+            onDecodeResultChanged: console.log(decodeResult)
+        }
+
+        // Video filter looking for barcodes. Invisible.
         Local.BarcodeFilter {
             id: barcodeFilter
             onTagFound: {
@@ -74,62 +87,112 @@ Kirigami.OverlaySheet {
                 scannerOverlay.barcodeFound(tag)
                 scannerOverlay.close()
             }
-            scanner: Local.BarcodeScanner {
-                // TODO: Make sure we include all necessary formats.
-                formats: [Local.BarcodeFormat.EAN_13, Local.BarcodeFormat.EAN_8]
-                tryHarder: true
-                tryRotate: true // Also try recognizing barcodes in a 90° rotated image.
-                onDecodeResultChanged: console.log(decodeResult)
+            scanner: barcodeScanner
+        }
+
+        // Configuration of device camera access. Invisible.
+        Camera {
+            function printViewfinderResolutions() {
+                var resolutions = camera.supportedViewfinderResolutions();
+
+                console.debug("Number of supported viewfinder resolutions: " + resolutions.length)
+
+                for(var i=0; i<resolutions.length; i++) {
+                    console.debug("resolution #" + i + ":" +
+                        resolutions[i].width + "×" + resolutions[i].height
+                    )
+                }
+
+                console.debug("Current resolution: " +
+                    camera.viewfinder.resolution.width + "×" + camera.viewfinder.resolution.height
+                )
             }
+
+            id: camera
+
+            // Prevent camera (as indicated by its LED) from switching on at application start.
+            //   Because OverlaySheet is instantiated when its parent object is instantiated,
+            //   and the default state is Camera.ActiveState. Using Camera.UnloadedState here
+            //   would be even slightly better in terms of energy consumption, but would not allow
+            //   setting the initial resolution simply with QML properties here.
+            cameraState: Camera.LoadedState
+
+            captureMode: Camera.CaptureViewfinder
+
+            focus {
+                // TODO: Only change focusMode if supported, to avoid messages like
+                // "Focus mode selection is not supported".
+                focusMode: CameraFocus.FocusContinuous
+                focusPointMode: CameraFocus.FocusPointAuto
+            }
+
+            deviceId: {
+                QtMultimedia.availableCameras[camerasComboBox.currentIndex] ?
+                    QtMultimedia.availableCameras[camerasComboBox.currentIndex].deviceId : ""
+            }
+
+            // Workaround for a viewfinder image distortion bug on Asus Nexus 7 and other models.
+            //   Basically, still image resolution has to match the preview size resolution.
+            //   Background and solution details: https://stackoverflow.com/a/62541306
+            //
+            //   Setting imageCapture.resolution is a good workaround as it does not break any
+            //   code for desktop systems, does not fail even when that resolution is not supported,
+            //   and does not require any special-casing for devices or operating systems.
+            //
+            //   TODO: The current setting matches the default preview size of 1920x1020 on the
+            //   Nexus 7. Make this solution generic for all devices with similar issues, according
+            //   to the instructions on https://stackoverflow.com/a/62541306 .
+            imageCapture {
+                resolution: "1920x1080"
+            }
+
+            onCameraStateChanged: {
+                // TODO: An event parameter "state" should be available but is empty. Maybe a bug?
+                // TODO: Encapsulate this into a function, so there's just one line of code here.
+
+                switch (cameraState) {
+                case Camera.UnloadedState:
+                    console.debug("New camera state: Camera.UnloadedState");
+                    break;
+                case Camera.LoadedState:
+                    console.debug("New camera state: Camera.LoadedState");
+                    printViewfinderResolutions()
+                    break;
+                case Camera.ActiveState:
+                    console.debug("New camera state: Camera.ActiveState");
+                    printViewfinderResolutions()
+                    break;
+                }
+            }
+            onDeviceIdChanged: {
+                focus.focusMode = CameraFocus.FocusContinuous
+                focus.focusPointMode = CameraFocus.FocusPointAuto
+            }
+            onLockStatusChanged: {
+                if (tagDiscoveredInSession)
+                    return
+                if (lockStatus === Camera.Locked)
+                    camera.unlock()
+            }
+            onError: console.log("camera error:" + errorString)
         }
 
         VideoOutput {
-            id: videoOutput
+            id: viewFinder
 
-            // Take all width and height not taken by sibling items.
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            autoOrientation: true
-            fillMode: VideoOutput.PreserveAspectFit
+            source: camera
             filters: [barcodeFilter]
-            focus : visible // Capture keys only while visible.
 
-            source: Camera {
-                id: camera
+            Layout.fillWidth: true  // Takes the width not taken by siblings.
+            Layout.fillHeight: true // Takes the height not taken by siblings.
+            fillMode: VideoOutput.PreserveAspectFit
 
-                // Prevent camera (as indicated by its LED) from switching on at application start.
-                //   Because OverlaySheet is instantiated when its parent object is instantiated,
-                //   and the default state is Camera.ActiveState.
-                cameraState: Camera.UnloadedState
-
-                focus {
-                    // TODO: Only change focusMode if supported, to avoid messages like
-                    // "Focus mode selection is not supported".
-                    focusMode: CameraFocus.FocusContinuous
-                    focusPointMode: CameraFocus.FocusPointAuto
-                }
-                deviceId: {
-                    QtMultimedia.availableCameras[camerasComboBox.currentIndex] ?
-                        QtMultimedia.availableCameras[camerasComboBox.currentIndex].deviceId : ""
-                }
-                onDeviceIdChanged: {
-                    focus.focusMode = CameraFocus.FocusContinuous
-                    focus.focusPointMode = CameraFocus.FocusPointAuto
-                    console.log("available resolutions: " + supportedViewfinderResolutions())
-                }
-                captureMode: Camera.CaptureViewfinder
-                onLockStatusChanged: {
-                    if (tagDiscoveredInSession)
-                        return
-                    if (lockStatus === Camera.Locked)
-                        camera.unlock()
-                }
-                onError: console.log("camera error:" + errorString)
-            }
+            // TODO: Find out if excluding iOS here is still necessary.
+            autoOrientation: Qt.platform.os == 'ios' ? false : true
+            focus: visible // Captures key events only while visible.
         }
 
-        // Camera chooser widget (shown if more than one camera exists).
+        // Camera chooser widget. Shown only when multiple cameras exist.
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: false
@@ -147,7 +210,7 @@ Kirigami.OverlaySheet {
             }
         }
 
-        // Status bar, good for debugging.
+        // Status bar. Useful for debugging.
         Label {
             id: resultOutput
             text: "Barcodes found: " + tagsFound + (lastTag ? " Last barcode: " + lastTag : "")
