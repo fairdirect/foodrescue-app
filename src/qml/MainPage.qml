@@ -8,8 +8,7 @@ import local 1.0 as Local // Our custom QML components, as exported in main.cpp.
 //   Shows the main area of the application, which contains every control element except the
 //   sidebar drawer and any layers / sheets / drawers added on top.
 Kirigami.ScrollablePage {
-
-    id: page
+    id: mainPage
 
     // Page title.
     // TODO: Set the title as suitable for current window contents.
@@ -19,8 +18,10 @@ Kirigami.ScrollablePage {
     keyboardNavigationEnabled: true
     horizontalScrollBarPolicy: ScrollBar.AlwaysOff
 
-    Local.ContentDatabase {
-        id: database
+    // Event handler for a dynamically created ScannerPage object.
+    function onBarcodeFound(code) {
+        addressBar.text = code
+        browserContent.text = database.search(code)
     }
 
     // Define the page toolbar's contents.
@@ -48,6 +49,10 @@ Kirigami.ScrollablePage {
 
         // No contextual actions so far.
         // contextualActions: [ ]
+    }
+
+    Local.ContentDatabase {
+        id: database
     }
 
     ColumnLayout {
@@ -84,6 +89,7 @@ Kirigami.ScrollablePage {
                 id: goButton
                 text: "Go"
                 enabled: false
+                Layout.alignment: Qt.AlignHCenter
                 onClicked: browserContent.text = database.search(addressBar.text)
             }
 
@@ -91,10 +97,27 @@ Kirigami.ScrollablePage {
                 id: scannerButton
                 text: "Scan"
                 Layout.alignment: Qt.AlignHCenter
-                onClicked: scannerOverlay.open()
+
+                // Create the barcode scanner page and connect its signal to this page.
+                //   Documentation of this technique: "Dynamic QML Object Creation from JavaScript",
+                //   https://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html
+                //
+                //   TODO: For simplicity, try to avoid dynamic object creation by instantiating the object
+                //   statically but not showing it (not giving it a graphical element as parent).
+                //   Connect its barcodeFound event via Connections {…}, see https://doc.qt.io/qt-5/qml-qtqml-connections.html
+                //   Then in onClicked here, just push the object to pageStack.layers.
+                onClicked: {
+                    var scannerPageComponent = Qt.createComponent(Qt.resolvedUrl("ScannerPage.qml"))
+                    var scannerPage = scannerPageComponent.createObject(mainPage)
+                    if (scannerPage === null) console.log("Error creating object")
+
+                    // Connect the barcodeFound event to a function in this object.
+                    scannerPage.barcodeFound.connect(onBarcodeFound)
+                    pageStack.layers.push(scannerPage);
+                }
             }
 
-            // TODO: Add "Bookmarks" button here.
+            // TODO: Maybe add a "Bookmarks" button here.
         }
 
         Text {
@@ -146,16 +169,6 @@ Kirigami.ScrollablePage {
                 acceptedButtons: Qt.NoButton // Don't eat clicks on the Text.
                 cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
             }
-        }
-    }
-
-    // Overlay sheet for the barcode scanner. See ScannerOverlay.qml.
-    ScannerOverlay {
-        id: scannerOverlay
-
-        onBarcodeFound: {
-            addressBar.text = code
-            browserContent.text = database.search(code)
         }
     }
 }

@@ -51,53 +51,39 @@ ApplicationWindow {
         titleIcon: "qrc:///images/secondfood-applogo-256x188.png"
 
         actions: [
-
             Action {
                 text: "History"
             },
-
             Action {
                 text: "Bookmarks"
             },
-
             Action {
                 text: "Settings"
                 icon.name: "configure"
             },
-
             Action {
                 separator: true
             },
-
             Action {
                 text: "Help"
             },
-
             Action {
                 text: "Feedback"
             },
-
             Action {
                 text: "About"
                 icon.name: "help-about"
-
-                onTriggered: {
-                    pageStack.layers.push(
-                        Qt.resolvedUrl("AboutPage.qml")
-                    );
-                }
+                onTriggered: pageStack.layers.push(Qt.resolvedUrl("AboutPage.qml"))
             },
-
             Action {
                 text: "License Notes"
                 icon.name: "help-about"
-                onTriggered: {
-                    pageStack.layers.push(
-                        Qt.resolvedUrl("LicensePage.qml")
-                    );
-                }
+                onTriggered: pageStack.layers.push(Qt.resolvedUrl("LicensePage.qml"))
+            },
+            Action {
+                text: "Tests"
+                onTriggered: pageStack.layers.push(Qt.resolvedUrl("TestPage.qml"))
             }
-
         ]
     }
 }

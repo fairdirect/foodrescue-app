@@ -644,9 +644,18 @@ TODO
 
 **Specific code style hints for QML:**
 
-* **Import namespaces.** All Qt5 provided QML is imported without a namespace – this is the "default stuff" that should be available directly. Everything else should be imported using a namespace, because only then it's clear where to look up documentation of an element found in the source code. (Also Kirigami uses some of the same names as Qt QML, which would add to the confusion without namespaces; e.g. Action, Label.) So all Kirigami QML imports are `import … as Kirigami` and all QML elements defined in the C++ part of this same application are imported as `import … as Local`.
+* **Assign IDs generously.** Every QML object can have an `id:` property, but only those references from the outside need one. However, assigning IDs with well-chosen names is code-as-documentation, defining the purpose and relations of the object without an additional comment.
 
-* **Visual order.** Order code elements as much as possible in the order they will appear in the user interface (top to bottom, left to right). If that means mixing contained QML types and QML attributes, so be it.
+* **Namespace use for imports.** All Qt5 provided QML is imported without a namespace – this is the "default stuff" that should be available directly. Everything else should be imported using a namespace, because only then it's clear where to look up documentation of an element found in the source code. (Also Kirigami uses some of the same names as Qt QML, which would add to the confusion without namespaces; e.g. Action, Label.) So all Kirigami QML imports are `import … as Kirigami` and all QML elements defined in the C++ part of this same application are imported as `import … as Local`.
+
+* **Order of elements.** Use the following order when defining or instantiating and refining a QML type. It helps navigating the code because one will know where to look for a specific element, similar to how people often typically use an "attributes, public methods, private methods" order in classes.
+
+    * **Identifying properties.** (`id`, `title` etc.)
+    * **Custom signals, custom properties.**
+    * **Properties.**
+    * **Signal handlers, functions.** Similar to how methods typically come after attributes, we place behavior after properties.
+    * **Invisible QML objects.** For example `Camera { … }`.
+    * **Visible QML elements.** Nested in their layouts and in their visual order in the user interface (top to bottom, left to right). This can include both instantiated QML objects and properties (such as `Kirigami::Page.actions`) that define visual elements – which then is an exception from the rule above that places properties near the start.
 
 
 ## 7.2. Documentation Style
