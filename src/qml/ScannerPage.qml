@@ -46,14 +46,6 @@ Kirigami.ScrollablePage {
         camera.start()
     }
 
-    // Don't forget to stop the camera when manually closing scannerPage.
-    onBackRequested: {
-        console.debug("scannerPage: 'backRequested()' event")
-        camera.stop()
-        scannerPage.destroy()
-        event.accepted = true
-    }
-
     // Barcode search algorithm, provided by ZXing-C++. Invisible.
     Local.BarcodeScanner {
         id: barcodeScanner

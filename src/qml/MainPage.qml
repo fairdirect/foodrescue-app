@@ -24,6 +24,10 @@ Kirigami.ScrollablePage {
         browserContent.text = database.search(code)
     }
 
+    Local.ContentDatabase {
+        id: database
+    }
+
     // Define the page toolbar's contents.
     //   A toolbar can have left / main / right / context buttons. The read-only property
     //   org::kde::kirigami::Page::globalToolBarItem refers to this toolbar.
@@ -49,10 +53,6 @@ Kirigami.ScrollablePage {
 
         // No contextual actions so far.
         // contextualActions: [ ]
-    }
-
-    Local.ContentDatabase {
-        id: database
     }
 
     ColumnLayout {
@@ -99,21 +99,24 @@ Kirigami.ScrollablePage {
                 Layout.alignment: Qt.AlignHCenter
 
                 // Create the barcode scanner page and connect its signal to this page.
-                //   Documentation of this technique: "Dynamic QML Object Creation from JavaScript",
-                //   https://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html
+                //   Documentation for this technique: QtQuick.Controls.StackView::push()
+                //   and "Dynamic QML Object Creation from JavaScript",
+                //   https://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html and
                 //
-                //   TODO: For simplicity, try to avoid dynamic object creation by instantiating the object
-                //   statically but not showing it (not giving it a graphical element as parent).
-                //   Connect its barcodeFound event via Connections {…}, see https://doc.qt.io/qt-5/qml-qtqml-connections.html
-                //   Then in onClicked here, just push the object to pageStack.layers.
+                //   By providing a component as URL and not an item, Kirigami takes care
+                //   of dynamic object creation and deletion. Deletion makes sure the camera
+                //   is stopped when the layer closes. This is simpler than creating a dynamic
+                //   object ourselves, but also slower than just hiding the camera for later re-use.
+                //   But as of Kirigami 2.10, there seems to be a bug preventing proper object
+                //   destruction on page close when providing an item here instead of a component.
+                //
+                //   TODO: Once the Kirigami bug mentioned above is fixed, switch to providing an
+                //   object that is not deleted (just hidden) when the page closes and keeps the
+                //   camera in Camera.LoadedState. That should speed up showing the barcode scanner
+                //   from the second time on. Not sure how much would be gained, though.
                 onClicked: {
-                    var scannerPageComponent = Qt.createComponent(Qt.resolvedUrl("ScannerPage.qml"))
-                    var scannerPage = scannerPageComponent.createObject(mainPage)
-                    if (scannerPage === null) console.log("Error creating object")
-
-                    // Connect the barcodeFound event to a function in this object.
+                    var scannerPage = pageStack.layers.push(Qt.resolvedUrl("ScannerPage.qml"));
                     scannerPage.barcodeFound.connect(onBarcodeFound)
-                    pageStack.layers.push(scannerPage);
                 }
             }
 
