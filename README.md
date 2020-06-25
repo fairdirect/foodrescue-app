@@ -238,19 +238,20 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
     Note that KDE Kirigami is a lightweight library independent of the KDE Plasma desktop environment – it has no dependencies beyond Qt, and you don't need KDE Plasma installed to use it or develop for it.
 
-5. **Install [ZXing-CPP](https://github.com/nu-book/zxing-cpp).** This has to be compiled from source because we rely on a newer version than Ubuntu 20.04 [package zxing-cpp](https://launchpad.net/ubuntu/+source/zxing-cpp) (which anyway seems only available as a proposed package there right now). Commit ed55911 from 2020-06-19 is the last version that has been tested with this application, so we use that just to be sure. Commit 37baf0a 2020-06-05 is the earliest possible version because the ZXing library targets were renamed there.
+5. **Install [ZXing-C++](https://github.com/nu-book/zxing-cpp).** This has to be compiled from source because we rely on a newer version than Ubuntu 20.04 [package zxing-cpp](https://launchpad.net/ubuntu/+source/zxing-cpp) (which anyway seems only available as a proposed package there right now). Commit 57c4a89 from 2020-06-25 is the last version that has been tested, and also the minimum necessary version (as it provides CMake package versioning that we use here).
 
-    We use a system-wide installation to keep `cmake` calls simple for desktop development. But we use `checkinstall` (`sudo apt install checkinstall`) to create a simple Ubuntu package and installs that, making it much easier to uninstall the ZXing files again when necessary.
+    We do a system-wide installation to keep `cmake` calls simple for desktop development. But we also use `checkinstall` (`sudo apt install checkinstall`) to create and install a simple Ubuntu package. That makes it much easier to uninstall all installed ZXing files again when necessary (`sudo apt remove zxing-cpp`).
 
     ```
     cd /some/out-of-source/path/
     git clone --depth 1 https://github.com/nu-book/zxing-cpp.git
-    git checkout ed55911
+    git checkout 57c4a89
     cd zxing-cpp
-    mkdir build && cd build
-    cmake ..
+    mkdir -p build/linux-amd64 && cd build/linux-amd64
+
+    cmake ../..
     make
-    sudo checkinstall make install
+    sudo checkinstall --pkgname zxing-cpp --pkgversion "1.0.8+57c4a89" --nodoc make install
     sudo ldconfig
     ```
 
@@ -384,9 +385,9 @@ Download and unpack the package to the place that will later also host the Andro
         make install
         ```
 
-8. **Install [ZXing-CPP](https://github.com/nu-book/zxing-cpp).** For Android we obviously need an installation with custom install prefix because that code does not belong on the development host's system (it's not even executable there).
+8. **Install [ZXing-C++](https://github.com/nu-book/zxing-cpp).** For Android we obviously need an installation with a custom install prefix because this build is not meant for the development host system (and not even executable there).
 
-    1. Clone the repository:
+    1. **Clone the repository.**
 
         ```
         cd /some/out-of-source/path/
@@ -395,9 +396,7 @@ Download and unpack the package to the place that will later also host the Andro
         cd zxing-cpp
         ```
 
-    2. Edit the following files, replacing one call to `round(…)` with `std::round(…)` in each: `core/src/ZXNumeric.h` and `core/src/datamatrix/DMDetector.cpp`. Otherwise the function will not be found at build time. TODO: There is probably a better solution for this as it seems to depend on variabl "GCC" if this code is compiled.
-
-    3. Build the code. Be sure to adapt `CMAKE_INSTALL_PREFIX` to point to your installation directory defined above. (Note, the command line options to not build the example applications prevent a build fail in step "Linking CXX executable ZXingWriter" with "ZXingWriter.cpp.o: requires unsupported dynamic reloc R_ARM_REL32". We don't need these examples for Android, and they are probably not made for Android anyway.)
+    2. **Configure the build.** Be sure to adapt `CMAKE_INSTALL_PREFIX` to point to your installation directory defined above. (Note, the command line options to not build the example applications prevent a build fail in step "Linking CXX executable ZXingWriter" with "ZXingWriter.cpp.o: requires unsupported dynamic reloc R_ARM_REL32". We don't need these examples for Android, and they are probably not made for Android anyway.)
 
         ```
         mkdir -p build/android && cd build/android
@@ -410,7 +409,7 @@ Download and unpack the package to the place that will later also host the Andro
         cmake ../.. -DECM_DIR=/usr/local/share/ECM/cmake -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 -DBUILD_EXAMPLES=OFF -DBUILD_BLACKBOX_TESTS=OFF -DCMAKE_INSTALL_PREFIX=../../../foodrescue-app/install/android
         ```
 
-    4. Build and install:
+    3. **Build and install.**
 
         ```
         make

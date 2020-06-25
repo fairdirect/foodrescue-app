@@ -165,17 +165,12 @@ find_package(KF5Kirigami2 REQUIRED)
 # Find ZXing C++ (a C++ reimplementation of popular barcode scanner library ZXing).
 #   Source: https://github.com/nu-book/zxing-cpp.
 #
-#   The library does not yet expose its version numbers to CMake as of 2020-06-19, so
-#   we can't do find_package(ZXing 1.0.8). Instead, version requirements are thus:
+#   Current ZXing version requirements: minimum version zxing-cpp commit 57c4a89 (which is 1.0.8
+#   plus some commits), because the CMake package versioning support was introduced here.
 #
-#   Minimum version: zxing-cpp commit 96ac75b (because the new BarcodeFormat enum values defined
-#   here are duplicated in our own source).
-#
-#   Latest tested version: zxing-cpp commit ed55911.
-#
-#   Due to a bug in ZXing, find_package() will only work if you installed ZXing system-wide. See:
-#   https://github.com/nu-book/zxing-cpp/issues/132
-find_package(ZXing REQUIRED)
+#   TODO: Switch to find_package(ZXing 1.0.9 REQUIRED) once that release is out, and then drop the
+#   additional commit version requirement from above and README.md.
+find_package(ZXing 1.0.8 REQUIRED)
 
 # Include specific QML modules. (Example; enable when needed.)
 # ecm_find_qmlmodule(QtGraphicalEffects 1.0)
