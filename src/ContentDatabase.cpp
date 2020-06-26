@@ -67,9 +67,6 @@ static QString androidAssetToFile(QString assetPath) {
         << "ContentDatabase::androidAssetToFile: INFO:"
         << "assetPath =" << assetPath << "filePath =" << filePath;
 
-    // filePath = fileDir.append("/").append(fileName); // TODO: Old code v2, delete.
-    // filePath = fileName.preprend(QString("/data/data/org.fairdirect.foodrescue/files")); // TODO: Old code v1, delete.
-
     QFile file(filePath);
     if (!file.exists()) {
         bool success = asset.copy(filePath);
@@ -110,7 +107,7 @@ void ContentDatabase::connect() {
 
     // Determine the SQLite database filename, depending on the operating system.
     qDebug() << "ContentDatabase::connect: QSysInfo::productType() = " << QSysInfo::productType();
-    QString dbName;
+    QString dbName(""); // Initialize with a name of a non-existent file.
     if (QSysInfo::productType() == "android") {
         // Under Android, the database is located in the "assets" folder of the APK package. Assets
         // can only be accessed via Qt's "assets" scheme, not directly via the file system.
@@ -123,8 +120,12 @@ void ContentDatabase::connect() {
         dbName = androidAssetToFile(dbName);
     }
     else {
-        // A path relative to the executable's current directory, usually its own directory.
-        dbName = "foodrescue-content.sqlite3";
+        // Look through Qt's app data directories from high to low priority and use the first DB file found.
+        QStringList dbNameCandidates = QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
+        for (QString dbNameCandidate : dbNameCandidates) {
+            dbNameCandidate += QString("/foodrescue-content.sqlite3");
+            if (QFile::exists(dbNameCandidate)) dbName = dbNameCandidate;
+        }
     }
 
     qDebug() << "ContentDatabase::connect: Database path used:" << dbName;

@@ -266,6 +266,14 @@ While the Android platform and Qt library interfaces are mature and almost alway
       qttools5-dev qttools5-dev-tools qtwayland5-dev-tools qtxmlpatterns5-dev-tools
     ```
 
+7. **Install the database.** The application relies on the database that is the build output of [project `foodrescue-content`](https://github.com/fairdirect/foodrescue-content). Since during development we'll want to run the application without installing it, we'll have to install the database manually:
+
+    1. To build that database, follow [the project's README](https://github.com/fairdirect/foodrescue-content#readme). To install it.
+
+    2. Select the directory where to install the database. This depends on your operating system. Select a suitable location with path type `AppLocalDataLocation` from [Qt's list of standard locations](https://doc.qt.io/qt-5/qstandardpaths.html#StandardLocation-enum). For Linux, this would be `~/.local/share/foodrescue/` or `/usr/local/share/foodrescue/`.
+
+    3. Copy the database there, using filename `foodrescue-content.sqlite`.
+
 
 ## 5.3. Desktop Build Process
 
@@ -285,11 +293,17 @@ You can also build this the Android application from inside Qt Creator. See chap
     cmake ../..
     cmake --build .
 
-    # Optional: if you don't want to trun the binary in place.
+    # Optional: if you don't want to run the binary in place.
     make install
     ```
 
     As an alternative to `cmake --build .`, you can also simply run `make`, because CMake is a tool that generates GNU Make makefiles.
+
+3. **Run the application.** To run the application in place without installing it, you'd do:
+
+    ```
+    ./bin/foodrescue
+    ```
 
 
 ## 5.4. Android Development Setup
