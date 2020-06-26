@@ -258,7 +258,12 @@ While the Android platform and Qt library interfaces are mature and almost alway
 6. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
 
     ```
-    sudo apt install libqt5gamepad5-dev libqt5opengl5-dev libqt5sensors5-dev libqt5serialport5-dev libqt5svg5-dev libqt5websockets5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev qtbase5-dev qtbase5-dev-tools qtdeclarative5-dev qtdeclarative5-dev-tools qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev qtscript5-dev qttools5-dev qttools5-dev-tools qtwayland5-dev-tools qtxmlpatterns5-dev-tools
+    sudo apt install \
+      libqt5gamepad5-dev libqt5opengl5-dev libqt5sensors5-dev libqt5serialport5-dev \
+      libqt5svg5-dev libqt5websockets5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev \
+      qtbase5-dev qtbase5-dev-tools qtdeclarative5-dev qtdeclarative5-dev-tools \
+      qtlocation5-dev qtpositioning5-dev qtquickcontrols2-5-dev qtscript5-dev \
+      qttools5-dev qttools5-dev-tools qtwayland5-dev-tools qtxmlpatterns5-dev-tools
     ```
 
 
@@ -373,7 +378,11 @@ Download and unpack the package to the place that will later also host the Andro
         export ANDROID_ARCH_ABI=armeabi-v7a
         export ANDROID_PLATFORM=23 # TODO: Might not be required.
 
-        cmake .. -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 -DECM_DIR=/usr/local/share/ECM/cmake -DCMAKE_INSTALL_PREFIX=../../foodrescue-app/install/android
+        cmake .. \
+          -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake \
+          -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 \
+          -DECM_DIR=/usr/local/share/ECM/cmake \
+          -DCMAKE_INSTALL_PREFIX=../../foodrescue-app/install/android
         ```
 
         TODO: Explain what these variables mean.
@@ -406,7 +415,13 @@ Download and unpack the package to the place that will later also host the Andro
         export ANDROID_ARCH_ABI=armeabi-v7a
         export ANDROID_PLATFORM=23
 
-        cmake ../.. -DECM_DIR=/usr/local/share/ECM/cmake -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 -DBUILD_EXAMPLES=OFF -DBUILD_BLACKBOX_TESTS=OFF -DCMAKE_INSTALL_PREFIX=../../../foodrescue-app/install/android
+        cmake ../.. \
+          -DECM_DIR=/usr/local/share/ECM/cmake \
+          -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake \
+          -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 \
+          -DBUILD_EXAMPLES=OFF \
+          -DBUILD_BLACKBOX_TESTS=OFF \
+          -DCMAKE_INSTALL_PREFIX=../../../foodrescue-app/install/android
         ```
 
     3. **Build and install.**
@@ -464,7 +479,11 @@ The following instructions create and install an APK package that will run succe
 
     * **`QTANDROID_EXPORTED_TARGET`:** A name component that will appear in Makefile targets to create the Android APK package define by a corresponding variable via `${ANDROID_APK_DIR}/AndroidManifest.xml`. Since we will only run `make && make install` later this name can be anything as it's not used directly, but it has to be define for CMake to not complain.
 
-    * **`ANDROID_APK_DIR`:** A path to the directory in your source tree that contains `AndroidManifest.xml`. As required in ECM's [`Android.cmake` toolchain l. 211](https://invent.kde.org/frameworks/extra-cmake-modules/-/blob/master/toolchain/Android.cmake#L211). If this is not set correctly, ECM will use Qt's default manifest template, causing your app package to be named `org.qtproject.example.appname`, the app icons to be missing etc.. While you can use a path relative to the current directory here, it is better to use an absolute path because only that will give an error instead of silently using Qt's default manifest ([see](https://invent.kde.org/frameworks/extra-cmake-modules/-/blob/13a1161/toolchain/Android.cmake#L200)).
+    * **`ANDROID_APK_DIR`:** A path to the directory in your source tree that contains `AndroidManifest.xml` and also any other files that you want included into the Android APK package. Especially, files placed into an `assets/` sub-directory in here will be available in the Android app's [`assets/` directory](https://developer.android.com/guide/topics/resources/providing-resources#OriginalFiles).
+
+        Placing your `AndroidManifest.xml` here is required in ECM's [`Android.cmake` toolchain l. 211](https://invent.kde.org/frameworks/extra-cmake-modules/-/blob/master/toolchain/Android.cmake#L211). If this is not set correctly, ECM will use Qt's default manifest template, causing your app package to be named `org.qtproject.example.appname`, the app icons to be missing etc.. While you can use a path relative to the current directory here, it is better to use an absolute path because only that will give an error instead of silently using Qt's default manifest ([see](https://invent.kde.org/frameworks/extra-cmake-modules/-/blob/13a1161/toolchain/Android.cmake#L200)).
+
+    * **`CMAKE_ANDROID_ASSETS_DIRECTORIES`**: Points to directories that will be also be included into the Android `assets/` folder of the Android APK package. Files from here will not be found in the installation directory (`CMAKE_INSTALL_PREFIX`), just in the APK package. You do not need to mention `${ANDROID_APK_DIR}/assets/` here, as that is automatically included into the APK's assets directory.
 
     * **`ECM_DIR`:** TODO: Document.
 
@@ -480,17 +499,27 @@ The following instructions create and install an APK package that will run succe
 
     * **`ZXing_DIR`:** A directory with the `ZXingConfig.cmake` file that defines the ZXing CMake package. It is located in a sub-directory of the installation directory chosen above.
 
-    The code to run CMake (with the variables adapted as told above):
+    The code to run CMake (after you adapted the variables as explained above):
 
     ```
-    mkdir -p build/Android.ConsoleBuild && cd build/Android.ConsoleBuild
+    mkdir -p build/Android.ConsoleKit && cd build/Android.ConsoleKit3
 
     export ANDROID_SDK_ROOT=/opt/android-sdk
     export ANDROID_NDK=/opt/android-sdk/ndk/18.1.5063045
     export ANDROID_ARCH_ABI=armeabi-v7a
     export ANDROID_PLATFORM=23 # TODO: Check if this is required.
 
-    cmake ../.. -DQTANDROID_EXPORTED_TARGET=foodrescue -DANDROID_APK_DIR=../../src/android -DECM_DIR=/usr/local/share/ECM/cmake -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake -DECM_ADDITIONAL_FIND_ROOT_PATH=/opt/qt/5.12.4/android_armv7 -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 -DCMAKE_INSTALL_PREFIX=../../install/android -DKF5Kirigami2_DIR=../../install/android/lib/cmake/KF5Kirigami2 -DZXing_DIR=../../install/android/lib/cmake/ZXing
+    cmake ../.. \
+      -DQTANDROID_EXPORTED_TARGET=foodrescue \
+      -DANDROID_APK_DIR=../../src/android \
+      -DECM_DIR=/usr/local/share/ECM/cmake \
+      -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake \
+      -DECM_ADDITIONAL_FIND_ROOT_PATH=/opt/qt/5.12.4/android_armv7 \
+      -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 \
+      -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 \
+      -DCMAKE_INSTALL_PREFIX=../../install/android \
+      -DKF5Kirigami2_DIR=../../install/android/lib/cmake/KF5Kirigami2 \
+      -DZXing_DIR=../../install/android/lib/cmake/ZXing
     ```
 
 3. **Build the application.** You could also just `make` first to see if the compilation step is successful. Note that `make install` is necessary before every `make create-apk` as otherwise newly added files like icons would not land in the Android APK package. Only the files found in `${CMAKE_INSTALL_PREFIX}` when `make create-apk` runs will make it to the APK package! (This should be considered a bug in the build dependencies and we'll try to get it fixed.)
