@@ -99,7 +99,7 @@ Tips for scanning a barcode:
 
 * Good and even lighting is important for fast barcode recognition.
 
-* Extreme contrast between the barcode and a large surrounding area will lead the camera to overexpose or underexpose the barcode. In that case, try moving the barcode closer to the camera so less of the surrounding area is visible.
+* Barcode recognition is very sensitive to overexposure of the barcode area, but not much to underexposure. A dark camera image background leads to overexposure of the barcode's white area, so prefer a lit / light background. Or try moving the barcode closer to the camera so that less background is visible and won't influence the exposure so much.
 
 * In rare cases there can be misreadings if more than one barcode is visible and barcodes overlap partially. Numbers would then not correspond to either barcode. Overlapping barcodes will not happen in live usage, but might when testing with pieces of paper.
 
@@ -272,7 +272,16 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
     2. Select the directory where to install the database. This depends on your operating system. Select a suitable location with path type `AppLocalDataLocation` from [Qt's list of standard locations](https://doc.qt.io/qt-5/qstandardpaths.html#StandardLocation-enum). For Linux, this would be `~/.local/share/foodrescue/` or `/usr/local/share/foodrescue/`.
 
-    3. Copy the database there, using filename `foodrescue-content.sqlite`.
+    3. Copy the database there, using filename `foodrescue-content.sqlite3`.
+
+    4. Add the relevant indexes to the database. They increase database size from by ~12% but reduce the query time of the typical query in Food Rescue App from 44 s to 0.2 s. TODO: Add these indexes by default in the database build process, then remove the instruction from here.
+
+    ```
+    sqlite3 foodrescue-content.sqlite3 <<SQLEND
+        CREATE INDEX idx_code ON products(code);
+        CREATE INDEX idx_categories_topics ON topic_categories(category_id,topic_id);
+    SQLEND
+    ```
 
 
 ## 5.3. Desktop Build Process

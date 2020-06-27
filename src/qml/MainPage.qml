@@ -20,6 +20,7 @@ Kirigami.ScrollablePage {
 
     // Event handler for a dynamically created ScannerPage object.
     function onBarcodeFound(code) {
+        console.log("mainPage: 'barcodeFound()' signal, code = " + code)
         addressBar.text = code
         browserContent.text = database.search(code)
     }

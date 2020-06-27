@@ -174,7 +174,7 @@ QString ContentDatabase::search(QString barcode) {
         "FROM topic_contents "
         "    INNER JOIN topics ON topic_contents.topic_id = topics.id "
         "    INNER JOIN topic_categories ON topics.id = topic_categories.topic_id "
-        "    INNER JOIN product_categories ON topic_categories.topic_id = product_categories.category_id "
+        "    INNER JOIN product_categories ON topic_categories.category_id = product_categories.category_id "
         "    INNER JOIN products ON product_categories.product_id = products.id "
         "WHERE products.code = :code"
     );

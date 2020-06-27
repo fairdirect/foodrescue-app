@@ -37,9 +37,8 @@ Kirigami.ScrollablePage {
     signal barcodeFound(string code)
 
     // Activate the camera only while visible.
-    //   Else it would consume energy and have its LED on permanently because OverlaySheet types
-    //   are instantiated at the same time as their parent object. Relies on an initial camera
-    //   state of Camera.UnloadedState.
+    //   Else it would consume energy and have its LED on permanently. This page is dynamically
+    //   created, so it is not visible before "inCompleted".
     Component.onCompleted: {
         tagsFound = 0
         lastTag = ""
@@ -65,11 +64,10 @@ Kirigami.ScrollablePage {
             tagsFound++
             lastTag = tag
 
-            // Stopping the camera now is needed because if done when closing the page would
-            // keep it enabled long enough to sometimes recognize more barcodes.
+            // Stop the camera manually to prevent finding more barcodes.
+            //   The camera will be stopped automatically by destroying the page (see pageStack.layers.pop()
+            //   below). However, it might recognize 1-2 more barcodes while the page is closing.
             camera.stop()
-
-            scannerPage.barcodeFound(tag)
 
             // TODO: We'd better like to reference the page instead of just removing the upmost
             // layer. However, pageStack.layers.pop(scannerPage) does nothing and
@@ -81,6 +79,8 @@ Kirigami.ScrollablePage {
             // different methods than org.kde.kirigami.PageRow. See the source code referenced from:
             // https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1PageRow.html#ab0a1367b4574053f31e376ed81e7e9c3
             pageStack.layers.pop()
+
+            scannerPage.barcodeFound(tag)
         }
     }
 
