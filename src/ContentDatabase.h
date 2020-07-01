@@ -9,15 +9,23 @@
 #include <QString>
 #include <QObject>
 
+enum ContentFormat {DOCBOOK, HTML};
+
 class ContentDatabase : public QObject {
    Q_OBJECT
 
 public:
     explicit ContentDatabase (QObject* parent = 0);
 
+    static QString androidAssetToFile(QString assetPath);
+
     void connect();
 
-    Q_INVOKABLE QString search(QString mInputText);
+    QString contentAsDocbook(QString barcode);
+
+    Q_INVOKABLE QString content(QString barcode, ContentFormat format = ContentFormat::HTML);
+
+    QString literature(QString barcode);
 };
 
 #endif // CONTENTDATABASE_H

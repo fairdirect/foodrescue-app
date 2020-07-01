@@ -22,7 +22,7 @@ Kirigami.ScrollablePage {
     function onBarcodeFound(code) {
         console.log("mainPage: 'barcodeFound()' signal, code = " + code)
         addressBar.text = code
-        browserContent.text = database.search(code)
+        browserContent.text = database.content(code)
     }
 
     Local.ContentDatabase {
@@ -83,7 +83,7 @@ Kirigami.ScrollablePage {
 
                 // When the user finishes editing the text field.
                 //   (On desktop, this requires pressing "Return". Moving focus does not count.)
-                onAccepted: browserContent.text = database.search(addressBar.text)
+                onAccepted: browserContent.text = database.content(addressBar.text)
             }
 
             Button {
@@ -91,7 +91,7 @@ Kirigami.ScrollablePage {
                 text: "Go"
                 enabled: false
                 Layout.alignment: Qt.AlignHCenter
-                onClicked: browserContent.text = database.search(addressBar.text)
+                onClicked: browserContent.text = database.content(addressBar.text)
             }
 
             Button {

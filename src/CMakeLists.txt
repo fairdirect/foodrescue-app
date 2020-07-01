@@ -119,6 +119,7 @@ target_link_libraries(foodrescue
     Qt5::Multimedia  # Needed for the barcode scanner.
     Qt5::Gui         # Needed for the barcode scanner.
     Qt5::Concurrent  # Needed for the barcode scanner.
+    Qt5::XmlPatterns # Needed for XSLT conversion of database contents for rendering.
     ZXing::ZXing     # Needed for the barcode scanner.
     # KF5::I18n      # TODO: Add when starting to use KDE i18n.
     ${foodrescue_EXTRA_LIBS}

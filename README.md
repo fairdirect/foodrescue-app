@@ -201,7 +201,7 @@ While the Android platform and Qt library interfaces are mature and almost alway
      sudo apt install build-essential cmake
      ```
 
-2. **Install ECM.** Under Ubuntu 20.04 LTS, you can install them with:
+2. **Install Extra CMake Modules (ECM).** Under Ubuntu 20.04 LTS, you can install them with:
 
     ```
     sudo apt install extra-cmake-modules
@@ -238,7 +238,15 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
     Note that KDE Kirigami is a lightweight library independent of the KDE Plasma desktop environment – it has no dependencies beyond Qt, and you don't need KDE Plasma installed to use it or develop for it.
 
-5. **Install [ZXing-C++](https://github.com/nu-book/zxing-cpp).** This has to be compiled from source because we rely on a newer version than Ubuntu 20.04 [package zxing-cpp](https://launchpad.net/ubuntu/+source/zxing-cpp) (which anyway seems only available as a proposed package there right now). Commit 57c4a89 from 2020-06-25 is the last version that has been tested, and also the minimum necessary version (as it provides CMake package versioning that we use here).
+5. **Install Qt5 development utilities.** Qt comes with some development tools. We'll need `xmlpatterns`, the XSLT processor utility, as it helps to test DocBook-to-HTML transformations developed for this software. Install it with:
+
+    ```
+    sudo apt install qtxmlpatterns5-dev-tools
+    ```
+
+6. **Make Qt5 your default Qt version.** If you have installed both Qt4 and Qt5 on your system, only one of them will be the default for same-named Qt binaries that you'll need during the development process. Build tools are not affected by this, as they will always call Qt binaries with a `-qt=5` argument to make sure they use Qt4 tools. But when using Qt binaries manually, not having Qt 5 as the default version is annoying. On Ubuntu `sudo apt install qt5-default` will make Qt5 the default, while on other systems you might have to deal with `qtchooser` ([details](https://stackoverflow.com/a/39742962)).
+
+7. **Install [ZXing-C++](https://github.com/nu-book/zxing-cpp).** This has to be compiled from source because we rely on a newer version than Ubuntu 20.04 [package zxing-cpp](https://launchpad.net/ubuntu/+source/zxing-cpp) (which anyway seems only available as a proposed package there right now). Commit 57c4a89 from 2020-06-25 is the last version that has been tested, and also the minimum necessary version (as it provides CMake package versioning that we rely on).
 
     We do a system-wide installation to keep `cmake` calls simple for desktop development. But we also use `checkinstall` (`sudo apt install checkinstall`) to create and install a simple Ubuntu package. That makes it much easier to uninstall all installed ZXing files again when necessary (`sudo apt remove zxing-cpp`).
 
@@ -255,7 +263,7 @@ While the Android platform and Qt library interfaces are mature and almost alway
     sudo ldconfig
     ```
 
-6. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
+8. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
 
     ```
     sudo apt install \
@@ -266,7 +274,7 @@ While the Android platform and Qt library interfaces are mature and almost alway
       qttools5-dev qttools5-dev-tools qtwayland5-dev-tools qtxmlpatterns5-dev-tools
     ```
 
-7. **Install the database.** The application relies on the database that is the build output of [project `foodrescue-content`](https://github.com/fairdirect/foodrescue-content). Since during development we'll want to run the application without installing it, we'll have to install the database manually:
+9. **Install the database.** The application relies on the database that is the build output of [project `foodrescue-content`](https://github.com/fairdirect/foodrescue-content). Since during development we'll want to run the application without installing it, we'll have to install the database manually:
 
     1. To build that database, follow [the project's README](https://github.com/fairdirect/foodrescue-content#readme). To install it.
 
@@ -276,12 +284,12 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
     4. Add the relevant indexes to the database. They increase database size from by ~12% but reduce the query time of the typical query in Food Rescue App from 44 s to 0.2 s. TODO: Add these indexes by default in the database build process, then remove the instruction from here.
 
-    ```
-    sqlite3 foodrescue-content.sqlite3 <<SQLEND
-        CREATE INDEX idx_code ON products(code);
-        CREATE INDEX idx_categories_topics ON topic_categories(category_id,topic_id);
-    SQLEND
-    ```
+        ```
+        sqlite3 foodrescue-content.sqlite3 <<SQLEND
+            CREATE INDEX idx_code ON products(code);
+            CREATE INDEX idx_categories_topics ON topic_categories(category_id,topic_id);
+        SQLEND
+        ```
 
 
 ## 5.3. Desktop Build Process
@@ -417,15 +425,12 @@ Download and unpack the package to the place that will later also host the Andro
         make install
         ```
 
-8. **Install [ZXing-C++](https://github.com/nu-book/zxing-cpp).** For Android we obviously need an installation with a custom install prefix because this build is not meant for the development host system (and not even executable there).
+8. **Build [ZXing-C++](https://github.com/nu-book/zxing-cpp) for Android.** For Android we obviously cannot do a system-wide installation as this build is not meant for the development host system (and not even executable there). We use the same ZXing repository already cloned while doing the desktop development setup, in the same commit version.
 
-    1. **Clone the repository.**
+    1. **Enter the repository.**
 
         ```
-        cd /some/out-of-source/path/
-        git clone --depth 1 https://github.com/nu-book/zxing-cpp.git
-        git checkout ed55911
-        cd zxing-cpp
+        cd /path-to-your/zxing-cpp/
         ```
 
     2. **Configure the build.** Be sure to adapt `CMAKE_INSTALL_PREFIX` to point to your installation directory defined above. (Note, the command line options to not build the example applications prevent a build fail in step "Linking CXX executable ZXingWriter" with "ZXingWriter.cpp.o: requires unsupported dynamic reloc R_ARM_REL32". We don't need these examples for Android, and they are probably not made for Android anyway.)
@@ -483,7 +488,14 @@ if it's not found. However, it would clone it into the build directory, and that
         * **If you use another desktop environment:** Change the icon theme in the ways your desktop environment wants it to be done. Qt applications should pick up this change.
         * **If nothing else works:** Install the Qt5 Configuration Tool (`sudo apt install qt5ct`) and in tab "Icon Theme" select "Breeze".
 
-9. **Adapt the makefile.** Due to open issues with the build process, right now you have to adapt `src/CMakeLists.txt` to your system as follows:
+9. **Install the database.** Since we installed the food rescue database in the desktop development setup already, we only have to symlink it now into the `src/android/assets/` directory. That will cause it to be included as a file when `make create-apk` creates the Android APK package later. And we'll not have yet another version of the database to keep up to date.
+
+    ```
+    ln -s /path/to/your/foodrescue-content.sqlite3 src/android/assets/
+    ```
+
+
+10. **Adapt the makefile.** Due to open issues with the build process, right now you have to adapt `src/CMakeLists.txt` to your system as follows:
 
     * In `set(foodrescue_EXTRA_LIBS …)` adapt the path to `libQt5Concurrent.so` for your system.
 
@@ -564,7 +576,12 @@ The following instructions create and install an APK package that will run succe
     adb install -r ./foodrescue_build_apk//build/outputs/apk/debug/foodrescue_build_apk-debug.apk
     ```
 
-    Both commands will first remov a previous version of the app from the device if necessary.
+    Both commands will first remove a previous version of the app from the device if necessary, but without removing application data or granted permissions. If you rather want to do a completely clean install (for example because you want to force using a new version of the database that is bundled into the APK package), then rather use do this:
+
+    ```
+    adb uninstall org.fairdirect.foodrescue
+    adb install ./foodrescue_build_apk//build/outputs/apk/debug/foodrescue_build_apk-debug.apk
+    ```
 
 
 You can also build this the Android application from inside Qt Creator. See chapter [5.4. Qt Creator configuration](54-qt-creator-configuration).

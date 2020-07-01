@@ -12,5 +12,6 @@
         <file>qml/AboutPage.qml</file>
         <file>qml/ScannerPage.qml</file>
         <file>qml/TestPage.qml</file>
+        <file>docbook-to-qthtml.xsl</file>
     </qresource>
 </RCC>

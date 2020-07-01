@@ -141,16 +141,17 @@ find_package(
     Qt5 ${REQUIRED_QT_VERSION}
     REQUIRED
     NO_MODULE
-    COMPONENTS
-        Core
+    COMPONENTS     # To know the available component names: https://stackoverflow.com/a/62676473
+        Core       # Could also be omitted as it's a dependency of the other components.
         Gui
         Qml
         QuickControls2
         Svg
         Sql
-        Multimedia # Needed by the barcode scanner.
-        Concurrent # Needed by the barcode scanner.
-        Quick      # Needed by the barcode scanner.
+        Multimedia  # Needed by the barcode scanner.
+        Concurrent  # Needed by the barcode scanner.
+        Quick       # Needed by the barcode scanner.
+        XmlPatterns # Needed for XSLT conversion of database content for rendering.
 )
 
 # Require the package providing library Qt5::AndroidExtras, as needed in src/CMakeLists.txt.
