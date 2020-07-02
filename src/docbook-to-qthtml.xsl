@@ -68,7 +68,31 @@
                     div.spacer-72 { color: transparent; margin-top: 56px; }
                 </style>
             </head>
-            <body><xsl:apply-templates/></body>
+            <body>
+                <!-- Create a "custom sort order" effect by selectively applying the templates. -->
+                <xsl:apply-templates select="./db:topic[@type='risks']"/>
+                <xsl:apply-templates select="./db:topic[@type='assessment']"/>
+                <xsl:apply-templates select="./db:topic[@type='symptoms']"/>
+
+                <xsl:apply-templates select="./db:topic[@type='pantry_storage']"/>
+                <xsl:apply-templates select="./db:topic[@type='refrigerator_storage']"/>
+                <xsl:apply-templates select="./db:topic[@type='freezer_storage']"/>
+                <xsl:apply-templates select="./db:topic[@type='other_storage']"/>
+                <xsl:apply-templates select="./db:topic[@type='commercial_storage']"/>
+
+                <xsl:apply-templates select="./db:topic[@type='donation_options']"/>
+                <xsl:apply-templates select="./db:topic[@type='post_spoilage']"/>
+
+                <xsl:apply-templates select="./db:topic[@type='edible_parts']"/>
+                <xsl:apply-templates select="./db:topic[@type='preservation']"/>
+                <xsl:apply-templates select="./db:topic[@type='preparation']"/>
+                <xsl:apply-templates select="./db:topic[@type='unliked_food']"/>
+                <xsl:apply-templates select="./db:topic[@type='residual_food']"/>
+
+                <xsl:apply-templates select="./db:topic[@type='reuse_and_recycling']"/>
+                <xsl:apply-templates select="./db:topic[@type='production_waste']"/>
+                <xsl:apply-templates select="./db:topic[@type='packaging_waste']"/>
+            </body>
         </html>
     </xsl:template>
 
@@ -106,7 +130,6 @@
                     <xsl:when test="./@type = 'packaging waste'">Packaging waste</xsl:when>
 
                     <xsl:otherwise><xsl:value-of select="./@type"/></xsl:otherwise>
-
                 </xsl:choose>
             </h1></td></tr>
         </table>
