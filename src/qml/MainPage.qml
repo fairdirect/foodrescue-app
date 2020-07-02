@@ -97,10 +97,14 @@ Kirigami.ScrollablePage {
                     goButton.enabled = text.length > 0 ? true : false
                 }
 
-                // Forward the "accepted" event to avoid redundant code.
-                //   The "accepted" event is emitted when the user finishes editing the text field.
+                // Handle the "text accepted" event.
+                //   This event is emitted when the user finishes editing the text field.
                 //   On desktop, this requires pressing "Return". Moving focus does not count.
-                Component.onCompleted: accepted.connect(goButton.clicked)
+                onAccepted: {
+                    console.log("addressBar: 'accepted()' signal")
+                    // Forward to the "Go" button to avoid duplicate code.
+                    goButton.clicked()
+                }
             }
 
             Button {
