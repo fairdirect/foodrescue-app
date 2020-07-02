@@ -80,7 +80,35 @@
         <!-- TODO: Replace this placeholder of the section header. It must be rendered only once per
           section, not once per topic. -->
         <table class="h1" width="100%">
-            <tr><td><h1><xsl:value-of select="./@type"/></h1></td></tr>
+            <tr><td><h1>
+                <xsl:choose>
+                    <!-- Content section shortnames and titles are as defined in the official documentation,
+                      see: https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA#z=ZYsoIiZKiCqqvdw_JZC4f7fV
+                      When new sections are added there, they also have to be included here. -->
+                    <!-- TODO: Render the proper i18n'ed versions of the section titles. -->
+                    <xsl:when test="./@type = 'risks'">Risks and caveats</xsl:when>
+                    <xsl:when test="./@type = 'assessment'">Edibility assessment</xsl:when>
+                    <xsl:when test="./@type = 'symptoms'">Symptoms and causes</xsl:when>
+                    <xsl:when test="./@type = 'post_spoilage'">Rescuing spoiled and damaged food</xsl:when>
+                    <xsl:when test="./@type = 'donation_options'">Donation options</xsl:when>
+                    <xsl:when test="./@type = 'edible_parts'">Edible parts</xsl:when>
+                    <xsl:when test="./@type = 'residual_food'">Cleaning out packaging, and cleaning pots and plates</xsl:when>
+                    <xsl:when test="./@type = 'unliked_food'">What to do when not liking a food item</xsl:when>
+                    <xsl:when test="./@type = 'pantry_storage'">Pantry storage</xsl:when>
+                    <xsl:when test="./@type = 'refrigerator_storage'">Refrigerator storage</xsl:when>
+                    <xsl:when test="./@type = 'freezer_storage'">Freezer storage</xsl:when>
+                    <xsl:when test="./@type = 'other_storage'">Other storage types</xsl:when>
+                    <xsl:when test="./@type = 'commercial_storage'">Commercial storage and management</xsl:when>
+                    <xsl:when test="./@type = 'preservation'">Preservation instructions</xsl:when>
+                    <xsl:when test="./@type = 'preparation'">Preparation instructions</xsl:when>
+                    <xsl:when test="./@type = 'reuse_and_recycling'">Reuse and recycling ideas</xsl:when>
+                    <xsl:when test="./@type = 'production_waste'">Production waste</xsl:when>
+                    <xsl:when test="./@type = 'packaging waste'">Packaging waste</xsl:when>
+
+                    <xsl:otherwise><xsl:value-of select="./@type"/></xsl:otherwise>
+
+                </xsl:choose>
+            </h1></td></tr>
         </table>
 
         <div class="spacer-16">.</div>
