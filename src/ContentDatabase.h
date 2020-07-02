@@ -17,8 +17,6 @@ class ContentDatabase : public QObject {
 public:
     explicit ContentDatabase (QObject* parent = 0);
 
-    static QString androidAssetToFile(QString assetPath);
-
     void connect();
 
     QString contentAsDocbook(QString barcode);

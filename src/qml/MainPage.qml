@@ -127,41 +127,9 @@ Kirigami.ScrollablePage {
         Text {
             id: browserContent
 
-            text: '
-                <html>
+            text: ''
 
-                  <h3>Lorem Ipsum 1</h3>
-
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer et ligula
-                    lectus. Praesent in ultrices ligula, quis luctus lorem. Mauris non magna
-                    dignissim, euismod risus et, aliquet dolor. Curabitur suscipit elit ante, in
-                    consequat ante tincidunt et. Nulla in pharetra felis. Sed sem neque, cursus
-                    finibus odio pretium, ornare efficitur ipsum. Nullam vel dui leo. In sit amet
-                    magna nibh. Vestibulum ultricies tincidunt diam, quis ullamcorper est. Donec
-                    tristique tellus at felis mattis luctus. Praesent rhoncus ipsum sed lorem
-                    fermentum cursus. Ut ut mollis ipsum.</p>
-
-                  <h3>Lorem Ipsum 2</h3>
-
-                  <p>Cras non nulla venenatis sem tempor pulvinar. Integer sed accumsan orci, id
-                    dapibus ante. Duis finibus vitae tellus sed hendrerit. Suspendisse potenti.
-                    Fusce sed leo egestas, venenatis eros non, lobortis libero. Nulla eu justo at
-                    ante fringilla viverra eget sit amet nunc. Aliquam sed augue sed libero lacinia
-                    lacinia sed non quam. Nunc ultrices ipsum nec eleifend fermentum. Ut viverra
-                    suscipit bibendum. Duis quis neque pellentesque, volutpat ante quis, posuere
-                    leo.</p>
-
-                  <h3>Lorem Ipsum 2</h3>
-
-                  <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere
-                    cubilia curae; Proin id justo sapien. Nam id nulla accumsan, rhoncus lacus id,
-                    imperdiet erat. Ut dictum euismod purus, sit amet faucibus mi. Sed lacinia
-                    dolor metus, aliquam cursus augue commodo sit amet. Aenean sed malesuada
-                    tellus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur
-                    ridiculus mus. In in fringilla dui, vel tempus justo.</p>
-
-                </html>'
-
+            textFormat: Text.RichText // Otherwise we get Text.StyledText, offering much fewer options.
             Layout.fillWidth: true
             wrapMode: Text.Wrap
             onLinkActivated: Qt.openUrlExternally(link)

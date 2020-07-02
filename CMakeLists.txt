@@ -148,10 +148,11 @@ find_package(
         QuickControls2
         Svg
         Sql
-        Multimedia  # Needed by the barcode scanner.
-        Concurrent  # Needed by the barcode scanner.
-        Quick       # Needed by the barcode scanner.
-        XmlPatterns # Needed for XSLT conversion of database content for rendering.
+        Multimedia  # For the barcode scanner.
+        Concurrent  # For the barcode scanner.
+        Quick       # For the barcode scanner.
+        Xml         # For XML debug output in formatXml(). TODO: Avoid in non-debug builds.
+        XmlPatterns # For XSLT conversion of database content for rendering.
 )
 
 # Require the package providing library Qt5::AndroidExtras, as needed in src/CMakeLists.txt.
