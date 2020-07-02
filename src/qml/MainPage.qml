@@ -7,6 +7,8 @@ import local 1.0 as Local // Our custom QML components, as exported in main.cpp.
 // Page shown at startup of the application.
 //   Shows the main area of the application, which contains every control element except the
 //   sidebar drawer and any layers / sheets / drawers added on top.
+//
+//   TODO: Rename this component from MainPage to ContentBrowser.
 Kirigami.ScrollablePage {
     id: mainPage
 
@@ -18,12 +20,25 @@ Kirigami.ScrollablePage {
     keyboardNavigationEnabled: true
     horizontalScrollBarPolicy: ScrollBar.AlwaysOff
 
+
+    // Wraps a database search and returns the result or a "nothing found" message.
+    function contentOrMessage(searchTerm) {
+        var content = database.content(searchTerm)
+        if (content === "")
+            // TODO: i18n this message properly.
+            return "No content found for \"" + searchTerm + "\"."
+        else
+            return content
+    }
+
+
     // Event handler for a dynamically created ScannerPage object.
     function onBarcodeFound(code) {
         console.log("mainPage: 'barcodeFound()' signal, code = " + code)
         addressBar.text = code
-        browserContent.text = database.content(code)
+        browserContent.text = contentOrMessage(code)
     }
+
 
     Local.ContentDatabase {
         id: database
@@ -62,6 +77,7 @@ Kirigami.ScrollablePage {
 
         spacing: 10
 
+        // Browser header bar: adress bar, "Go" button, "Scan" button.
         RowLayout {
             Layout.fillWidth: true
 
@@ -81,9 +97,10 @@ Kirigami.ScrollablePage {
                     goButton.enabled = text.length > 0 ? true : false
                 }
 
-                // When the user finishes editing the text field.
-                //   (On desktop, this requires pressing "Return". Moving focus does not count.)
-                onAccepted: browserContent.text = database.content(addressBar.text)
+                // Forward the "accepted" event to avoid redundant code.
+                //   The "accepted" event is emitted when the user finishes editing the text field.
+                //   On desktop, this requires pressing "Return". Moving focus does not count.
+                Component.onCompleted: accepted.connect(goButton.clicked)
             }
 
             Button {
@@ -91,11 +108,11 @@ Kirigami.ScrollablePage {
                 text: "Go"
                 enabled: false
                 Layout.alignment: Qt.AlignHCenter
-                onClicked: browserContent.text = database.content(addressBar.text)
+                onClicked: browserContent.text = contentOrMessage(addressBar.text)
             }
 
             Button {
-                id: scannerButton
+                id: scanButton
                 text: "Scan"
                 Layout.alignment: Qt.AlignHCenter
 
