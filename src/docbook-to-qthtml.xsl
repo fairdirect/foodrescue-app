@@ -81,76 +81,99 @@
                 <!-- Sadly we cannot replace this with a xsl:for-each loop over strings because Qt's
                     variable binding in loops is broken, preventing access to anything outside the
                     loop context (which is just the strings in this case). -->
+                <!-- Content section shortnames and header texts are as defined in the official documentation,
+                    see: https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA#z=ZYsoIiZKiCqqvdw_JZC4f7fV
+                    When new sections are added there, they also have to be included here. -->
+                <!-- TODO: Render the proper i18n'ed versions of the section titles. -->
+
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'risks'"/>
+                    <xsl:with-param name="header">Risks and caveats</xsl:with-param>
+                    <xsl:with-param name="topictype">risks</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'assessment'"/>
+                    <xsl:with-param name="header">Edibility assessment</xsl:with-param>
+                    <xsl:with-param name="topictype">assessment</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'symptoms'"/>
+                    <xsl:with-param name="header">Symptoms and causes</xsl:with-param>
+                    <xsl:with-param name="topictype">symptoms</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'pantry_storage'"/>
+                    <xsl:with-param name="header">Pantry storage</xsl:with-param>
+                    <xsl:with-param name="topictype">pantry_storage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'refrigerator_storage'"/>
+                    <xsl:with-param name="header">Refrigerator storage</xsl:with-param>
+                    <xsl:with-param name="topictype">refrigerator_storage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'freezer_storage'"/>
+                    <xsl:with-param name="header">Freezer storage</xsl:with-param>
+                    <xsl:with-param name="topictype">freezer_storage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'other_storage'"/>
+                    <xsl:with-param name="header">Other storage types</xsl:with-param>
+                    <xsl:with-param name="topictype">other_storage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'commercial_storage'"/>
+                    <xsl:with-param name="header">Commercial storage and management</xsl:with-param>
+                    <xsl:with-param name="topictype">commercial_storage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'donation_options'"/>
+                    <xsl:with-param name="header">Donation options</xsl:with-param>
+                    <xsl:with-param name="topictype">donation_options</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'post_spoilage'"/>
+                    <xsl:with-param name="header">Rescuing spoiled and damaged food</xsl:with-param>
+                    <xsl:with-param name="topictype">post_spoilage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'edible_parts'"/>
+                    <xsl:with-param name="header">Edible parts</xsl:with-param>
+                    <xsl:with-param name="topictype">edible_parts</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'preservation'"/>
+                    <xsl:with-param name="header">Preservation instructions</xsl:with-param>
+                    <xsl:with-param name="topictype">preservation</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'preparation'"/>
+                    <xsl:with-param name="header">Preparation instructions</xsl:with-param>
+                    <xsl:with-param name="topictype">preparation</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'unliked_food'"/>
+                    <xsl:with-param name="header">When you don't like this food</xsl:with-param>
+                    <xsl:with-param name="topictype">unliked_food</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'residual_food'"/>
+                    <xsl:with-param name="header">Cleaning out residual food</xsl:with-param>
+                    <xsl:with-param name="topictype">residual_food</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'reuse_and_recycling'"/>
+                    <xsl:with-param name="header">Reuse and recycling ideas</xsl:with-param>
+                    <xsl:with-param name="topictype">reuse_and_recycling</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'production_waste'"/>
+                    <xsl:with-param name="header">Production waste</xsl:with-param>
+                    <xsl:with-param name="topictype">production_waste</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="type" select="'packaging_waste'"/>
+                    <xsl:with-param name="header">Packaging waste</xsl:with-param>
+                    <xsl:with-param name="topictype">packaging_waste</xsl:with-param>
                 </xsl:call-template>
 
             </body>
@@ -160,49 +183,21 @@
 
     <!-- Render all topics within one content section, such as "pantry storage". -->
     <xsl:template name="section">
-        <xsl:param name="type"/>
+        <xsl:param name="header"/>
+        <xsl:param name="topictype"/>
 
-        <xsl:if test="./db:topic[@type = $type]" >
+        <xsl:if test="./db:topic[@type = $topictype]" >
 
             <!-- Create a gap to the previous content. Automatically omitted at the start of the document. -->
             <div class="spacer-56">.</div>
 
             <!-- Render the section title. -->
             <table class="h1" width="100%">
-                <tr><td><h1>
-                    <xsl:choose>
-                        <!-- Content section shortnames and titles are as defined in the official documentation,
-                            see: https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA#z=ZYsoIiZKiCqqvdw_JZC4f7fV
-                            When new sections are added there, they also have to be included here. -->
-                        <!-- TODO: Avoid this switch statement by using a second template parameter "headertext".
-                            This also avoids spreading section meta-information to two places in this file. -->
-                        <!-- TODO: Render the proper i18n'ed versions of the section titles. -->
-                        <xsl:when test="$type = 'risks'">Risks and caveats</xsl:when>
-                        <xsl:when test="$type = 'assessment'">Edibility assessment</xsl:when>
-                        <xsl:when test="$type = 'symptoms'">Symptoms and causes</xsl:when>
-                        <xsl:when test="$type = 'post_spoilage'">Rescuing spoiled and damaged food</xsl:when>
-                        <xsl:when test="$type = 'donation_options'">Donation options</xsl:when>
-                        <xsl:when test="$type = 'edible_parts'">Edible parts</xsl:when>
-                        <xsl:when test="$type = 'residual_food'">Cleaning out packaging, and cleaning pots and plates</xsl:when>
-                        <xsl:when test="$type = 'unliked_food'">What to do when not liking a food item</xsl:when>
-                        <xsl:when test="$type = 'pantry_storage'">Pantry storage</xsl:when>
-                        <xsl:when test="$type = 'refrigerator_storage'">Refrigerator storage</xsl:when>
-                        <xsl:when test="$type = 'freezer_storage'">Freezer storage</xsl:when>
-                        <xsl:when test="$type = 'other_storage'">Other storage types</xsl:when>
-                        <xsl:when test="$type = 'commercial_storage'">Commercial storage and management</xsl:when>
-                        <xsl:when test="$type = 'preservation'">Preservation instructions</xsl:when>
-                        <xsl:when test="$type = 'preparation'">Preparation instructions</xsl:when>
-                        <xsl:when test="$type = 'reuse_and_recycling'">Reuse and recycling ideas</xsl:when>
-                        <xsl:when test="$type = 'production_waste'">Production waste</xsl:when>
-                        <xsl:when test="$type = 'packaging waste'">Packaging waste</xsl:when>
-
-                        <xsl:otherwise><xsl:value-of select="./@type"/></xsl:otherwise>
-                    </xsl:choose>
-                </h1></td></tr>
+                <tr><td><h1><xsl:value-of select="$header" /></h1></td></tr>
             </table>
 
             <!-- Render the topics within the section. -->
-            <xsl:for-each select="./db:topic[@type = $type]" >
+            <xsl:for-each select="./db:topic[@type = $topictype]" >
                 <div class="spacer-16">.</div>
 
                 <table class="h2" width="100%">
