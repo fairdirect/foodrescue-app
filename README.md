@@ -30,7 +30,9 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
 **[6. Release Process](#6-release-process)**<br/>
 
   * [6.1. Desktop Linux](#61-desktop-linus)
-  * [6.2. Android](#62-android)
+  * [6.2. F-Droid](#62-f-droid)
+  * [6.3. Google Play](#63-google-play)
+  * [6.4. Apple AppStore](#64-apple-appstore)
 
 **[7. Style Guide](#7-style-guide)**
 
@@ -282,7 +284,9 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
     3. Copy the database there, using filename `foodrescue-content.sqlite3`.
 
-    4. Add the relevant indexes to the database. They increase database size from by ~12% but reduce the query time of the typical query in Food Rescue App from 44 s to 0.2 s. TODO: Add these indexes by default in the database build process, then remove the instruction from here.
+    4. Add the relevant indexes to the database. They increase database size by ~12% but reduce the query time of the typical queries in Food Rescue App from 44 s to 0.2 s.
+
+        TODO: Add these indexes by default in the database build process, then remove the instruction from here.
 
         ```
         sqlite3 foodrescue-content.sqlite3 <<SQLEND
@@ -320,6 +324,12 @@ You can also build this the Android application from inside Qt Creator. See chap
 
     ```
     ./bin/foodrescue
+    ```
+
+    If you have done the `make install` step, you can also start the application from your desktop environment's start menu, or you can start it with:
+
+    ```
+    foodrescue
     ```
 
 
@@ -375,7 +385,7 @@ Download and unpack the package to the place that will later also host the Andro
     yes | sdkmanager --licenses
     ```
 
-6. **Install Qt for Android.** Needed because the Ubuntu repositories contain only the desktop variant "Qt 5.12.5 (GCC 5.3.1 … 64 bit)". For Android, we need a variant compiled for ARMv7 / ARMv8 architecture instead. The below is the most comfortable way to install Qt for Android; for other options, [see here]( (https://stackoverflow.com/a/62090264).
+6. **Install Qt for Android.** Needed because the Ubuntu repositories contain only the desktop variant "Qt 5.12.5 (GCC 5.3.1 … 64 bit)". For Android, we need a variant compiled for ARMv7 / ARMv8 architecture instead. The below is the most comfortable way to install Qt for Android; for other options, [see here](https://stackoverflow.com/a/62090264).
 
     1. **Install [`aqtinstall`](https://github.com/miurahr/aqtinstall/).** This is an unofficial installer to install any platform version of Qt on any platform. This is needed because the version of Qt provided in the Ubuntu repositories does not provide the Qt Maintenance Tool that could be used as an alternative.
 
@@ -433,7 +443,7 @@ Download and unpack the package to the place that will later also host the Andro
         cd /path-to-your/zxing-cpp/
         ```
 
-    2. **Configure the build.** Be sure to adapt `CMAKE_INSTALL_PREFIX` to point to your installation directory defined above. (Note, the command line options to not build the example applications prevent a build fail in step "Linking CXX executable ZXingWriter" with "ZXingWriter.cpp.o: requires unsupported dynamic reloc R_ARM_REL32". We don't need these examples for Android, and they are probably not made for Android anyway.)
+    2. **Configure the build.** Be sure to adapt `CMAKE_INSTALL_PREFIX` to point to your installation directory defined above. (Note: The command line options to not build the example applications prevent a build fail in step "Linking CXX executable ZXingWriter" with error message "ZXingWriter.cpp.o: requires unsupported dynamic reloc R_ARM_REL32". We don't need these examples for Android, and they are probably not made for Android anyway.)
 
         ```
         mkdir -p build/android && cd build/android
@@ -683,21 +693,65 @@ If you use Qt Creator as your IDE, here are ways to make developing for this (an
    ```
 
 
-## 6. Release Process
+# 6. Release Process
 
 The default build type is "Debug". To create a release build that is ready for packaging and uploading, follow the process below:
 
 
-#### 6.1. Desktop Linux
+## 6.1. Desktop Linux
 
 TODO
 
 
-#### 6.2. Android
+## 6.2. F-Droid
 
-To control the build type, use `cmake` variable [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/v3.0/variable/CMAKE_BUILD_TYPE.html).
+TODO
 
-But even with `-DCMAKE_BUILD_TYPE=Release` or `-DCMAKE_BUILD_TYPE=Release` passed to the `cmake` call, the generated Android APK package will sill be named `foodrescue_build_apk-debug.apk`. This is because a release package will only be generated when you provide a certificate for signing – which can be considered a bug in `androiddeployqt` ([details](https://stackoverflow.com/a/28509035)).
+
+## 6.3. Google Play
+
+This does not describe the initial setup to be able to upload the application to Google Play for the first time. For that, [see here](https://support.google.com/googleplay/android-developer/answer/113469). Instead, this is the process to follow to upload any update to the application to Google Play.
+
+1. **Configure package signing.** This is necessary only the first time you start creating Android packages for Google Play on a new device. Alternatively and probably more comfortably, use [app signing by Google Play](https://support.google.com/googleplay/android-developer/answer/7384423).
+
+    Even with `-DCMAKE_BUILD_TYPE=Release` passed to the `cmake` call, the generated Android APK package will sill be named `foodrescue_build_apk-debug.apk`. This is because a release package will only be generated when you provide a certificate for signing – which can be considered a bug in `androiddeployqt` ([details](https://stackoverflow.com/a/28509035)). TODO: How to configure package signing.
+
+2. **Update the version.** TODO
+
+3. **Create a release build.** To control the build type, use `cmake` variable [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/v3.0/variable/CMAKE_BUILD_TYPE.html). For a release build, use:
+
+    ```
+    -DCMAKE_BUILD_TYPE=Release
+    ```
+
+    TODO: Change this to the RelMinSize or similar value to create a minimum size release package.
+
+4. **Create an AAB package.** An AAB (Android Application Bundle) combines the APK packages of multiple processor architectures (ABIs, meaning Application Binary Interface). The ABIs to support are only **`armeabi-v7a` and `arm64-v8a`** (the "newer version"). Together these account for 98% of all Android devices in use ([see](https://android.stackexchange.com/a/202022)). Also, native apps must support both `armeabi-v7a` and `arm64-v8a` to be publishable on Google Play ([see](https://stackoverflow.com/a/53413715)).
+
+    Typically, processors supporting `arm64-v8a` also support code made for `armeabi-v7a` but it will run slower, not utilizing the full capabilities of the CPU ([see](https://stackoverflow.com/a/33230181)). So for testing or for publishing outside Google Play, a single APK made for `armeabi-v7a` is enough.
+
+    For end users, support for the `x86` and `x86_64` ABIs only matters with respect to Chromebooks ([see](https://android.stackexchange.com/a/202022)). Most Chromebooks still use the x86 and x86_64 processor architecture and only some use ARM based processors. However, since Chromebooks can also run Linux desktop applications ([see](https://en.wikipedia.org/wiki/Chromebook#Integration_with_Linux)), that seems to be a better route for a cross-platform application like this to support them, given that they are more like a notebook than like a typical Android phone or tablet.
+
+    Finally, support for the `x86` and `x86_64` ABIs would also be relevant for Android emulators. But for a cross-platform application that also runs natively under Windows, Linux and Mac OS X, emulators are only useful for developers during testing. And developers can build their own version anyway.
+
+5. **Log in to Google Play Console.** Use any Google account to register on [Google Play Console](https://play.google.com/apps/publish/), the place for publishing Android apps on Google Play.
+
+6. **Update the screenshots.** If there were significant changes to the user interface, run the application under Android and create screenshots for uploading to Google Play. For that, execute something like this to update one of the screenshots for a 7" tablet saved in the Food Rescue App repository. The `convert` command requires to have ImageMagick installed.
+
+    ```
+    cd /path/to/foodrescue-app/
+    adb exec-out screencap -p > metadata-screenshot-tablet7-1.png
+    convert -quality 75 metadata-screenshot-tablet7-1.png metadata-screenshot-tablet7-1.jpg
+    ```
+
+    Then upload the screensots to Google Play Console under "All Apps → Food Rescue → Store Entry".
+
+7. **Upload to Google Play.** TODO.
+
+
+## 6.4. Apple AppStore
+
+TODO
 
 
 # 7. Style Guide
