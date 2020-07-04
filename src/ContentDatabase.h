@@ -19,11 +19,15 @@ public:
 
     void connect();
 
+    Q_INVOKABLE // Allows to invoke this method from QML.
+    QString normalize(QString searchTerm);
+
     QString contentAsDocbook(QString barcode);
 
-    Q_INVOKABLE QString content(QString barcode, ContentFormat format = ContentFormat::HTML);
+    Q_INVOKABLE // Allows to invoke this method from QML.
+    QString content(QString searchTerm, ContentFormat format = ContentFormat::HTML);
 
-    QString literature(QString barcode);
+    QString literature(QString searchTerm);
 };
 
 #endif // CONTENTDATABASE_H

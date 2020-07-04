@@ -40,6 +40,11 @@ Kirigami.ScrollablePage {
     }
 
 
+    // Interface to the food rescue content.
+    //   This is a C++ defined QML type, see ContentDatabase.h. Interface: method content(string).
+    //   Note that this is not the same ContentDatabase object that is created in main.cpp. It still
+    //   works because we rely on the QSqlDatabase default connection, see ContentDatabase.cpp for
+    //   details.
     Local.ContentDatabase {
         id: database
     }
@@ -112,7 +117,13 @@ Kirigami.ScrollablePage {
                 text: "Go"
                 enabled: false
                 Layout.alignment: Qt.AlignHCenter
-                onClicked: browserContent.text = contentOrMessage(addressBar.text)
+                onClicked: {
+                    var searchTerm = database.normalize(addressBar.text)
+                    // As in a web browser, we'll correct the "address" entered. Such as:
+                    // " 2 165741  004149  " → "2165741004149"
+                    addressBar.text = searchTerm
+                    browserContent.text = contentOrMessage(searchTerm)
+                }
             }
 
             Button {

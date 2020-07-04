@@ -6,6 +6,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QRegularExpression>
 #include <QVariant>
 #include <QDebug>
 
@@ -43,7 +44,8 @@ void ContentDatabase::connect() {
     }
 
     // Set up the database connection as the default (unnamed) connection.
-    //   This causes QSqlQuery etc. to use this connection by not specifying a connection name.
+    //   This causes QSqlQuery etc. to use this connection when no connection name is specified.
+    //   This works even when accessing QSqlDatabase from different ContentDatabase objects.
     //   See: https://doc.qt.io/qt-5/qsqldatabase.html#details
     QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
 
@@ -98,6 +100,25 @@ void ContentDatabase::connect() {
             << "ContentDatabase::connect: ERROR: could not open database "
             << dbName << ": " << db.lastError().text();
     }
+}
+
+
+/**
+ * @brief Normalize the provided search term.
+ * @param searchTerm The raw search term, usually as entered by a user.
+ * @return The normalized search term. For example, leading and trailing spaces and spaces inside
+ *   numerical search terms are removed.
+ */
+QString ContentDatabase::normalize(QString searchTerm) {
+    QRegExp spacedNumber("[0-9 ]*");
+
+    if (spacedNumber.exactMatch(searchTerm))
+        return searchTerm.replace(" ", "");
+    else
+        return searchTerm;
+
+    // TODO Also normalize category search terms by stripping leading and trailing whitespaces
+    // and reducing other whitespace to single space characters with QString::simplify().
 }
 
 
@@ -165,22 +186,26 @@ QString ContentDatabase::contentAsDocbook(QString barcode) {
 
 /**
  * @brief Search the database for a barcode and return associated topics.
- * @param barcode Text as decoded from a barcode, used as the search term to find associated
- *   content topics in the database.
+ * @param searchTerm Text to use as the search term to find associated content topics in the
+ *   database. This can be either text as decoded from a product barcode or a category name. The
+ *   search term has to be in normalized format (see ContentDatabase::normalize()).
  * @param format The format to return the content in.
  * @return The content topics resulting from the database search, combined into a single DocBook
  *   XML or Qt5 HTML document. All topic meta-information about the topics (author, content section,
  *   version date, categories etc.) is rendered into the returned document.
  */
-QString ContentDatabase::content(QString barcode, ContentFormat format) {
+QString ContentDatabase::content(QString searchTerm, ContentFormat format) {
 
-    QString docbook = contentAsDocbook(barcode);
+    // Get the raw database search results.
+    QString docbook = contentAsDocbook(searchTerm);
+
+    // Deal with the simple cases first.
     if (format == ContentFormat::DOCBOOK)
         return docbook;
     else if (docbook.isEmpty())
         return "";
 
-    // Return database content in HTML format (the only option besides ContentFormat::DOCBOOK).
+    // Deal with the remaining case: converting the content to HTML format.
     QString html;
     QXmlQuery query(QXmlQuery::XSLT20);
     query.setFocus(docbook);
@@ -208,8 +233,8 @@ QString ContentDatabase::content(QString barcode, ContentFormat format) {
  * @param barcode Text as decoded from a barcode.
  * @return TODO
  */
-QString ContentDatabase::literature(QString barcode) {
+QString ContentDatabase::literature(QString searchTerm) {
     // TODO: Implementation. Probably the return type has to be changed to a two-dimensional
     // array ("table" / "hash").
-    return barcode; // Dummy, just to avoid the warnings.
+    return searchTerm; // Dummy, just to avoid the warnings.
 }

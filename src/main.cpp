@@ -49,8 +49,8 @@ int main(int argc, char *argv[]) {
     db.connect();
 
     // Make the Food Rescue database available for use in QML.
-    // TODO: Better than registering the type to be instantiated in QML, provide the above "db"
-    // object as a global object to be accessed in QML.
+    //   TODO: Better than registering the type to be instantiated in QML, provide the above "db"
+    //   object as a global object to be accessed in QML.
     qmlRegisterType<ContentDatabase>("local", 1, 0, "ContentDatabase");
 
     QQmlApplicationEngine engine;
