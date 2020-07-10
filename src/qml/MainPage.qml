@@ -42,28 +42,48 @@ Kirigami.ScrollablePage {
     }
 
 
-    // Highlight the completions of a multi-substring search term in bold.
+    // Highlight the completed parts of a multi-substring search term in bold, using HTML "<b>".
+    // @param fragmentsString  The part to not render in bold, when matched case-insensitively against the
+    //   completion.
     // TODO: Document the parameters.
-    // TODO: Handle the error condition when not all words from "original" are found in "completion".
-    function boldenCompletion(completion, original) {
-        // TODO: Make sure original contains no HTML tags by sanitizing these. Otherwise searching
-        //   for parts of original below may match "word</b>" etc. and mess up the result.
-        var words = original.split(" ")
-        var completionPos = 0
+    // TODO: Make sure original contains no HTML tags by sanitizing these. Otherwise searching
+    //   for parts of original below may match "word</b>" etc. and mess up the result.
+    function boldenCompletion(completion, fragmentsString) {
+        var fragments = fragmentsString.trim().split(" ")
+        // Tracks the current search position in "completion", ensuring fragments are found in sequence.
+        var searchPos = 0
 
-        // Start with the whole completion in bold.
+        // Start by boldening everything.
         completion = "<b>" + completion + "</b>"
 
-        // De-bold all search terms contained as words in "original".
-        for (var i = 0; i < words.length; i++) {
-            var searchWord = words[i]
+        // De-bold the sequential first occurrences of the fragments.
+        for (var i = 0; i < fragments.length; i++) {
+            var iCompletion = completion.toLowerCase() // "i" as in "case-Insensitive"
+            var fragment = fragments[i]
+            var fragmentStart = iCompletion.indexOf(fragment.toLowerCase(), searchPos)
 
-            if (searchWord !== "")
-                // Replace the first occurrence of searchWord with its de-bolded version.
-                //   TODO: Only replace starting from completionPos. And track the position of the last
-                //   match end in completionPos via "match.index + match[0].length".
-                //   TODO: Make the replacement case-insensitive.
-                completion = completion.replace(searchWord, "</b>" + searchWord + "<b>")
+            // Nothing to de-bolden if fragment was not found.
+            // TODO: This is an error condition that should generate a warning.
+            if (fragmentStart === -1)
+                continue
+
+            var fragmentEnd = fragmentStart + fragment.length
+
+            console.log("boldenCompletion(): fragment = " + fragment)
+            console.log("boldenCompletion(): fragmentStart = " + fragmentStart)
+            console.log("boldenCompletion(): fragmentEnd = " + fragmentEnd)
+
+            searchPos = fragmentEnd
+
+            var completionBefore = completion.substr(0, fragmentStart)
+            var completionDebold = completion.substr(fragmentStart, fragment.length)
+            var completionAfter = completion.substr(fragmentEnd)
+
+            console.log("boldenCompletion(): completionBefore = " + completionBefore)
+            console.log("boldenCompletion(): completionDebold = " + completionDebold)
+            console.log("boldenCompletion(): completionAfter = " + completionAfter)
+
+            completion = completionBefore + "</b>" + completionDebold + "<b>" + completionAfter
         }
 
         return completion
@@ -150,18 +170,22 @@ Kirigami.ScrollablePage {
                     console.log("addressBar: 'textChanged()' signal")
 
                     // TODO: This should better be set as a binding on goButton itself.
-                    goButton.enabled = text.length > 0 ? true : false
+                    goButton.enabled = text == "" ? false : true;
 
-                    // Show the auto-suggestions box while entering a category name.
-                    //   Means, don't show it while the text entered could be a barcode number.
-                    suggestionsBox.visible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
 
-                    // Only update the auto-completions if the textChanged() event is due to user text input.
-                    //   If currentIndex points to a valid completion, the event is rather because the user
-                    //   is navigating the existing completions using the arrow keys, or clicked on one item.
-                    //   Also if the user deleted all text, completions have to be cleared even if there is
-                    //   still a highlighted item at this point.
-                    if (suggestionsList.currentIndex == -1 || text.length == 0) {
+                    // Don't calculate or show completions for nothing or barcode numbers.
+                    if (text == "" || text.match("^[0-9 ]+$")) {
+                        suggestionsBox.visible = false
+                        database.clearCompletions()
+                        // When list content changes, index becomes invalid as it would point to another or no item.
+                        // TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
+                        suggestionsList.currentIndex = -1
+                    }
+                    // Show completions but only if the textChanged() event is due to user text input.
+                    //   If currentIndex points to a valid list item in the completions list (!=-1),
+                    //   the event is rather because the user is navigating or clicking existing completions.
+                    else if (suggestionsList.currentIndex == -1) {
+                        suggestionsBox.visible = true;
                         database.updateCompletions(text, 10)
                         // When list content changes, index becomes invalid as it would point to another or no item.
                         // TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.

@@ -26,12 +26,15 @@ public:
     Q_INVOKABLE // Allows to invoke this method from QML.
     QString normalize(QString searchTerm);
 
-    Q_INVOKABLE // Allows to invoke this method from QML.
+    Q_INVOKABLE
     void updateCompletions(QString nameFragments, int limit);
+
+    Q_INVOKABLE
+    void clearCompletions();
 
     QString contentAsDocbook(QString barcode);
 
-    Q_INVOKABLE // Allows to invoke this method from QML.
+    Q_INVOKABLE
     QString content(QString searchTerm, ContentFormat format = ContentFormat::HTML);
 
     QString literature(QString searchTerm);

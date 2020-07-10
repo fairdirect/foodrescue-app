@@ -166,6 +166,15 @@ void ContentDatabase::updateCompletions(QString fragments, int limit) {
 
 
 /**
+ * @brief Empty the current list of auto-completions.
+ */
+void ContentDatabase::clearCompletions() {
+    m_completionModel.clear();
+    completionsChanged();
+}
+
+
+/**
  * @brief Search the database for a barcode and return associated topics in DocBook XML format.
  * @param searchTerm Text to use as the search term to find associated content topics in the
  *   database. This can be either text as decoded from a product barcode or a category name. The
