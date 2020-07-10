@@ -135,9 +135,7 @@ void ContentDatabase::updateCompletions(QString fragments, int limit) {
     query.prepare(
         "SELECT name "
         "FROM categories "
-        "WHERE "
-        "    lang LIKE 'en%' AND "
-        "    name LIKE :searchTerm "
+        "WHERE lang LIKE 'en%' AND name LIKE :searchTerm "
         "LIMIT :limit"
     );
     query.bindValue(":searchTerm", searchTerm);
@@ -147,13 +145,18 @@ void ContentDatabase::updateCompletions(QString fragments, int limit) {
 
     m_completionModel.clear();
 
-    // Execute the database query.
-    if(!query.exec())
-        qWarning() << "ContentDatabase::search: ERROR: " << query.lastError().text();
-    else
+    // If there is nothing to complete, we're done.
+    if(fragments.isEmpty()) {
+        completionsChanged();
+        return;
+    }
+
+    if(query.exec())
         while (query.next()) {
             m_completionModel << query.value(0).toString();
         }
+    else
+        qWarning() << "ContentDatabase::search: ERROR: " << query.lastError().text();
 
     qDebug() << "completionModel is now:" << m_completionModel;
 

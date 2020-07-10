@@ -141,17 +141,32 @@ Kirigami.ScrollablePage {
                 //   A workaround for multiple Qt bugs. See: https://stackoverflow.com/a/62526369
                 inputMethodHints: Qt.ImhSensitiveData
 
+                // Necessary to have a blinking cursor in addressBar at application startup.
+                //   This is needed in addition to the same line in root.Component.onCompleted in BaseApp.qml.
+                //   TODO: Simplify this stuff. Perhaps a FocusScope can help.
                 Component.onCompleted: forceActiveFocus()
 
                 onTextChanged: {
                     console.log("addressBar: 'textChanged()' signal")
+
+                    // TODO: This should better be set as a binding on goButton itself.
                     goButton.enabled = text.length > 0 ? true : false
 
                     // Show the auto-suggestions box while entering a category name.
                     //   Means, don't show it while the text entered could be a barcode number.
                     suggestionsBox.visible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
 
-                    database.updateCompletions(text, 10)
+                    // Only update the auto-completions if the textChanged() event is due to user text input.
+                    //   If currentIndex points to a valid completion, the event is rather because the user
+                    //   is navigating the existing completions using the arrow keys, or clicked on one item.
+                    //   Also if the user deleted all text, completions have to be cleared even if there is
+                    //   still a highlighted item at this point.
+                    if (suggestionsList.currentIndex == -1 || text.length == 0) {
+                        database.updateCompletions(text, 10)
+                        // When list content changes, index becomes invalid as it would point to another or no item.
+                        // TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
+                        suggestionsList.currentIndex = -1
+                    }
 
                     console.log("suggestionsList.model: " + JSON.stringify(suggestionsList.model))
                 }
@@ -198,17 +213,27 @@ Kirigami.ScrollablePage {
 
                         case Qt.Key_Up:
                             suggestionsList.currentIndex--
+
+                            // When moving prior the first item, cycle through completions from the end again.
                             if (suggestionsList.currentIndex < 0)
-                                suggestionsList.currentIndex = suggestionsList.model.count - 1
-                            addressBar.text = suggestionsList.model.get(suggestionsList.currentIndex)
+                                suggestionsList.currentIndex = suggestionsList.model.length - 1
+
+                            console.log(
+                                "suggestionsList.model[" + suggestionsList.currentIndex + "]: " +
+                                JSON.stringify(suggestionsList.model[suggestionsList.currentIndex])
+                            )
+
+                            addressBar.text = suggestionsList.model[suggestionsList.currentIndex]
                             break
 
                         case Qt.Key_Down:
-                            console.log("Down key pressed.")
                             suggestionsList.currentIndex++
-                            if (suggestionsList.currentIndex > suggestionsList.model.count - 1)
+
+                            // When moving past the last item, cycle through completions from the start again.
+                            if (suggestionsList.currentIndex > suggestionsList.model.length - 1)
                                 suggestionsList.currentIndex = 0
-                            addressBar.text = suggestionsList.model.get(suggestionsList.currentIndex)
+
+                            addressBar.text = suggestionsList.model[suggestionsList.currentIndex]
                             break
 
                         case Qt.Key_Return:
@@ -226,7 +251,8 @@ Kirigami.ScrollablePage {
                             break
 
                         case Qt.Key_Down:
-                            suggestionsBox.visible = true
+                            if (suggestionsList.model.length > 0)
+                                suggestionsBox.visible = true
                             break
                         }
                     }
@@ -258,9 +284,11 @@ Kirigami.ScrollablePage {
                             // Repeater lacks ListView's currentIndex, so we'll add it.
                             property var currentIndex: -1 // No element highlighted initially.
 
-                            // The repeater's delegate to represent one list item.
+                            // Data source of autocomplete suggestions.
+                            //   This is a string array, so access with [index], not the usual .get(index).
                             model: database.completionModel
 
+                            // The repeater's delegate to represent one list item.
                             delegate: Kirigami.BasicListItem {
                                 id: listItem
 

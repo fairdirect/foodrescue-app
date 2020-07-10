@@ -63,6 +63,8 @@ Kirigami.ApplicationWindow {
         //   (and so also MainPage, which is a Kirigami.ScrollablePage) acts as a FocusScope as per
         //   https://doc.qt.io/qt-5/qtquickcontrols2-focus.html . And for a FocusScope,
         //   forceActiveFocus() is needed as per https://stackoverflow.com/a/43490143 .
+        //   In addition, the same line has to be in addressBar.Component.onCompleted in MainPage.qml
+        //   for some reason.
         root.pageStack.currentItem.forceActiveFocus()
     }
 
