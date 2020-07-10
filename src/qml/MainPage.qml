@@ -148,6 +148,9 @@ Kirigami.ScrollablePage {
             //   dependencies. For example, after database.clearCompletions() one also always has to
             //   do suggestionsList.currentIndex = -1. Thats should be handled automatically.
             //
+            //   TODO: Clear up the confusion between an invisible suggestion box and a visible one with
+            //   no content. Both cases are used currently, but only one is necessary, as both look the same.
+            //
             //   TODO: Use custom properties as a more declarative way to govern behavior here.
             //   For example, "completionsVisibility" set to an expression. See:
             //   https://github.com/dant3/qmlcompletionbox/blob/41eebf2b50ef4ade26c99946eaa36a7bfabafef5/SuggestionBox.qml#L36
@@ -157,9 +160,15 @@ Kirigami.ScrollablePage {
             //   See: https://code.qt.io/cgit/qt/qtdeclarative.git/tree/examples/quick/keyinteraction/focus/focus.qml?h=5.15#n166
             TextField {
                 id: addressBar
+
+                // The currently active, in-use address of the address bar.
+                //   It differs from the address bar's text content while navigating through autocompletions.
+                //   Then, the address as typed by the user is the address and the address bar content is
+                //   a potential next address, with completion highlighting done based on the current address.
+                property string address
+
                 Layout.fillWidth: true
                 focus: true
-
                 placeholderText: "barcode number or category"
 
                 // Disable predictive text input to make textEdited() signals work under Android.
@@ -171,12 +180,24 @@ Kirigami.ScrollablePage {
                 //   TODO: Simplify this stuff. Perhaps a FocusScope can help.
                 Component.onCompleted: forceActiveFocus()
 
+                // This event handler is undocumented for TextField and incompletely documented for TextInput,
+                // which TextField wraps: https://doc.qt.io/qt-5/qml-qtquick-textinput.html#textEdited-signal .
+                // However, it works, and is also proposed by code insight in Qt Creator.
+                onTextEdited: {
+                    // Whenever the user writes something, that defines the new current address of the
+                    // address bar. When the address bar content changes otherwise, such as by navigating
+                    // through completions, that's not the case. So we can't do this in "onTextChanged".
+                    address = text
+                }
+
+                // About the missing documentation for this event handler, see onTextEdited.
                 onTextChanged: {
                     console.log("addressBar: 'textChanged()' signal")
 
+                    // TODO: In the rest of this block, using address instead of text will be clearer.
+
                     // TODO: This should better be set as a binding on goButton itself.
                     goButton.enabled = text == "" ? false : true;
-
 
                     // Don't calculate or show completions for nothing or barcode numbers.
                     if (text == "" || text.match("^[0-9 ]+$")) {
@@ -200,14 +221,17 @@ Kirigami.ScrollablePage {
                     console.log("suggestionsList.model: " + JSON.stringify(suggestionsList.model))
                 }
 
-                // Handle the "text accepted" event.
+                // Handle the "text accepted" event, which sets the address from the text.
                 //   This event is emitted when the user finishes editing the text field.
                 //   On desktop, this requires pressing "Return". Moving focus does not count.
                 //   This event is also artificially emitted by the "Go" button and by clicking on
                 //   an auto-suggest proposal.
                 onAccepted: {
                     console.log("addressBar: 'accepted()' signal")
+                    address = text
                     suggestionsBox.visible = false
+
+                    // TODO: In the rest of this block, using address instead of text will be clearer.
 
                     // When clicking into addressBar again, a brand new search should start. The old
                     // completions are certainly useless now.
@@ -322,7 +346,7 @@ Kirigami.ScrollablePage {
                             id: suggestionsList
 
                             // Repeater lacks ListView's currentIndex, so we'll add it.
-                            property var currentIndex: -1 // No element highlighted initially.
+                            property int currentIndex: -1 // No element highlighted initially.
 
                             // Data source of autocomplete suggestions.
                             //   This is a string array, so access with [index], not the usual .get(index).
@@ -332,7 +356,7 @@ Kirigami.ScrollablePage {
                             delegate: Kirigami.BasicListItem {
                                 id: listItem
 
-                                label: boldenCompletion(modelData, addressBar.text)
+                                label: boldenCompletion(modelData, addressBar.address)
                                 width: suggestionsBox.width
                                 reserveSpaceForIcon: false
 
