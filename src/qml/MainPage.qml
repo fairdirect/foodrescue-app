@@ -50,11 +50,12 @@ Kirigami.ScrollablePage {
     //   for parts of original below may match "word</b>" etc. and mess up the result.
     function boldenCompletion(completion, fragmentsString) {
         var fragments = fragmentsString.trim().split(" ")
-        // Tracks the current search position in "completion", ensuring fragments are found in sequence.
-        var searchPos = 0
 
-        // Start by boldening everything.
-        completion = "<b>" + completion + "</b>"
+        // Tracks the current processing position in "completion".
+        //   This ensures that fragments are found in their given sequence. It also prevents
+        //   modifying the <b> HTML tags themselves by matching against a "b" fragment. We'll simply
+        //   work only on the part that has not yet had any insertions of HTML tags.
+        var searchPos = 0
 
         // De-bold the sequential first occurrences of the fragments.
         for (var i = 0; i < fragments.length; i++) {
@@ -63,28 +64,25 @@ Kirigami.ScrollablePage {
             var fragmentStart = iCompletion.indexOf(fragment.toLowerCase(), searchPos)
 
             // Nothing to de-bolden if fragment was not found.
-            // TODO: This is an error condition that should generate a warning.
+            //   TODO: This is an error condition that should generate a warning.
             if (fragmentStart === -1)
                 continue
 
             var fragmentEnd = fragmentStart + fragment.length
-
-            console.log("boldenCompletion(): fragment = " + fragment)
-            console.log("boldenCompletion(): fragmentStart = " + fragmentStart)
-            console.log("boldenCompletion(): fragmentEnd = " + fragmentEnd)
-
-            searchPos = fragmentEnd
-
             var completionBefore = completion.substr(0, fragmentStart)
             var completionDebold = completion.substr(fragmentStart, fragment.length)
             var completionAfter = completion.substr(fragmentEnd)
 
-            console.log("boldenCompletion(): completionBefore = " + completionBefore)
-            console.log("boldenCompletion(): completionDebold = " + completionDebold)
-            console.log("boldenCompletion(): completionAfter = " + completionAfter)
-
             completion = completionBefore + "</b>" + completionDebold + "<b>" + completionAfter
+
+            // The search for the next fragment may start with completionAfter. That's after all HTML
+            // tags inserted so far, which prevents messing them up when a "b" fragment matches against them.
+            searchPos = completion.length - completionAfter.length - 1
         }
+
+        // Wrap everything in bold to provide the proper "context" for the de-boldening above.
+        //   This could not be done before to prevent matches of a "b" fragment against </b>".
+        completion = "<b>" + completion + "</b>"
 
         return completion
     }
@@ -143,13 +141,20 @@ Kirigami.ScrollablePage {
             //   we can't set this on suggestionsBox directly.
             z: 1
 
-            // TODO: Refactor this into a reusable auto-suggest component.
-            // TODO: Use custom properties as a more declarative way to govern behavior here.
-            // For example, "completionsVisibility" set to an expression. See:
-            // https://github.com/dant3/qmlcompletionbox/blob/41eebf2b50ef4ade26c99946eaa36a7bfabafef5/SuggestionBox.qml#L36
-            // https://github.com/dant3/qmlcompletionbox/blob/master/SuggestionBox.qml
-            // TODO: Use states to better describe the open and closed state of the completions box.
-            // See: https://code.qt.io/cgit/qt/qtdeclarative.git/tree/examples/quick/keyinteraction/focus/focus.qml?h=5.15#n166
+            // A text field with Google-like auto-completion.
+            //   TODO: Refactor this into a reusable auto-suggest component.
+            //
+            //   TODO: Fix that the parts of this auto-complete widget have confusing internal
+            //   dependencies. For example, after database.clearCompletions() one also always has to
+            //   do suggestionsList.currentIndex = -1. Thats should be handled automatically.
+            //
+            //   TODO: Use custom properties as a more declarative way to govern behavior here.
+            //   For example, "completionsVisibility" set to an expression. See:
+            //   https://github.com/dant3/qmlcompletionbox/blob/41eebf2b50ef4ade26c99946eaa36a7bfabafef5/SuggestionBox.qml#L36
+            //   https://github.com/dant3/qmlcompletionbox/blob/master/SuggestionBox.qml
+            //
+            //   TODO: Use states to better describe the open and closed state of the completions box.
+            //   See: https://code.qt.io/cgit/qt/qtdeclarative.git/tree/examples/quick/keyinteraction/focus/focus.qml?h=5.15#n166
             TextField {
                 id: addressBar
                 Layout.fillWidth: true
@@ -177,7 +182,7 @@ Kirigami.ScrollablePage {
                     if (text == "" || text.match("^[0-9 ]+$")) {
                         suggestionsBox.visible = false
                         database.clearCompletions()
-                        // When list content changes, index becomes invalid as it would point to another or no item.
+                        // Invalidate the index, as there are zero list elements now.
                         // TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
                         suggestionsList.currentIndex = -1
                     }
@@ -203,6 +208,14 @@ Kirigami.ScrollablePage {
                 onAccepted: {
                     console.log("addressBar: 'accepted()' signal")
                     suggestionsBox.visible = false
+
+                    // When clicking into addressBar again, a brand new search should start. The old
+                    // completions are certainly useless now.
+                    database.clearCompletions()
+                    // Invalidate the index, as there are zero list elements now.
+                    // TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
+                    suggestionsList.currentIndex = -1
+
                     var searchTerm = database.normalize(addressBar.text)
                     // As in a web browser, we'll correct the "address" entered. Such as:
                     // " 2 165741  004149  " → "2165741004149"
@@ -216,6 +229,9 @@ Kirigami.ScrollablePage {
                 onActiveFocusChanged: {
                     if (activeFocus)
                         suggestionsBox.visible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
+                        // TODO: Perhaps initialize the completions with suggestions based on the current
+                        // text in addressBar. If the reason for not having the focus before was a previous
+                        // search, then it has no completions at this point.
                     else
                         suggestionsBox.visible = false
                 }
@@ -331,12 +347,6 @@ Kirigami.ScrollablePage {
                                     addressBar.text = modelData
                                     addressBar.accepted()
                                 }
-
-//                                Component.onCompleted: {
-//                                    console.log("listItem index: " + index)
-//                                    console.log("suggestionsList.currentIndex: " + suggestionsList.currentIndex)
-//                                }
-
                             }
                         }
                     }
