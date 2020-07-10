@@ -115,53 +115,111 @@ QString ContentDatabase::normalize(QString searchTerm) {
     if (spacedNumber.exactMatch(searchTerm))
         return searchTerm.replace(" ", "");
     else
-        return searchTerm;
+        return searchTerm.simplified(); // Trims whitespace and reduces other whitespace sequences to " ".
+}
 
-    // TODO Also normalize category search terms by stripping leading and trailing whitespaces
-    // and reducing other whitespace to single space characters with QString::simplify().
+
+/**
+ * @brief Provide search term auto-completion for the given text. Completion is right now done using
+ *   only category names, but this may be extended later. Results are provided in member
+ *   m_completionModel and to QML as property completionModel.
+ * @param fragments  Space separated parts that must occur in this order as substrings in the
+ *   auto-completion results.
+ * @param limit  Maximum number of completion results to provide.
+ */
+void ContentDatabase::updateCompletions(QString fragments, int limit) {
+    QSqlQuery query;
+    QString searchTerm =  "%" + fragments.replace(" ", "%") + "%";
+
+    // TODO Use a full-text index in this search for speed.
+    query.prepare(
+        "SELECT name "
+        "FROM categories "
+        "WHERE "
+        "    lang LIKE 'en%' AND "
+        "    name LIKE :searchTerm "
+        "LIMIT :limit"
+    );
+    query.bindValue(":searchTerm", searchTerm);
+    query.bindValue(":limit", limit);
+
+    qDebug() << "ContentDatabase::completeCategory: Value bound to: " << searchTerm;
+
+    m_completionModel.clear();
+
+    // Execute the database query.
+    if(!query.exec())
+        qWarning() << "ContentDatabase::search: ERROR: " << query.lastError().text();
+    else
+        while (query.next()) {
+            m_completionModel << query.value(0).toString();
+        }
+
+    qDebug() << "completionModel is now:" << m_completionModel;
+
+    // Notify QML components and widgets using completionsModel to update their data.
+    completionsChanged();
 }
 
 
 /**
  * @brief Search the database for a barcode and return associated topics in DocBook XML format.
- * @param barcode Text as decoded from a barcode, used as the search term to find associated
- *   content topics in the database.
+ * @param searchTerm Text to use as the search term to find associated content topics in the
+ *   database. This can be either text as decoded from a product barcode or a category name. The
+ *   search term has to be in normalized format (see ContentDatabase::normalize()).
  * @return The content topics resulting from the database search, combined into a single DocBook
  *   XML document. All topic meta-information about the topics (author, content section,
  *   version date, categories etc.) is rendered into the returned document.
  */
-QString ContentDatabase::contentAsDocbook(QString barcode) {
+QString ContentDatabase::contentAsDocbook(QString searchTerm) {
 
+    QRegExp isNumber("[0-9]*");
     QSqlQuery query;
 
-    // TODO: Chain the JOINs in the other direction because it's more logical. So
-    //   it would be "SELECT FROM products … WHERE products.code = …" then.
-    query.prepare(
-        "SELECT topic_contents.title, topics.section, topics.version, topic_contents.content "
-        "FROM topic_contents "
-        "    INNER JOIN topics ON topic_contents.topic_id = topics.id "
-        "    INNER JOIN topic_categories ON topics.id = topic_categories.topic_id "
-        "    INNER JOIN product_categories ON topic_categories.category_id = product_categories.category_id "
-        "    INNER JOIN products ON product_categories.product_id = products.id "
-        "WHERE products.code = :code"
-    );
-    query.bindValue(":code", barcode.toLongLong());
-    // TODO: Check if the conversion was successful. See: https://doc.qt.io/qt-5/qstring.html#toLongLong
+    if (isNumber.exactMatch(searchTerm)) {
+        // Set up the query for a barcode number.
+        // TODO: Chain the JOINs in the other direction because it's more logical. So
+        //   it would be "SELECT FROM products … WHERE products.code = …" then.
+        query.prepare(
+            "SELECT topic_contents.title, topics.section, topics.version, topic_contents.content "
+            "FROM topic_contents "
+            "    INNER JOIN topics ON topic_contents.topic_id = topics.id "
+            "    INNER JOIN topic_categories ON topics.id = topic_categories.topic_id "
+            "    INNER JOIN product_categories ON topic_categories.category_id = product_categories.category_id "
+            "    INNER JOIN products ON product_categories.product_id = products.id "
+            "WHERE products.code = :code"
+        );
+        query.bindValue(":code", searchTerm.toLongLong());
+        // TODO: Check if the conversion was successful. See: https://doc.qt.io/qt-5/qstring.html#toLongLong
 
-    qDebug() << "ContentDatabase::search: Value bound to: " << barcode.toLongLong();
+        qDebug() << "ContentDatabase::search: Value bound to: " << searchTerm.toLongLong();
+    }
+    else {
+        // Set up the query for a category name.
+        query.prepare(
+            "SELECT topic_contents.title, topics.section, topics.version, topic_contents.content "
+            "FROM categories "
+            "    INNER JOIN topic_categories ON topic_categories.category_id = categories.id "
+            "    INNER JOIN topics ON topics.id = topic_categories.topic_id "
+            "    INNER JOIN topic_contents ON topic_contents.topic_id = topics.id "
+            "WHERE categories.name = :name COLLATE NOCASE;"
+        );
+        query.bindValue(":name", searchTerm);
+    }
 
-    // Return if there is nothing to render.
+    // Execute the database query.
     if(!query.exec()) {
+        // Return if there is nothing to render.
         qWarning() << "ContentDatabase::search: ERROR: " << query.lastError().text();
         return "";
     }
 
-    // SQLite can't indicate search result size, so so use checking query.size() here.
+    // SQLite can't indicate search result size, so checking query.size() here is useless.
 
     // Render the search results into a simple DocBook "book" document.
-    // TODO: Also render the OFF category names into here.
-    // TODO: Also render the author names into here.
-    // TODO: Exchange this with a more readable single HTML string with %1, %2 etc. arguments.
+    //   TODO: Also render the OFF category names into here.
+    //   TODO: Also render the author names into here.
+    //   TODO: Exchange this with a more readable single HTML string with %1, %2 etc. arguments.
     QString docbook;
     while (query.next()) {
         docbook
