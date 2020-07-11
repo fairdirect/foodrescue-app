@@ -211,11 +211,11 @@ Kirigami.ScrollablePage {
                     //   If currentIndex points to a valid list item in the completions list (!=-1),
                     //   the event is rather because the user is navigating or clicking existing completions.
                     else if (suggestionsList.currentIndex == -1) {
-                        suggestionsBox.visible = true;
                         database.updateCompletions(text, 10)
                         // When list content changes, index becomes invalid as it would point to another or no item.
                         // TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
                         suggestionsList.currentIndex = -1
+                        suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false;
                     }
 
                     console.log("suggestionsList.model: " + JSON.stringify(suggestionsList.model))
@@ -251,7 +251,7 @@ Kirigami.ScrollablePage {
                 }
 
                 onActiveFocusChanged: {
-                    if (activeFocus)
+                    if (activeFocus && suggestionsList.model.length > 0)
                         suggestionsBox.visible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
                         // TODO: Perhaps initialize the completions with suggestions based on the current
                         // text in addressBar. If the reason for not having the focus before was a previous
@@ -315,8 +315,8 @@ Kirigami.ScrollablePage {
                             break
 
                         case Qt.Key_Down:
-                            if (suggestionsList.model.length > 0)
-                                suggestionsBox.visible = true
+                            suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false
+                            console.log("After Key Down: suggestionsBox.visible = " + suggestionsBox.visible)
                             break
                         }
                     }
