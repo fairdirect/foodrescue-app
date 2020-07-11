@@ -233,11 +233,10 @@ Kirigami.ScrollablePage {
 
                     // TODO: In the rest of this block, using address instead of text will be clearer.
 
-                    // When clicking into addressBar again, a brand new search should start. The old
-                    // completions are certainly useless now.
-                    database.clearCompletions()
-                    // Invalidate the index, as there are zero list elements now.
-                    // TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
+                    // When clicking into addressBar again, the completions shown when executing the
+                    // search should appear again. So don't database.clearCompletions(). But selecting
+                    // them should start afresh, so:
+                    //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
                     suggestionsList.currentIndex = -1
 
                     var searchTerm = database.normalize(addressBar.text)
