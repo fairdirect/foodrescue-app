@@ -184,41 +184,29 @@ Kirigami.ScrollablePage {
                 // which TextField wraps: https://doc.qt.io/qt-5/qml-qtquick-textinput.html#textEdited-signal .
                 // However, it works, and is also proposed by code insight in Qt Creator.
                 onTextEdited: {
-                    // Whenever the user writes something, that defines the new current address of the
-                    // address bar. When the address bar content changes otherwise, such as by navigating
-                    // through completions, that's not the case. So we can't do this in "onTextChanged".
+                    // Whenever the user writes or deletes something (incl. by cut / paste), that
+                    // defines the new current address of the address bar. When the address bar
+                    // content changes otherwise, such as by navigating through completions, that's
+                    // not the case. So we can't do this in "onTextChanged".
                     address = text
-                }
-
-                // About the missing documentation for this event handler, see onTextEdited.
-                onTextChanged: {
-                    console.log("addressBar: 'textChanged()' signal")
-
-                    // TODO: In the rest of this block, using address instead of text will be clearer.
 
                     // TODO: This should better be set as a binding on goButton itself.
-                    goButton.enabled = text == "" ? false : true;
+                    goButton.enabled = address == "" ? false : true;
 
-                    // Don't calculate or show completions for nothing or barcode numbers.
-                    if (text == "" || text.match("^[0-9 ]+$")) {
-                        suggestionsBox.visible = false
+                    // Don't auto-complete nothing or barcode numbers.
+                    if (address == "" || address.match("^[0-9 ]+$"))
                         database.clearCompletions()
-                        // Invalidate the index, as there are zero list elements now.
-                        // TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
-                        suggestionsList.currentIndex = -1
-                    }
-                    // Show completions but only if the textChanged() event is due to user text input.
-                    //   If currentIndex points to a valid list item in the completions list (!=-1),
-                    //   the event is rather because the user is navigating or clicking existing completions.
-                    else if (suggestionsList.currentIndex == -1) {
-                        database.updateCompletions(text, 10)
-                        // When list content changes, index becomes invalid as it would point to another or no item.
-                        // TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
-                        suggestionsList.currentIndex = -1
-                        suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false;
-                    }
+                    // Auto-complete a category name fragment (or later other "address" type).
+                    //   Not done in onTextChanged because navigating through completion should not update them.
+                    else
+                        database.updateCompletions(address, 10)
 
-                    console.log("suggestionsList.model: " + JSON.stringify(suggestionsList.model))
+                    // Invalidate the completion selection, because the user edited the address so
+                    // it does not correspond to any current completion. Also completions might have been cleared.
+                    //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
+                    suggestionsList.currentIndex = -1
+
+                    suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false;
                 }
 
                 // Handle the "text accepted" event, which sets the address from the text.
