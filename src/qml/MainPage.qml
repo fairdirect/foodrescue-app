@@ -17,7 +17,6 @@ Kirigami.ScrollablePage {
     title: "Food Rescue"
 
     Layout.fillWidth: true
-    keyboardNavigationEnabled: true
     horizontalScrollBarPolicy: ScrollBar.AlwaysOff
     supportsRefreshing: false
 
@@ -153,22 +152,22 @@ Kirigami.ScrollablePage {
         Keys.onPressed: {
             switch (event.key) {
             case Qt.Key_PageUp:
-                browser.flick(0, 2400)
+                flick(0, 2400)
                 event.accepted = true;
                 break
 
             case Qt.Key_PageDown:
-                browser.flick(0, -2400)
+                flick(0, -2400)
                 event.accepted = true;
                 break
 
             case Qt.Key_Up:
-                browser.flick(0, 800)
+                flick(0, 800)
                 event.accepted = true;
                 break
 
             case Qt.Key_Down:
-                browser.flick(0, -800)
+                flick(0, -800)
                 event.accepted = true;
                 break
             }
