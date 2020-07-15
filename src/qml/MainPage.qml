@@ -126,10 +126,8 @@ Kirigami.ScrollablePage {
 
 
     // Scrollable element wrapping the content.
-    //   This is necessary to allow programmatic scrolling (here by key events) in a Kirigami
-    //   ScrollablePage. If just providing the content, not wrapped into a Flickable, Kirigami
-    //   ScrollablePage will do that wrapping but we'd not have access to the wrapping Flickable
-    //   to flick it on key press events. The scrollbar etc. is still provided by ScrollablePage.
+    //   This is necessary to allow scrolling with the keyboard in a Kirigami ScrollablePage.
+    //   Details: https://stackoverflow.com/a/62853851
     //
     //   Positioning, sizing and margin'ing the Flickable with either Layout or anchors properties
     //   does not work, probably because ScrollablePage overrides these settings when integrating
@@ -216,7 +214,7 @@ Kirigami.ScrollablePage {
                     property string address
 
                     focus: true
-                    placeholderText: "barcode number or category"
+                    placeholderText: "barcode number, or food name (plural form only)"
                     Layout.fillWidth: true
 
                     // Disable predictive text input to make textEdited() signals work under Android.

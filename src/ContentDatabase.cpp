@@ -141,8 +141,6 @@ void ContentDatabase::updateCompletions(QString fragments, int limit) {
     query.bindValue(":searchTerm", searchTerm);
     query.bindValue(":limit", limit);
 
-    qDebug() << "ContentDatabase::completeCategory: Value bound to: " << searchTerm;
-
     m_completionModel.clear();
 
     // If there is nothing to complete, we're done.
@@ -152,13 +150,10 @@ void ContentDatabase::updateCompletions(QString fragments, int limit) {
     }
 
     if(query.exec())
-        while (query.next()) {
+        while (query.next())
             m_completionModel << query.value(0).toString();
-        }
     else
         qWarning() << "ContentDatabase::search: ERROR: " << query.lastError().text();
-
-    qDebug() << "completionModel is now:" << m_completionModel;
 
     // Notify QML components and widgets using completionsModel to update their data.
     completionsChanged();
@@ -170,6 +165,7 @@ void ContentDatabase::updateCompletions(QString fragments, int limit) {
  */
 void ContentDatabase::clearCompletions() {
     m_completionModel.clear();
+    // Notify QML components and widgets using completionsModel to update their data.
     completionsChanged();
 }
 
@@ -243,7 +239,6 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
             .append(query.value(3).toString()) // Main content.
             .append("</topic>\n\n");
     }
-
     if (docbook.isEmpty())
         return "";
     else

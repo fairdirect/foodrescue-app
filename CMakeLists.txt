@@ -87,7 +87,6 @@ set(QML_IMPORT_PATH ${QML_IMPORT_PATH}
 )
 
 # Enable Qt MOC (Meta Object Compiler) pre-processor to run on C++ source files when needed.
-# TODO: Remove if it turns out to be unnecessary. Only needed when using Q_OBJECT macros in our code.
 set(CMAKE_AUTOMOC ON)
 set(AUTOMOC_MOC_OPTIONS "-Muri=org.kde.kirigami")
 
@@ -97,8 +96,8 @@ add_definitions(
     # 1.0.7 and 1.0.8. Because ZXing code throws exceptions.
     -fexceptions
 
-    # Helps to catch implicit conversion of filenames to URLs by making it illegal, so you can
-    # write code to properly convert to a file:// URL or something. See documentation at:
+    # Catches and prevents implicit conversions of filenames to URLs, making it easy to write own
+    # code for proper conversions (for example to file:// URLs). See documentation at:
     # https://doc.qt.io/qt-5/qurl.html#QT_NO_URL_CAST_FROM_STRING
     -DQT_NO_URL_CAST_FROM_STRING
 )
