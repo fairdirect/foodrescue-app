@@ -136,6 +136,7 @@ void ContentDatabase::updateCompletions(QString fragments, int limit) {
         "SELECT name "
         "FROM categories "
         "WHERE lang LIKE 'en%' AND name LIKE :searchTerm "
+        "ORDER BY LENGTH(name) "
         "LIMIT :limit"
     );
     query.bindValue(":searchTerm", searchTerm);

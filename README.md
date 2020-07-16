@@ -107,15 +107,30 @@ Tips for scanning a barcode:
 
 The following keyboard combinations are available:
 
-* **Close the application.** Ctrl + Q (Kirigami default)
-* **Select menu item.** Alt + highlighted letter while menu drawer is open
-* **Page back / forward.** Alt + Arrow Left / Alt + Arrow Right. You can also use the hardware keys "Page Back" and "Page Forward" if you have them. Not found often, but for example some Lenovo ThinkPad models have these above the Arrow Left / Arrow Right keys.
-* **Move focus.** Tab moves the keyboard focus to the next element, Shift + Tab moves it to the previous element.
-* **Click on focused element.** The Space bar key is like clicking on the element currently having the keyboard focus.
-* **Close overlay sheet.** There is no default key binding for this. Esc does not work. Some applications bind the "Alt + Left" and "Page Back" keys to this, for example the Kirigami Gallery demo application.
+* **Auto-complete related.** It works the same as in a Google Search:
+
+    * **Edit mode.** F2 will always put the cursor back into the autocomplete field.
+    * **Next / previous completion.** Arrow Down / Arrow Up.
+    * **Choose completion.** Return or Enter.
+    * **Close completion box.** Escape.
+    * **Close and leave completion box.** Press Escape twice. It will move the keyboard focus to the browser so you can keyboard-scroll there afterwards.
+
+* **Content browser related.**
+
+    * **Scroll a bit.** Arrow Up / Arrow Down.
+    * **Scroll one page.** Page Up / Page Down.
+
+* **Kirigami defaults.**
+    * **Activate menu item.** Alt + highlighted letter while menu drawer is open.
+    * **Page back / forward.** Alt + Arrow Left / Alt + Arrow Right. You can also use the hardware keys "Page Back" and "Page Forward" if you have them. Not found often, but for example some Lenovo ThinkPad models have these above the Arrow Left / Arrow Right keys.
+    * **Move focus.** Tab moves the keyboard focus to the next element, Shift + Tab moves it to the previous element.
+    * **Click on focused element.** The Space bar key is like clicking on the element currently having the keyboard focus. Except for text fields, where you need Return or Enter.
+    * **Close overlay sheet.** There is no default key binding for this. Esc does not work. Some applications bind the "Alt + Left" and "Page Back" keys to this, for example the Kirigami Gallery demo application.
+    * **Close the application.** Ctrl + Q.
+
 * TODO: Complete this list. There should be an official list somewhere.
 
-TODO: Complete usage instructions.
+TODO: Complete the usage instructions.
 
 
 # 4. Repository Layout

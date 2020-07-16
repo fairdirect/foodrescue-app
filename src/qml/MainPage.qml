@@ -110,6 +110,11 @@ Kirigami.ScrollablePage {
                 flick(0, -800)
                 event.accepted = true;
                 break
+
+            case Qt.Key_F2: // F2 is typically used for "edit mode", so it fits well here.
+                autocomplete.focus = true;
+                event.accepted = true;
+                break
             }
         }
 
