@@ -13,7 +13,7 @@ Kirigami.ScrollablePage {
     id: mainPage
 
     // Page title.
-    //   TODO: Set the title as suitable for current window contents.
+    //   TODO: Set the title as suitable for the current contents displayed in this window.
     title: "Food Rescue"
 
     Layout.fillWidth: true
@@ -31,7 +31,6 @@ Kirigami.ScrollablePage {
             return content
     }
 
-
     // Interface to the food rescue content.
     //   This is a C++ defined QML type, see ContentDatabase.h. Interface: method content(string).
     //   Note that this is not the same ContentDatabase object that is created in main.cpp. It still
@@ -40,7 +39,6 @@ Kirigami.ScrollablePage {
     Local.ContentDatabase {
         id: database
     }
-
 
     // Define the page toolbar's contents.
     //   A toolbar can have left / main / right / context buttons. The read-only property
@@ -68,7 +66,6 @@ Kirigami.ScrollablePage {
         // No contextual actions so far.
         // contextualActions: [ ]
     }
-
 
     // Scrollable element wrapping the content.
     //   This is necessary to allow scrolling with the keyboard in a Kirigami ScrollablePage.
@@ -146,10 +143,7 @@ Kirigami.ScrollablePage {
                             database.updateCompletions(input, 10)
                     }
 
-                    onAccepted: {
-                        browserContent.text = contentOrMessage(input)
-                        browser.focus = true // Allows for keyboard scrolling in the browser.
-                    }
+                    onAccepted: browserContent.text = contentOrMessage(input)
 
                     function normalize(searchString) {
                         return database.normalize(searchString)

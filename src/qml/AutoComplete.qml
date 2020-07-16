@@ -32,7 +32,7 @@ import local 1.0 as Local // Our custom QML components, as exported in main.cpp.
 //
 //   TODO: Use states to better describe the open and closed state of the completions box.
 //   See: https://code.qt.io/cgit/qt/qtdeclarative.git/tree/examples/quick/keyinteraction/focus/focus.qml?h=5.15#n166
-Item {
+FocusScope {
     id: autocomplete
 
     // Always give a QML component a defined height.
@@ -47,14 +47,9 @@ Item {
     //   In JavaScript, this is a string array, so access it with [index], not the usual .get(index).
     //   For implementing in C++, use QStringList.
     //
-    //   TODO: Replace this with a QML ListModel model. This is supported by suggestionsList.model,
-    //   which is a Repeater model (see https://doc.qt.io/qt-5/qml-qtquick-repeater.html#model-prop ).
-    //   It allows to call clear() and to modify the model from code here in AutoComplete, which is
-    //   not possible with a string list model. That will allow to remove the AutoComplete methods
-    //   to do that which have to be overwritten by client code.
-    //
-    //   TODO: Even better, allow client code to set this to any type of model accepted by a Repeater.
-    //   See: https://doc.qt.io/qt-5/qml-qtquick-repeater.html#model-prop
+    //   TODO: Allow client code to set this to any type of model accepted by a Repeater.
+    //   See: https://doc.qt.io/qt-5/qml-qtquick-repeater.html#model-prop . Right now, only a QStringList
+    //   is accepted.
     property alias model: suggestionsList.model
 
     // The currently active, in-use user input that is the basis for the current completions.
@@ -85,16 +80,30 @@ Item {
     // it is selected.
     signal accepted()
 
+    // React to our own auto-provided signal for a change in the "input" property.
+    //   When client code also implements onInputChanged when instantiating an AutoComplete, it
+    //   will not overwrite this handler but add to it. So no caveats when reacting to own signals.
+    //
+    //   TODO: Make sure that text is only set here and not also unnecessarily in other locations in
+    //   this component.
+    onInputChanged: {
+        console.log("AutoComplete: autocomplete: 'inputChanged()' signal received")
+        text = input
+    }
+
     // Normalize user input to a form based on which the completions can be calculated.
     //   Only a do-nothing implementation is provided. Client code should overwrite this as required
     //   by the model used.
     function normalize(input) { return input }
 
     // Highlight the auto-completed parts of a multi-substring search term using HTML.
-    //   This implementation uses <b> tags to highlight the completed portions. Client code can
-    //   overwrite this to implement a different type of completion.
+    //
+    // This implementation uses <b> tags to highlight the completed portions. Client code can
+    // overwrite this to implement a different type of completion.
+    //
     // @param fragmentsString  The part to not render in bold, when matched case-insensitively against the
     //   completion.
+    //
     // TODO: Document the parameters.
     // TODO: Make sure original contains no HTML tags by sanitizing these. Otherwise searching
     //   for parts of original below may match "word</b>" etc. and mess up the result.
@@ -138,17 +147,6 @@ Item {
         completion = "<b>" + completion + "</b>"
 
         return completion
-    }
-
-    // React to our own auto-provided signal for a change in the "input" property.
-    //   When client code also implements onInputChanged when instantiating an AutoComplete, it
-    //   will not overwrite this handler but add to it. So no caveats when reacting to own signals.
-    //
-    //   TODO: Make sure that text is only set here and not also unnecessarily in other locations in
-    //   this component.
-    onInputChanged: {
-        console.log("AutoComplete: autocomplete: 'inputChanged()' signal received")
-        text = input
     }
 
     // The text field where a user enters to-be-completed text.
@@ -196,9 +194,13 @@ Item {
         //   This event is emitted by a TextField when the user finishes editing it.
         //   In desktop software, this requires pressing "Return". Moving focus does not count.
         onAccepted: {
-            console.log("AutoComplete: field: 'accepted()' signal received")
-            autocomplete.completionsVisible = false
+            console.log("AutoComplete: field: 'accepted()' received")
 
+            // Give up the focus, making it available for grabs by the rest of the UI
+            // via appropriate focus property bindings.
+            autocomplete.focus = false
+
+            autocomplete.completionsVisible = false
             // When clicking into the text field again, the last set of completions should show
             // again. But selecting them will start anew.
             //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
@@ -278,9 +280,9 @@ Item {
                 // This way, "double Escape" can be used to move the focus to the browser.
                 // The first hides the suggestions box, the second moves the focus.
                 case Qt.Key_Escape:
-                    // TODO: Do this in a different way, since "browser" is no longer accessible
-                    //   after outsourcing this component to AutoComplete.qml.
-                    browser.focus = true
+                    // Give up the focus, making it available for grabs by the rest of the UI
+                    // via appropriate focus property bindings.
+                    autocomplete.focus = false
                     event.accepted = true
                     break
 
