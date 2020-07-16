@@ -4,7 +4,34 @@ import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.10 as Kirigami
 import local 1.0 as Local // Our custom QML components, as exported in main.cpp.
 
-
+// Auto-complete widget with completion highlighting similar to a Google Search.
+//
+//   When using this, be sure to adjust the z indexes of sibling items so that the container of the
+//   autocomplete widget (e.g. RowLayout) has a higher z value than the container of every widget
+//   following it that might be overlaid by the suggestions.
+//
+//   TODO: To avoid having to adjust z indexes when using this, perhaps place the suggestions into
+//   a Kirigami Sheet, or use the same mechanism to overlay a target widget. Or introduce a property
+//   to reference the component to overlay, and then do Component.onCompleted: { while
+//   (notOverlaid(targetToOverlay)) { ancestor = ancestor.parent; ancestor.z += 1000 }.
+//
+//   TODO: Set a minimum width. Otherwise, without AutoComplete { Layout.fillWidth: true },
+//   the auto-complete box would not be visible at all.
+//
+//   TODO: Fix that the parts of this auto-complete widget have confusing internal
+//   dependencies. For example, after changing the address property one also always has to
+//   do suggestionsList.currentIndex = -1. Thats should be handled automatically.
+//
+//   TODO: Clear up the confusion between an invisible suggestion box and a visible one with
+//   no content. Both cases are used currently, but only one is necessary, as both look the same.
+//
+//   TODO: Use custom properties as a more declarative way to govern behavior here.
+//   For example, "completionsVisibility" set to an expression. See:
+//   https://github.com/dant3/qmlcompletionbox/blob/41eebf2b50ef4ade26c99946eaa36a7bfabafef5/SuggestionBox.qml#L36
+//   https://github.com/dant3/qmlcompletionbox/blob/master/SuggestionBox.qml
+//
+//   TODO: Use states to better describe the open and closed state of the completions box.
+//   See: https://code.qt.io/cgit/qt/qtdeclarative.git/tree/examples/quick/keyinteraction/focus/focus.qml?h=5.15#n166
 Item {
     id: autocomplete
 
@@ -15,12 +42,6 @@ Item {
     //   place the widget into a Layout or a non-widget object. See: https://stackoverflow.com/a/38511223
     Layout.preferredHeight: addressBar.height
     height: addressBar.height
-
-    // Place the auto-completions in a different layer on top of widgets following the autocomplete.
-    //   When the auto-suggest box is shown, it will overlap the widgets following it, and due
-    //   to the z index is shown on top. z indexes only work between sibling items, so
-    //   we can't set this on suggestionsBox directly.
-    z: 1
 
     // Data source containing the current autocomplete suggestions.
     //   In JavaScript, this is a string array, so access it with [index], not the usual .get(index).
@@ -127,264 +148,199 @@ Item {
         text = address
     }
 
-    RowLayout {
-        // Our parent "Item {}" is not a layout, so we can't use the attached Layout properties.
-        // anchors.fill: parent
+    // The text field where a user enters to-be-completed text.
+    TextField {
+        id: addressBar
+
+        focus: true
+        placeholderText: "barcode number, or food name (plural form only)"
+
+        // Our parent "Item {}" is not a layout, so we can't use "Layout.fillWidth: true".
         anchors.left: parent.left
         anchors.right: parent.right
 
-        // A text field with Google-like auto-completion.
-        //   TODO: Set a minimum width. Otherwise, without AutoComplete { Layout.fillWidth: true },
-        //   the auto-complete box would not be visible at all.
+        // Disable predictive text input to make textEdited() signals work under Android.
+        //   A workaround for multiple Qt bugs. See: https://stackoverflow.com/a/62526369
+        inputMethodHints: Qt.ImhSensitiveData
+
+        // Necessary to have a blinking cursor in addressBar at application startup.
+        //   This is needed in addition to the same line in root.Component.onCompleted in BaseApp.qml.
+        //   TODO: Simplify this stuff. Perhaps a FocusScope can help.
+        Component.onCompleted: forceActiveFocus()
+
+        // This event handler is undocumented for TextField and incompletely documented for TextInput,
+        // which TextField wraps: https://doc.qt.io/qt-5/qml-qtquick-textinput.html#textEdited-signal .
+        // However, it works, and is also proposed by code insight in Qt Creator.
+        onTextEdited: {
+            // Update the current address when the user changes the text.
+            //   User changes include cutting and pasting. The "textChanged()" event however
+            //   is emitted also when software changes the text field content (such as when
+            //   navigating through completions), making it  the wrong place to update the address.
+            //   This automatically emits addressChanged() so client code can adapt the model.
+            autocomplete.address = text
+
+            // TODO: This should better be set as a binding on goButton itself.
+            goButton.enabled = autocomplete.address == "" ? false : true;
+
+            // Invalidate the completion selection, because the user edited the address so
+            // it does not correspond to any current completion. Also completions might have been cleared.
+            //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
+            suggestionsList.currentIndex = -1
+
+            suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false;
+        }
+
+        // Handle the "text accepted" event, which sets the address from the text.
+        //   This event is also artificially emitted by the "Go" button and by clicking on
+        //   an auto-suggest proposal.
         //
-        //   TODO: Fix that the parts of this auto-complete widget have confusing internal
-        //   dependencies. For example, after changing the address property one also always has to
-        //   do suggestionsList.currentIndex = -1. Thats should be handled automatically.
-        //
-        //   TODO: Clear up the confusion between an invisible suggestion box and a visible one with
-        //   no content. Both cases are used currently, but only one is necessary, as both look the same.
-        //
-        //   TODO: Use custom properties as a more declarative way to govern behavior here.
-        //   For example, "completionsVisibility" set to an expression. See:
-        //   https://github.com/dant3/qmlcompletionbox/blob/41eebf2b50ef4ade26c99946eaa36a7bfabafef5/SuggestionBox.qml#L36
-        //   https://github.com/dant3/qmlcompletionbox/blob/master/SuggestionBox.qml
-        //
-        //   TODO: Use states to better describe the open and closed state of the completions box.
-        //   See: https://code.qt.io/cgit/qt/qtdeclarative.git/tree/examples/quick/keyinteraction/focus/focus.qml?h=5.15#n166
-        TextField {
-            id: addressBar
+        //   This event is emitted by a TextField when the user finishes editing it.
+        //   In desktop software, this requires pressing "Return". Moving focus does not count.
+        onAccepted: {
+            console.log("AutoComplete: addressBar: 'accepted()' signal received")
+            autocomplete.completionsVisible = false
 
-            focus: true
-            placeholderText: "barcode number, or food name (plural form only)"
-            Layout.fillWidth: true
+            // When clicking into addressBar again, the completions shown when executing the
+            // search should show again. But selecting them should start afresh.
+            //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
+            suggestionsList.currentIndex = -1
 
-            // Disable predictive text input to make textEdited() signals work under Android.
-            //   A workaround for multiple Qt bugs. See: https://stackoverflow.com/a/62526369
-            inputMethodHints: Qt.ImhSensitiveData
+            // As in a web browser, we'll correct the "address" entered. Such as:
+            // " 2 165741  004149  " → "2165741004149"
+            var searchTerm = normalize(text)
+            autocomplete.address = searchTerm
 
-            // Necessary to have a blinking cursor in addressBar at application startup.
-            //   This is needed in addition to the same line in root.Component.onCompleted in BaseApp.qml.
-            //   TODO: Simplify this stuff. Perhaps a FocusScope can help.
-            Component.onCompleted: forceActiveFocus()
+            autocomplete.accepted()
+        }
 
-            // This event handler is undocumented for TextField and incompletely documented for TextInput,
-            // which TextField wraps: https://doc.qt.io/qt-5/qml-qtquick-textinput.html#textEdited-signal .
-            // However, it works, and is also proposed by code insight in Qt Creator.
-            onTextEdited: {
-                // Update the current address when the user changes the text.
-                //   User changes include cutting and pasting. The "textChanged()" event however
-                //   is emitted also when software changes the text field content (such as when
-                //   navigating through completions), making it  the wrong place to update the address.
-                //   This automatically emits addressChanged() so client code can adapt the model.
-                autocomplete.address = text
+        onActiveFocusChanged: {
+            if (activeFocus && suggestionsList.model.length > 0)
+                suggestionsBox.visible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
+                // TODO: Perhaps initialize the completions with suggestions based on the current
+                // text in addressBar. If the reason for not having the focus before was a previous
+                // search, then it has no completions at this point.
+            else
+                suggestionsBox.visible = false
+        }
 
-                // TODO: This should better be set as a binding on goButton itself.
-                goButton.enabled = autocomplete.address == "" ? false : true;
+        // Process all keyboard events here centrally.
+        //   Since the TextEdit plus suggestions box is one combined component, handling all
+        //   key presses here is more tidy. They cannot all be handled in suggestionsBox as
+        //   key presses are not delivered or forwarded to components in their invisible state.
+        Keys.onPressed: {
+            console.log("AutoComplete: addressBar: Keys.pressed(): " + event.key + " : " + event.text)
 
-                // Invalidate the completion selection, because the user edited the address so
-                // it does not correspond to any current completion. Also completions might have been cleared.
-                //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
-                suggestionsList.currentIndex = -1
+            if (suggestionsBox.visible) {
+                switch (event.key) {
 
-                suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false;
-            }
-
-            // Handle the "text accepted" event, which sets the address from the text.
-            //   This event is also artificially emitted by the "Go" button and by clicking on
-            //   an auto-suggest proposal.
-            //
-            //   This event is emitted by a TextField when the user finishes editing it.
-            //   In desktop software, this requires pressing "Return". Moving focus does not count.
-            onAccepted: {
-                console.log("AutoComplete: addressBar: 'accepted()' signal received")
-                autocomplete.completionsVisible = false
-
-                // When clicking into addressBar again, the completions shown when executing the
-                // search should show again. But selecting them should start afresh.
-                //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
-                suggestionsList.currentIndex = -1
-
-                // As in a web browser, we'll correct the "address" entered. Such as:
-                // " 2 165741  004149  " → "2165741004149"
-                var searchTerm = normalize(text)
-                autocomplete.address = searchTerm
-
-                autocomplete.accepted()
-            }
-
-            onActiveFocusChanged: {
-                if (activeFocus && suggestionsList.model.length > 0)
-                    suggestionsBox.visible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
-                    // TODO: Perhaps initialize the completions with suggestions based on the current
-                    // text in addressBar. If the reason for not having the focus before was a previous
-                    // search, then it has no completions at this point.
-                else
+                case Qt.Key_Escape:
                     suggestionsBox.visible = false
-            }
+                    suggestionsList.currentIndex = -1
+                    event.accepted = true;
+                    break
 
-            // Process all keyboard events here centrally.
-            //   Since the TextEdit plus suggestions box is one combined component, handling all
-            //   key presses here is more tidy. They cannot all be handled in suggestionsBox as
-            //   key presses are not delivered or forwarded to components in their invisible state.
-            Keys.onPressed: {
-                console.log("AutoComplete: addressBar: Keys.pressed(): " + event.key + " : " + event.text)
+                case Qt.Key_Up:
+                    suggestionsList.currentIndex--
 
-                if (suggestionsBox.visible) {
-                    switch (event.key) {
+                    // When moving prior the first item, cycle through completions from the end again.
+                    if (suggestionsList.currentIndex < 0)
+                        suggestionsList.currentIndex = suggestionsList.model.length - 1
 
-                    case Qt.Key_Escape:
-                        suggestionsBox.visible = false
-                        suggestionsList.currentIndex = -1
-                        event.accepted = true;
-                        break
+                    console.log(
+                        "suggestionsList.model[" + suggestionsList.currentIndex + "]: " +
+                        JSON.stringify(suggestionsList.model[suggestionsList.currentIndex])
+                    )
 
-                    case Qt.Key_Up:
-                        suggestionsList.currentIndex--
+                    addressBar.text = suggestionsList.model[suggestionsList.currentIndex]
+                    event.accepted = true;
+                    break
 
-                        // When moving prior the first item, cycle through completions from the end again.
-                        if (suggestionsList.currentIndex < 0)
-                            suggestionsList.currentIndex = suggestionsList.model.length - 1
+                case Qt.Key_Down:
+                    suggestionsList.currentIndex++
 
-                        console.log(
-                            "suggestionsList.model[" + suggestionsList.currentIndex + "]: " +
-                            JSON.stringify(suggestionsList.model[suggestionsList.currentIndex])
-                        )
+                    // When moving past the last item, cycle through completions from the start again.
+                    if (suggestionsList.currentIndex > suggestionsList.model.length - 1)
+                        suggestionsList.currentIndex = 0
 
-                        addressBar.text = suggestionsList.model[suggestionsList.currentIndex]
-                        event.accepted = true;
-                        break
+                    addressBar.text = suggestionsList.model[suggestionsList.currentIndex]
+                    event.accepted = true;
+                    break
 
-                    case Qt.Key_Down:
-                        suggestionsList.currentIndex++
-
-                        // When moving past the last item, cycle through completions from the start again.
-                        if (suggestionsList.currentIndex > suggestionsList.model.length - 1)
-                            suggestionsList.currentIndex = 0
-
-                        addressBar.text = suggestionsList.model[suggestionsList.currentIndex]
-                        event.accepted = true;
-                        break
-
-                    case Qt.Key_Return:
-                        addressBar.accepted()
-                        event.accepted = true;
-                        break
-                    }
-                }
-                else {
-                    switch (event.key) {
-
-                    // This way, "double Escape" can be used to move the focus to the browser.
-                    // The first hides the suggestions box, the second moves the focus.
-                    case Qt.Key_Escape:
-                        // TODO: Do this in a different way, since "browser" is no longer accessible
-                        //   after outsourcing this component to AutoComplete.qml.
-                        browser.focus = true
-                        event.accepted = true;
-                        break
-
-                    case Qt.Key_Down:
-                        suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false
-                        console.log("After Key Down: suggestionsBox.visible = " + suggestionsBox.visible)
-                        event.accepted = true;
-                        break
-                    }
+                case Qt.Key_Return:
+                    addressBar.accepted()
+                    event.accepted = true;
+                    break
                 }
             }
+            else {
+                switch (event.key) {
 
-            // Auto-suggest dropdown.
-            //   Rectangle is only needed to provide a white background canvas for Repeater.
-            Rectangle {
-                id: suggestionsBox
+                // This way, "double Escape" can be used to move the focus to the browser.
+                // The first hides the suggestions box, the second moves the focus.
+                case Qt.Key_Escape:
+                    // TODO: Do this in a different way, since "browser" is no longer accessible
+                    //   after outsourcing this component to AutoComplete.qml.
+                    browser.focus = true
+                    event.accepted = true;
+                    break
 
-                visible: false // Will be made visible once starting to type a category name.
+                case Qt.Key_Down:
+                    suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false
+                    console.log("After Key Down: suggestionsBox.visible = " + suggestionsBox.visible)
+                    event.accepted = true;
+                    break
+                }
+            }
+        }
 
-                anchors.top: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: childrenRect.height
+        // Auto-suggest dropdown.
+        //   Rectangle is only needed to provide a white background canvas for Repeater.
+        Rectangle {
+            id: suggestionsBox
 
-                color: "white" // The default, anyway.
-                border.width: 1
-                border.color: "silver" // TODO: Replace with the themed color used for field borders etc..
+            visible: false // Will be made visible once starting to type a category name.
 
-                // Using Column { Repeater } instead of ListView because the latter does not support
-                // setting the height to the same as the content because it's meant to be scrollable.
-                // (And that includes trying "suggestionsBox.height: childrenRect.height".)
-                Column {
-                    Repeater {
-                        id: suggestionsList
+            anchors.top: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: childrenRect.height
 
-                        // Repeater lacks ListView's currentIndex, so we'll add it.
-                        property int currentIndex: -1 // No element highlighted initially.
+            color: "white" // The default, anyway.
+            border.width: 1
+            border.color: "silver" // TODO: Replace with the themed color used for field borders etc..
 
-                        // The repeater's delegate to represent one list item.
-                        delegate: Kirigami.BasicListItem {
-                            id: listItem
+            // Using Column { Repeater } instead of ListView because the latter does not support
+            // setting the height to the same as the content because it's meant to be scrollable.
+            // (And that includes trying "suggestionsBox.height: childrenRect.height".)
+            Column {
+                Repeater {
+                    id: suggestionsList
 
-                            label: highlightCompletion(modelData, autocomplete.address)
-                            width: suggestionsBox.width
-                            reserveSpaceForIcon: false
+                    // Repeater lacks ListView's currentIndex, so we'll add it.
+                    property int currentIndex: -1 // No element highlighted initially.
 
-                            // Remove any initial background coloring except on mouse-over.
-                            highlighted: index == suggestionsList.currentIndex
+                    // The repeater's delegate to represent one list item.
+                    delegate: Kirigami.BasicListItem {
+                        id: listItem
 
-                            onClicked: {
-                                suggestionsList.currentIndex = index
+                        label: highlightCompletion(modelData, autocomplete.address)
+                        width: suggestionsBox.width
+                        reserveSpaceForIcon: false
 
-                                console.log("modelData = " + JSON.stringify(modelData))
+                        // Remove any initial background coloring except on mouse-over.
+                        highlighted: index == suggestionsList.currentIndex
 
-                                addressBar.text = modelData
-                                addressBar.accepted()
-                            }
+                        onClicked: {
+                            suggestionsList.currentIndex = index
+
+                            console.log("modelData = " + JSON.stringify(modelData))
+
+                            addressBar.text = modelData
+                            addressBar.accepted()
                         }
                     }
                 }
             }
         }
-
-        Button {
-            id: goButton
-            text: "Go"
-            enabled: false
-            Layout.alignment: Qt.AlignHCenter
-            onClicked: {
-                console.log("goButton: 'clicked()' signal")
-
-                // Forward to the address bar to avoid duplicating code.
-                //   The address bar is the right element to handle its own input. This button
-                //   is just an independent element triggering an action there for convenience.
-                addressBar.accepted()
-            }
-        }
-
-        Button {
-            id: scanButton
-            text: "Scan"
-            Layout.alignment: Qt.AlignHCenter
-
-            // Create the barcode scanner page and connect its signal to this page.
-            //   Documentation for this technique: QtQuick.Controls.StackView::push()
-            //   and "Dynamic QML Object Creation from JavaScript",
-            //   https://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html and
-            //
-            //   By providing a component as URL and not an item, Kirigami takes care
-            //   of dynamic object creation and deletion. Deletion makes sure the camera
-            //   is stopped when the layer closes. This is simpler than creating a dynamic
-            //   object ourselves, but also slower than just hiding the camera for later re-use.
-            //   But as of Kirigami 2.10, there seems to be a bug preventing proper object
-            //   destruction on page close when providing an item here instead of a component.
-            //
-            //   TODO: Once the Kirigami bug mentioned above is fixed, switch to providing an
-            //   object that is not deleted (just hidden) when the page closes and keeps the
-            //   camera in Camera.LoadedState. That should speed up showing the barcode scanner
-            //   from the second time on. Not sure how much would be gained, though.
-            onClicked: {
-                var scannerPage = pageStack.layers.push(Qt.resolvedUrl("ScannerPage.qml"));
-                scannerPage.barcodeFound.connect(onBarcodeFound)
-            }
-        }
-
-        // TODO: Maybe add a "Bookmarks" button here.
     }
 }

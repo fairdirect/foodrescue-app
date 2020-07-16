@@ -32,15 +32,6 @@ Kirigami.ScrollablePage {
     }
 
 
-    // Event handler for a dynamically created ScannerPage object.
-    // TODO: Document the parameters.
-    function onBarcodeFound(code) {
-        console.log("MainPage: 'barcodeFound()' signal, code = " + code)
-        autocomplete.address = code
-        browserContent.text = contentOrMessage(code)
-    }
-
-
     // Interface to the food rescue content.
     //   This is a C++ defined QML type, see ContentDatabase.h. Interface: method content(string).
     //   Note that this is not the same ContentDatabase object that is created in main.cpp. It still
@@ -131,31 +122,91 @@ Kirigami.ScrollablePage {
             width: mainPage.width - browser.leftMargin - browser.rightMargin
 
             // Browser header toolbar: adress bar, "Go" button, "Scan" button.
-            AutoComplete {
-                id: autocomplete
+            RowLayout {
 
-                model: database.completionModel
-                Layout.fillWidth: true
+                // Place the autocomplete suggestions box overlaying the content browser.
+                //   z indexes only work between sibling items, so we can't implement this
+                //   inside AutoComplete.
+                z: 1
 
-                onAddressChanged: {
-                    console.log("MainPage: autocomplete: 'addressChanged()' signal received")
+                AutoComplete {
+                    id: autocomplete
 
-                    // Don't auto-complete nothing or barcode numbers.
-                    if (address == "" || address.match("^[0-9 ]+$"))
-                        database.clearCompletions()
-                    // Auto-complete a category name fragment (and in the future other "address" types).
-                    else
-                        database.updateCompletions(address, 10)
+                    model: database.completionModel
+                    Layout.fillWidth: true
+
+                    onAddressChanged: {
+                        console.log("MainPage: autocomplete: 'addressChanged()' signal received")
+
+                        // Don't auto-complete nothing or barcode numbers.
+                        if (address == "" || address.match("^[0-9 ]+$"))
+                            database.clearCompletions()
+                        // Auto-complete a category name fragment (and in the future other "address" types).
+                        else
+                            database.updateCompletions(address, 10)
+                    }
+
+                    onAccepted: {
+                        browserContent.text = contentOrMessage(address)
+                        browser.focus = true // Allows for keyboard scrolling in the browser.
+                    }
+
+                    function normalize(searchString) {
+                        return database.normalize(searchString)
+                    }
                 }
 
-                onAccepted: {
-                    browserContent.text = contentOrMessage(address)
-                    browser.focus = true // Allows for keyboard scrolling in the browser.
+                Button {
+                    id: goButton
+                    text: "Go"
+                    enabled: false
+                    Layout.alignment: Qt.AlignHCenter
+                    onClicked: {
+                        console.log("MainPage: goButton: 'clicked()' received")
+
+                        // Forward to the address bar to avoid duplicating code.
+                        //   The address bar is the right element to handle its own input. This button
+                        //   is just an independent element triggering an action there for convenience.
+                        autocomplete.accepted()
+                    }
                 }
 
-                function normalize(searchString) {
-                    return database.normalize(searchString)
+                Button {
+                    id: scanButton
+                    text: "Scan"
+                    Layout.alignment: Qt.AlignHCenter
+
+                    // Event handler for a dynamically created ScannerPage object.
+                    // TODO: Document the parameters.
+                    function onBarcodeFound(code) {
+                        console.log("MainPage: scanButton: 'barcodeFound()' received, code = " + code)
+                        autocomplete.address = code
+                        browserContent.text = contentOrMessage(code)
+                    }
+
+                    // Create the barcode scanner page and connect its signal to this page.
+                    //   Documentation for this technique: QtQuick.Controls.StackView::push()
+                    //   and "Dynamic QML Object Creation from JavaScript",
+                    //   https://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html and
+                    //
+                    //   By providing a component as URL and not an item, Kirigami takes care
+                    //   of dynamic object creation and deletion. Deletion makes sure the camera
+                    //   is stopped when the layer closes. This is simpler than creating a dynamic
+                    //   object ourselves, but also slower than just hiding the camera for later re-use.
+                    //   But as of Kirigami 2.10, there seems to be a bug preventing proper object
+                    //   destruction on page close when providing an item here instead of a component.
+                    //
+                    //   TODO: Once the Kirigami bug mentioned above is fixed, switch to providing an
+                    //   object that is not deleted (just hidden) when the page closes and keeps the
+                    //   camera in Camera.LoadedState. That should speed up showing the barcode scanner
+                    //   from the second time on. Not sure how much would be gained, though.
+                    onClicked: {
+                        var scannerPage = pageStack.layers.push(Qt.resolvedUrl("ScannerPage.qml"));
+                        scannerPage.barcodeFound.connect(onBarcodeFound)
+                    }
                 }
+
+                // TODO: Maybe add a "Bookmarks" button here.
             }
 
             Text {
