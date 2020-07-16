@@ -82,7 +82,7 @@ Kirigami.ScrollablePage {
     Flickable {
         id: browser
 
-        focus: !addressBar.focus
+        focus: !autocomplete.focus
         contentWidth: mainLayout.width
         contentHeight: mainLayout.height
 
@@ -135,19 +135,19 @@ Kirigami.ScrollablePage {
                     model: database.completionModel
                     Layout.fillWidth: true
 
-                    onAddressChanged: {
-                        console.log("MainPage: autocomplete: 'addressChanged()' signal received")
+                    onInputChanged: {
+                        console.log("MainPage: autocomplete: 'inputChanged()' signal received")
 
                         // Don't auto-complete nothing or barcode numbers.
-                        if (address == "" || address.match("^[0-9 ]+$"))
+                        if (input == "" || input.match("^[0-9 ]+$"))
                             database.clearCompletions()
-                        // Auto-complete a category name fragment (and in the future other "address" types).
+                        // Auto-complete a category name fragment (and in the future other search term types).
                         else
-                            database.updateCompletions(address, 10)
+                            database.updateCompletions(input, 10)
                     }
 
                     onAccepted: {
-                        browserContent.text = contentOrMessage(address)
+                        browserContent.text = contentOrMessage(input)
                         browser.focus = true // Allows for keyboard scrolling in the browser.
                     }
 
@@ -159,14 +159,14 @@ Kirigami.ScrollablePage {
                 Button {
                     id: goButton
                     text: "Go"
-                    enabled: false
+                    enabled: autocomplete.input === "" ? false : true;
                     Layout.alignment: Qt.AlignHCenter
                     onClicked: {
                         console.log("MainPage: goButton: 'clicked()' received")
 
-                        // Forward to the address bar to avoid duplicating code.
-                        //   The address bar is the right element to handle its own input. This button
-                        //   is just an independent element triggering an action there for convenience.
+                        // Forward to the autocomplete widget to avoid duplicating code.
+                        //   The autocomplete is the right element to handle its own input. This button
+                        //   is just an independent element providing a convenience action.
                         autocomplete.accepted()
                     }
                 }
@@ -180,7 +180,7 @@ Kirigami.ScrollablePage {
                     // TODO: Document the parameters.
                     function onBarcodeFound(code) {
                         console.log("MainPage: scanButton: 'barcodeFound()' received, code = " + code)
-                        autocomplete.address = code
+                        autocomplete.input = code
                         browserContent.text = contentOrMessage(code)
                     }
 

@@ -19,7 +19,7 @@ import local 1.0 as Local // Our custom QML components, as exported in main.cpp.
 //   the auto-complete box would not be visible at all.
 //
 //   TODO: Fix that the parts of this auto-complete widget have confusing internal
-//   dependencies. For example, after changing the address property one also always has to
+//   dependencies. For example, after changing the input property one also always has to
 //   do suggestionsList.currentIndex = -1. Thats should be handled automatically.
 //
 //   TODO: Clear up the confusion between an invisible suggestion box and a visible one with
@@ -40,8 +40,8 @@ Item {
     //   the autocomplete will overlap other widgets following it in a ColumnLayout because it has
     //   height 0 and shows overflow. Defining height in the two ways below allows client code to
     //   place the widget into a Layout or a non-widget object. See: https://stackoverflow.com/a/38511223
-    Layout.preferredHeight: addressBar.height
-    height: addressBar.height
+    Layout.preferredHeight: field.height
+    height: field.height
 
     // Data source containing the current autocomplete suggestions.
     //   In JavaScript, this is a string array, so access it with [index], not the usual .get(index).
@@ -57,27 +57,27 @@ Item {
     //   See: https://doc.qt.io/qt-5/qml-qtquick-repeater.html#model-prop
     property alias model: suggestionsList.model
 
-    // The currently active, in-use address of the address bar.
-    //   It differs from the address bar's text content while navigating through autocompletions.
-    //   Then, the address as typed by the user is the address and the address bar content is
-    //   a potential next address, with completion highlighting done based on the address.
+    // The currently active, in-use user input that is the basis for the current completions.
+    //   It differs from the text field's "text" content while navigating through autocompletions.
+    //   During that time, the last input as typed by the user is "input" and the text field content is
+    //   a potential next input, with completion highlighting done based on the current input.
     //
-    //   Use the `onAddressChanged` handler to update the model providing the completions to the
+    //   Use the `onInputChanged` handler to update the model providing the completions to the
     //   autocomplete. For example, if the model is the result of a database query, then the database
     //   query has to be run again to update it.
     //
-    //   TODO: Rename to something more generic now that this is ought to be a generic auto-complete widget.
-    //   Proposal: name it "input", as that relates to "what the user entered", which can be something
-    //   different from "what is currently in the text field".
-    //
-    //   TODO: Make code in here less redundant by setting autocomplete.text in onAddressChanged instead
-    //   of imperatively in multiple locations.
-    property string address
+    //   TODO: If it is necessary to also keep the "text" property, better rename the "input" property
+    //   to "searchTerm". Because it's confusing otherwise.
+    property string input
 
-    // The current textual content of the address bar.
-    //   When the address (see property `address`) changes, the text changes. But when the text changes,
-    //   the address changes only if this was triggered by user input.
-    property alias text: addressBar.text
+    // The current textual content of the text field.
+    //   When the input property changes, the text property changes. But when the text property changes,
+    //   the input property changes only if this was triggered by user input.
+    //
+    //   TODO: Probably, this does not have to be part of the public interface. If not, remove it,
+    //   because the distinction between "input" and "text" is quite confusing.
+    property alias text: field.text
+
     property alias completionsVisible: suggestionsBox.visible
 
     // This signal is emitted when the Return or Enter key is pressed in the autocomplete's underlying
@@ -140,18 +140,20 @@ Item {
         return completion
     }
 
-    // React to our own auto-provided signal for a change in the "address" property.
-    //   When client code also implements onAddressChanged when instantiating an AutoComplete, it
+    // React to our own auto-provided signal for a change in the "input" property.
+    //   When client code also implements onInputChanged when instantiating an AutoComplete, it
     //   will not overwrite this handler but add to it. So no caveats when reacting to own signals.
-    onAddressChanged: {
-        console.log("AutoComplete: autocomplete: 'addressChanged()' signal received")
-        text = address
+    //
+    //   TODO: Make sure that text is only set here and not also unnecessarily in other locations in
+    //   this component.
+    onInputChanged: {
+        console.log("AutoComplete: autocomplete: 'inputChanged()' signal received")
+        text = input
     }
 
     // The text field where a user enters to-be-completed text.
     TextField {
-        id: addressBar
-
+        id: field
         focus: true
         placeholderText: "barcode number, or food name (plural form only)"
 
@@ -163,7 +165,7 @@ Item {
         //   A workaround for multiple Qt bugs. See: https://stackoverflow.com/a/62526369
         inputMethodHints: Qt.ImhSensitiveData
 
-        // Necessary to have a blinking cursor in addressBar at application startup.
+        // Necessary to have a blinking cursor in text field at application startup.
         //   This is needed in addition to the same line in root.Component.onCompleted in BaseApp.qml.
         //   TODO: Simplify this stuff. Perhaps a FocusScope can help.
         Component.onCompleted: forceActiveFocus()
@@ -172,17 +174,14 @@ Item {
         // which TextField wraps: https://doc.qt.io/qt-5/qml-qtquick-textinput.html#textEdited-signal .
         // However, it works, and is also proposed by code insight in Qt Creator.
         onTextEdited: {
-            // Update the current address when the user changes the text.
+            // Update the current input because the user changed the text.
             //   User changes include cutting and pasting. The "textChanged()" event however
             //   is emitted also when software changes the text field content (such as when
-            //   navigating through completions), making it  the wrong place to update the address.
-            //   This automatically emits addressChanged() so client code can adapt the model.
-            autocomplete.address = text
+            //   navigating through completions), making it the wrong place to update the input.
+            //   This automatically emits inputChanged() so client code can adapt the model.
+            autocomplete.input = text
 
-            // TODO: This should better be set as a binding on goButton itself.
-            goButton.enabled = autocomplete.address == "" ? false : true;
-
-            // Invalidate the completion selection, because the user edited the address so
+            // Invalidate the completion selection, because the user edited the input so
             // it does not correspond to any current completion. Also completions might have been cleared.
             //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
             suggestionsList.currentIndex = -1
@@ -190,25 +189,25 @@ Item {
             suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false;
         }
 
-        // Handle the "text accepted" event, which sets the address from the text.
+        // Handle the "text accepted" event, which sets the input from the text.
         //   This event is also artificially emitted by the "Go" button and by clicking on
         //   an auto-suggest proposal.
         //
         //   This event is emitted by a TextField when the user finishes editing it.
         //   In desktop software, this requires pressing "Return". Moving focus does not count.
         onAccepted: {
-            console.log("AutoComplete: addressBar: 'accepted()' signal received")
+            console.log("AutoComplete: field: 'accepted()' signal received")
             autocomplete.completionsVisible = false
 
-            // When clicking into addressBar again, the completions shown when executing the
-            // search should show again. But selecting them should start afresh.
+            // When clicking into the text field again, the last set of completions should show
+            // again. But selecting them will start anew.
             //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
             suggestionsList.currentIndex = -1
 
-            // As in a web browser, we'll correct the "address" entered. Such as:
-            // " 2 165741  004149  " → "2165741004149"
+            // True to the browser paradigm where URLs are fixed up, we'll correct the input entered.
+            // Such as: " 2 165741  004149  " → "2165741004149"
             var searchTerm = normalize(text)
-            autocomplete.address = searchTerm
+            autocomplete.input = searchTerm
 
             autocomplete.accepted()
         }
@@ -216,8 +215,9 @@ Item {
         onActiveFocusChanged: {
             if (activeFocus && suggestionsList.model.length > 0)
                 suggestionsBox.visible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
+                // TODO: Probably better use "input" instead of "text" in the line above.
                 // TODO: Perhaps initialize the completions with suggestions based on the current
-                // text in addressBar. If the reason for not having the focus before was a previous
+                // text. If the reason for not having the focus before was a previous
                 // search, then it has no completions at this point.
             else
                 suggestionsBox.visible = false
@@ -228,7 +228,7 @@ Item {
         //   key presses here is more tidy. They cannot all be handled in suggestionsBox as
         //   key presses are not delivered or forwarded to components in their invisible state.
         Keys.onPressed: {
-            console.log("AutoComplete: addressBar: Keys.pressed(): " + event.key + " : " + event.text)
+            console.log("AutoComplete: field: Keys.pressed(): " + event.key + " : " + event.text)
 
             if (suggestionsBox.visible) {
                 switch (event.key) {
@@ -236,7 +236,7 @@ Item {
                 case Qt.Key_Escape:
                     suggestionsBox.visible = false
                     suggestionsList.currentIndex = -1
-                    event.accepted = true;
+                    event.accepted = true
                     break
 
                 case Qt.Key_Up:
@@ -251,8 +251,8 @@ Item {
                         JSON.stringify(suggestionsList.model[suggestionsList.currentIndex])
                     )
 
-                    addressBar.text = suggestionsList.model[suggestionsList.currentIndex]
-                    event.accepted = true;
+                    field.text = suggestionsList.model[suggestionsList.currentIndex]
+                    event.accepted = true
                     break
 
                 case Qt.Key_Down:
@@ -262,12 +262,12 @@ Item {
                     if (suggestionsList.currentIndex > suggestionsList.model.length - 1)
                         suggestionsList.currentIndex = 0
 
-                    addressBar.text = suggestionsList.model[suggestionsList.currentIndex]
-                    event.accepted = true;
+                    field.text = suggestionsList.model[suggestionsList.currentIndex]
+                    event.accepted = true
                     break
 
                 case Qt.Key_Return:
-                    addressBar.accepted()
+                    field.accepted()
                     event.accepted = true;
                     break
                 }
@@ -281,13 +281,13 @@ Item {
                     // TODO: Do this in a different way, since "browser" is no longer accessible
                     //   after outsourcing this component to AutoComplete.qml.
                     browser.focus = true
-                    event.accepted = true;
+                    event.accepted = true
                     break
 
                 case Qt.Key_Down:
                     suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false
                     console.log("After Key Down: suggestionsBox.visible = " + suggestionsBox.visible)
-                    event.accepted = true;
+                    event.accepted = true
                     break
                 }
             }
@@ -323,7 +323,7 @@ Item {
                     delegate: Kirigami.BasicListItem {
                         id: listItem
 
-                        label: highlightCompletion(modelData, autocomplete.address)
+                        label: highlightCompletion(modelData, autocomplete.input)
                         width: suggestionsBox.width
                         reserveSpaceForIcon: false
 
@@ -335,8 +335,8 @@ Item {
 
                             console.log("modelData = " + JSON.stringify(modelData))
 
-                            addressBar.text = modelData
-                            addressBar.accepted()
+                            field.text = modelData
+                            field.accepted()
                         }
                     }
                 }
