@@ -36,7 +36,7 @@ Kirigami.ScrollablePage {
     // TODO: Document the parameters.
     function onBarcodeFound(code) {
         console.log("MainPage: 'barcodeFound()' signal, code = " + code)
-        headerBar.text = code
+        autocomplete.address = code
         browserContent.text = contentOrMessage(code)
     }
 
@@ -132,18 +132,29 @@ Kirigami.ScrollablePage {
 
             // Browser header toolbar: adress bar, "Go" button, "Scan" button.
             AutoComplete {
-                id: headerBar
+                id: autocomplete
 
                 model: database.completionModel
                 Layout.fillWidth: true
+
+                onAddressChanged: {
+                    console.log("MainPage: autocomplete: 'addressChanged()' signal received")
+
+                    // Don't auto-complete nothing or barcode numbers.
+                    if (address == "" || address.match("^[0-9 ]+$"))
+                        database.clearCompletions()
+                    // Auto-complete a category name fragment (and in the future other "address" types).
+                    else
+                        database.updateCompletions(address, 10)
+                }
 
                 onAccepted: {
                     browserContent.text = contentOrMessage(address)
                     browser.focus = true // Allows for keyboard scrolling in the browser.
                 }
 
-                function normalize(input) {
-                    return database.normalize(input)
+                function normalize(searchString) {
+                    return database.normalize(searchString)
                 }
             }
 

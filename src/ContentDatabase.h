@@ -15,7 +15,6 @@ class ContentDatabase : public QObject {
    Q_OBJECT
 
    Q_PROPERTY(QStringList completionModel MEMBER m_completionModel NOTIFY completionsChanged)
-
    QStringList m_completionModel;
 
 public:

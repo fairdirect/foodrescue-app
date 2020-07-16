@@ -22,17 +22,18 @@ Item {
     //   we can't set this on suggestionsBox directly.
     z: 1
 
-    property alias text: addressBar.text
-    property alias completionsVisible: suggestionsBox.visible
-
-    // Data source of autocomplete suggestions. Must be an array of strings.
-    //   This is a string array, so access it with [index], not the usual .get(index).
+    // Data source containing the current autocomplete suggestions.
+    //   In JavaScript, this is a string array, so access it with [index], not the usual .get(index).
+    //   For implementing in C++, use QStringList.
     //
     //   TODO: Replace this with a QML ListModel model. This is supported by suggestionsList.model,
     //   which is a Repeater model (see https://doc.qt.io/qt-5/qml-qtquick-repeater.html#model-prop ).
     //   It allows to call clear() and to modify the model from code here in AutoComplete, which is
     //   not possible with a string list model. That will allow to remove the AutoComplete methods
     //   to do that which have to be overwritten by client code.
+    //
+    //   TODO: Even better, allow client code to set this to any type of model accepted by a Repeater.
+    //   See: https://doc.qt.io/qt-5/qml-qtquick-repeater.html#model-prop
     property alias model: suggestionsList.model
 
     // The currently active, in-use address of the address bar.
@@ -40,30 +41,46 @@ Item {
     //   Then, the address as typed by the user is the address and the address bar content is
     //   a potential next address, with completion highlighting done based on the address.
     //
+    //   Use the `onAddressChanged` handler to update the model providing the completions to the
+    //   autocomplete. For example, if the model is the result of a database query, then the database
+    //   query has to be run again to update it.
+    //
     //   TODO: Rename to something more generic now that this is ought to be a generic auto-complete widget.
+    //   Proposal: name it "input", as that relates to "what the user entered", which can be something
+    //   different from "what is currently in the text field".
     //
     //   TODO: Make code in here less redundant by setting autocomplete.text in onAddressChanged instead
     //   of imperatively in multiple locations.
     property string address
+
+    // The current textual content of the address bar.
+    //   When the address (see property `address`) changes, the text changes. But when the text changes,
+    //   the address changes only if this was triggered by user input.
+    property alias text: addressBar.text
+    property alias completionsVisible: suggestionsBox.visible
 
     // This signal is emitted when the Return or Enter key is pressed in the autocomplete's underlying
     // text field, or a completion is accepted with a mouse click or by pressing Return or Enter when
     // it is selected.
     signal accepted()
 
-    // Normalize user input to a form based on which the completions can be calculated. Only a do-nothing
-    // implementation is provided. Client code should overwrite this as required by the model used.
+    // Normalize user input to a form based on which the completions can be calculated.
+    //   Only a do-nothing implementation is provided. Client code should overwrite this as required
+    //   by the model used.
     function normalize(input) { return input }
 
-
-    // Highlight the completed parts of a multi-substring search term in bold, using HTML "<b>".
-    // Considered private.
+    // Highlight the auto-completed parts of a multi-substring search term using HTML.
+    //   This implementation uses <b> tags to highlight the completed portions. Client code can
+    //   overwrite this to implement a different type of completion.
     // @param fragmentsString  The part to not render in bold, when matched case-insensitively against the
     //   completion.
     // TODO: Document the parameters.
     // TODO: Make sure original contains no HTML tags by sanitizing these. Otherwise searching
     //   for parts of original below may match "word</b>" etc. and mess up the result.
-    function boldenCompletion(completion, fragmentsString) {
+    // TODO: Add a parameter to make it configurable which HTML tag (incl. attributes) to use for the
+    //   highlighting.
+    // TODO: Maybe add a parameter to de-highlight the original parts with configurable HTML.
+    function highlightCompletion(completion, fragmentsString) {
         var fragments = fragmentsString.trim().split(" ")
 
         // Tracks the current processing position in "completion".
@@ -102,6 +119,13 @@ Item {
         return completion
     }
 
+    // React to our own auto-provided signal for a change in the "address" property.
+    //   When client code also implements onAddressChanged when instantiating an AutoComplete, it
+    //   will not overwrite this handler but add to it. So no caveats when reacting to own signals.
+    onAddressChanged: {
+        console.log("AutoComplete: autocomplete: 'addressChanged()' signal received")
+        text = address
+    }
 
     RowLayout {
         // Our parent "Item {}" is not a layout, so we can't use the attached Layout properties.
@@ -114,7 +138,7 @@ Item {
         //   the auto-complete box would not be visible at all.
         //
         //   TODO: Fix that the parts of this auto-complete widget have confusing internal
-        //   dependencies. For example, after database.clearCompletions() one also always has to
+        //   dependencies. For example, after changing the address property one also always has to
         //   do suggestionsList.currentIndex = -1. Thats should be handled automatically.
         //
         //   TODO: Clear up the confusion between an invisible suggestion box and a visible one with
@@ -147,22 +171,15 @@ Item {
             // which TextField wraps: https://doc.qt.io/qt-5/qml-qtquick-textinput.html#textEdited-signal .
             // However, it works, and is also proposed by code insight in Qt Creator.
             onTextEdited: {
-                // Whenever the user writes or deletes something (incl. by cut / paste), that
-                // defines the new current address of the address bar. When the address bar
-                // content changes otherwise, such as by navigating through completions, that's
-                // not the case. So we can't do this in "onTextChanged".
+                // Update the current address when the user changes the text.
+                //   User changes include cutting and pasting. The "textChanged()" event however
+                //   is emitted also when software changes the text field content (such as when
+                //   navigating through completions), making it  the wrong place to update the address.
+                //   This automatically emits addressChanged() so client code can adapt the model.
                 autocomplete.address = text
 
                 // TODO: This should better be set as a binding on goButton itself.
                 goButton.enabled = autocomplete.address == "" ? false : true;
-
-                // Don't auto-complete nothing or barcode numbers.
-                if (autocomplete.address == "" || autocomplete.address.match("^[0-9 ]+$"))
-                    database.clearCompletions()
-                // Auto-complete a category name fragment (or later other "address" type).
-                //   Not done in onTextChanged because navigating through completion should not update them.
-                else
-                    database.updateCompletions(autocomplete.address, 10)
 
                 // Invalidate the completion selection, because the user edited the address so
                 // it does not correspond to any current completion. Also completions might have been cleared.
@@ -179,22 +196,19 @@ Item {
             //   This event is emitted by a TextField when the user finishes editing it.
             //   In desktop software, this requires pressing "Return". Moving focus does not count.
             onAccepted: {
-                console.log("addressBar: 'accepted()' signal")
+                console.log("AutoComplete: addressBar: 'accepted()' signal received")
                 autocomplete.completionsVisible = false
 
                 // When clicking into addressBar again, the completions shown when executing the
-                // search should appear again. So don't database.clearCompletions(). But selecting
-                // them should start afresh, so:
+                // search should show again. But selecting them should start afresh.
                 //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
                 suggestionsList.currentIndex = -1
 
                 // As in a web browser, we'll correct the "address" entered. Such as:
                 // " 2 165741  004149  " → "2165741004149"
                 var searchTerm = normalize(text)
-                autocomplete.text = searchTerm
                 autocomplete.address = searchTerm
 
-                // Send the accepted() signal of the parent component so client code can react.
                 autocomplete.accepted()
             }
 
@@ -213,7 +227,7 @@ Item {
             //   key presses here is more tidy. They cannot all be handled in suggestionsBox as
             //   key presses are not delivered or forwarded to components in their invisible state.
             Keys.onPressed: {
-                console.log("addressBar: Keys.pressed(): " + event.key + " : " + event.text)
+                console.log("AutoComplete: addressBar: Keys.pressed(): " + event.key + " : " + event.text)
 
                 if (suggestionsBox.visible) {
                     switch (event.key) {
@@ -308,7 +322,7 @@ Item {
                         delegate: Kirigami.BasicListItem {
                             id: listItem
 
-                            label: boldenCompletion(modelData, autocomplete.address)
+                            label: highlightCompletion(modelData, autocomplete.address)
                             width: suggestionsBox.width
                             reserveSpaceForIcon: false
 
