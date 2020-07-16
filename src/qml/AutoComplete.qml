@@ -20,7 +20,7 @@ import local 1.0 as Local // Our custom QML components, as exported in main.cpp.
 //
 //   TODO: Fix that the parts of this auto-complete widget have confusing internal
 //   dependencies. For example, after changing the input property one also always has to
-//   do suggestionsList.currentIndex = -1. Thats should be handled automatically.
+//   do completions.currentIndex = -1. That should be handled automatically.
 //
 //   TODO: Clear up the confusion between an invisible suggestion box and a visible one with
 //   no content. Both cases are used currently, but only one is necessary, as both look the same.
@@ -50,7 +50,7 @@ FocusScope {
     //   TODO: Allow client code to set this to any type of model accepted by a Repeater.
     //   See: https://doc.qt.io/qt-5/qml-qtquick-repeater.html#model-prop . Right now, only a QStringList
     //   is accepted.
-    property alias model: suggestionsList.model
+    property alias model: completions.model
 
     // The currently active, in-use user input that is the basis for the current completions.
     //   It differs from the text field's "text" content while navigating through autocompletions.
@@ -73,7 +73,7 @@ FocusScope {
     //   because the distinction between "input" and "text" is quite confusing.
     property alias text: field.text
 
-    property alias completionsVisible: suggestionsBox.visible
+    property alias completionsVisible: completionsBox.visible
 
     // This signal is emitted when the Return or Enter key is pressed in the autocomplete's underlying
     // text field, or a completion is accepted with a mouse click or by pressing Return or Enter when
@@ -182,9 +182,9 @@ FocusScope {
             // Invalidate the completion selection, because the user edited the input so
             // it does not correspond to any current completion. Also completions might have been cleared.
             //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
-            suggestionsList.currentIndex = -1
+            completions.currentIndex = -1
 
-            suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false;
+            completionsBox.visible = completions.model.length > 0 ? true : false;
         }
 
         // Handle the "text accepted" event, which sets the input from the text.
@@ -204,7 +204,7 @@ FocusScope {
             // When clicking into the text field again, the last set of completions should show
             // again. But selecting them will start anew.
             //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
-            suggestionsList.currentIndex = -1
+            completions.currentIndex = -1
 
             // True to the browser paradigm where URLs are fixed up, we'll correct the input entered.
             // Such as: " 2 165741  004149  " → "2165741004149"
@@ -215,56 +215,56 @@ FocusScope {
         }
 
         onActiveFocusChanged: {
-            if (activeFocus && suggestionsList.model.length > 0)
-                suggestionsBox.visible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
+            if (activeFocus && completions.model.length > 0)
+                completionsBox.visible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
                 // TODO: Probably better use "input" instead of "text" in the line above.
                 // TODO: Perhaps initialize the completions with suggestions based on the current
                 // text. If the reason for not having the focus before was a previous
                 // search, then it has no completions at this point.
             else
-                suggestionsBox.visible = false
+                completionsBox.visible = false
         }
 
         // Process all keyboard events here centrally.
         //   Since the TextEdit plus suggestions box is one combined component, handling all
-        //   key presses here is more tidy. They cannot all be handled in suggestionsBox as
+        //   key presses here is more tidy. They cannot all be handled in completionsBox as
         //   key presses are not delivered or forwarded to components in their invisible state.
         Keys.onPressed: {
             console.log("AutoComplete: field: Keys.pressed(): " + event.key + " : " + event.text)
 
-            if (suggestionsBox.visible) {
+            if (completionsBox.visible) {
                 switch (event.key) {
 
                 case Qt.Key_Escape:
-                    suggestionsBox.visible = false
-                    suggestionsList.currentIndex = -1
+                    completionsBox.visible = false
+                    completions.currentIndex = -1
                     event.accepted = true
                     break
 
                 case Qt.Key_Up:
-                    suggestionsList.currentIndex--
+                    completions.currentIndex--
 
                     // When moving prior the first item, cycle through completions from the end again.
-                    if (suggestionsList.currentIndex < 0)
-                        suggestionsList.currentIndex = suggestionsList.model.length - 1
+                    if (completions.currentIndex < 0)
+                        completions.currentIndex = completions.model.length - 1
 
                     console.log(
-                        "suggestionsList.model[" + suggestionsList.currentIndex + "]: " +
-                        JSON.stringify(suggestionsList.model[suggestionsList.currentIndex])
+                        "completions.model[" + completions.currentIndex + "]: " +
+                        JSON.stringify(completions.model[completions.currentIndex])
                     )
 
-                    field.text = suggestionsList.model[suggestionsList.currentIndex]
+                    field.text = completions.model[completions.currentIndex]
                     event.accepted = true
                     break
 
                 case Qt.Key_Down:
-                    suggestionsList.currentIndex++
+                    completions.currentIndex++
 
                     // When moving past the last item, cycle through completions from the start again.
-                    if (suggestionsList.currentIndex > suggestionsList.model.length - 1)
-                        suggestionsList.currentIndex = 0
+                    if (completions.currentIndex > completions.model.length - 1)
+                        completions.currentIndex = 0
 
-                    field.text = suggestionsList.model[suggestionsList.currentIndex]
+                    field.text = completions.model[completions.currentIndex]
                     event.accepted = true
                     break
 
@@ -287,18 +287,25 @@ FocusScope {
                     break
 
                 case Qt.Key_Down:
-                    suggestionsBox.visible = suggestionsList.model.length > 0 ? true : false
-                    console.log("After Key Down: suggestionsBox.visible = " + suggestionsBox.visible)
+                    completionsBox.visible = completions.model.length > 0 ? true : false
+
                     event.accepted = true
                     break
                 }
             }
         }
 
-        // Auto-suggest dropdown.
-        //   Rectangle is only needed to provide a white background canvas for Repeater.
+
+        // Autocomplete dropdown.
+        //   Using Rectangle{Column{Repeater}} here because a ListView does not support setting its
+        //   height to its content's height because it's meant to be scrolled. Doesn't work even
+        //   with "height: childrenRect.height". The Rectangle is just to provide a background canvas.
+        //
+        //   TODO: Make this a sub-component, means provide a public interface of (alias) properties
+        //   and signals that is then accessed by the rest of the AutoComplete code. That avoids
+        //   the confusing parallel use of "completionsBox" and "completions".
         Rectangle {
-            id: suggestionsBox
+            id: completionsBox
 
             visible: false // Will be made visible once starting to type a category name.
 
@@ -311,32 +318,29 @@ FocusScope {
             border.width: 1
             border.color: "silver" // TODO: Replace with the themed color used for field borders etc..
 
-            // Using Column { Repeater } instead of ListView because the latter does not support
-            // setting the height to the same as the content because it's meant to be scrollable.
-            // (And that includes trying "suggestionsBox.height: childrenRect.height".)
             Column {
                 Repeater {
-                    id: suggestionsList
+                    id: completions
 
                     // Repeater lacks ListView's currentIndex, so we'll add it.
                     property int currentIndex: -1 // No element highlighted initially.
 
-                    // The repeater's delegate to represent one list item.
+                    // A delegate renders one list item.
+                    //   TODO: Use a basic QML component to not tie AutoComplete to Kirigami. Or
+                    //   tell what to use here when wanting to use it independent of Kirigami.
                     delegate: Kirigami.BasicListItem {
                         id: listItem
 
                         label: highlightCompletion(modelData, autocomplete.input)
-                        width: suggestionsBox.width
+                        width: completionsBox.width
                         reserveSpaceForIcon: false
 
                         // Remove any initial background coloring except on mouse-over.
-                        highlighted: index == suggestionsList.currentIndex
+                        highlighted: index == completions.currentIndex
 
                         onClicked: {
-                            suggestionsList.currentIndex = index
-
                             console.log("modelData = " + JSON.stringify(modelData))
-
+                            completions.currentIndex = index
                             field.text = modelData
                             field.accepted()
                         }
