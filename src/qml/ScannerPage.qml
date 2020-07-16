@@ -29,7 +29,6 @@ import local 1.0 as Local // Our custom QML components, exported in main.cpp.
 
 Kirigami.ScrollablePage {
     id: scannerPage
-
     title: "Scan a Barcode"
 
     property int tagsFound: 0

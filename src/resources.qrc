@@ -13,5 +13,6 @@
         <file>qml/ScannerPage.qml</file>
         <file>qml/TestPage.qml</file>
         <file>docbook-to-qthtml.xsl</file>
+        <file>qml/AutoComplete.qml</file>
     </qresource>
 </RCC>
