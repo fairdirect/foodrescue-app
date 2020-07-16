@@ -295,6 +295,17 @@ FocusScope {
             }
         }
 
+        // Because there is no TextField::onClicked(), we have to add that ourselves.
+        MouseArea {
+            anchors.fill: parent
+
+            // On click, show the suggestions box again. It is the complementary action to pressing
+            // "Esc" once, and does the same as pressing "Arrow Down" while completionsBox is hidden.
+            onClicked: {
+                console.log("AutoComplete: field: clicked() received")
+                completionsBox.visible = completions.model.length > 0 ? true : false
+            }
+        }
 
         // Autocomplete dropdown.
         //   Using Rectangle{Column{Repeater}} here because a ListView does not support setting its
