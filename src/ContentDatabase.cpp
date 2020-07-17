@@ -187,17 +187,30 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
 
     if (isNumber.exactMatch(searchTerm)) {
         // Set up the query for a barcode number.
-        // TODO: Chain the JOINs in the other direction because it's more logical. So
-        //   it would be "SELECT FROM products … WHERE products.code = …" then.
+        //   The query uses a recursive SQLite Common Table Expression (see https://sqlite.org/lang_with.html )
+        //   to collect topics for a product based on both the directly assigned categories and the ancestor
+        //   categories of those.
         query.prepare(
-            "SELECT topic_contents.title, topics.section, topics.version, topic_contents.content "
-            "FROM topic_contents "
-            "    INNER JOIN topics ON topic_contents.topic_id = topics.id "
-            "    INNER JOIN topic_categories ON topics.id = topic_categories.topic_id "
-            "    INNER JOIN product_categories ON topic_categories.category_id = product_categories.category_id "
-            "    INNER JOIN products ON product_categories.product_id = products.id "
+            "WITH RECURSIVE all_product_categories (product_id, category_id) AS ( "
+            "    SELECT product_id, category_id "
+            "        FROM product_categories "
+            "            INNER JOIN products ON products.id = product_categories.product_id "
+            "        WHERE products.code = :code "
+            "    UNION ALL "
+            "    SELECT (SELECT id FROM products WHERE code = :code ), categories_structure.parent_id "
+            "        FROM all_product_categories "
+            "            INNER JOIN categories_structure ON all_product_categories.category_id = categories_structure.category_id "
+            ") "
+            "SELECT topic_contents.title, topics.section, topics.version, topic_contents.content, categories.name "
+            "FROM products "
+            "    INNER JOIN all_product_categories ON products.id = all_product_categories.product_id "
+            "    INNER JOIN categories ON all_product_categories.category_id = categories.id "
+            "    INNER JOIN topic_categories ON categories.id = topic_categories.category_id "
+            "    INNER JOIN topics ON topic_categories.topic_id = topics.id "
+            "    INNER JOIN topic_contents ON topics.id = topic_contents.topic_id "
             "WHERE products.code = :code"
         );
+
         query.bindValue(":code", searchTerm.toLongLong());
         // TODO: Check if the conversion was successful. See: https://doc.qt.io/qt-5/qstring.html#toLongLong
 
@@ -205,14 +218,39 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
     }
     else {
         // Set up the query for a category name.
+        //   Again, the query uses a recursive CTE (see https://sqlite.org/lang_with.html ). It first builds
+        //   up a table ancestor_categories containing the category in question and all its ancestors, and then
+        //   uses that in the main SELECT at the end to find topics connected to any of these ancestor categories.
+        //
+        //   TODO: It might be possible to build up the ancestor_categories table with just a single column.
         query.prepare(
-            "SELECT topic_contents.title, topics.section, topics.version, topic_contents.content "
-            "FROM categories "
-            "    INNER JOIN topic_categories ON topic_categories.category_id = categories.id "
+            "WITH RECURSIVE "
+            //   -- Defining a reusable single-value 'variable', as seen at https://stackoverflow.com/a/56179189
+            "    var_1 (category_id) AS (SELECT id FROM categories WHERE name = :name COLLATE NOCASE LIMIT 1), "
+            "    "
+            //   -- TODO: Rename ancestor_categories since the searched-for category is also included in them.
+            "    ancestor_categories (category_id, ancestor_id) AS ( "
+            //       -- First SELECT includes the search term category itself, as it's also relevant for finding topics.
+            "        SELECT var_1.category_id, var_1.category_id FROM var_1 "
+            "        UNION "
+            "        SELECT categories_structure.category_id, categories_structure.parent_id "
+            "            FROM categories_structure, var_1 "
+            "            WHERE categories_structure.category_id = var_1.category_id "
+            "        UNION ALL "
+            "        SELECT ancestor_categories.category_id, categories_structure.parent_id "
+            "            FROM ancestor_categories "
+            "                INNER JOIN categories_structure ON ancestor_categories.ancestor_id = categories_structure.category_id "
+            "    ) "
+            "    "
+            "SELECT topic_contents.title, topics.section, topics.version, topic_contents.content, categories.name "
+            "FROM categories, var_1 "
+            "    INNER JOIN ancestor_categories ON ancestor_categories.category_id = categories.id "
+            "    INNER JOIN topic_categories ON ancestor_categories.ancestor_id = topic_categories.category_id "
             "    INNER JOIN topics ON topics.id = topic_categories.topic_id "
             "    INNER JOIN topic_contents ON topic_contents.topic_id = topics.id "
-            "WHERE categories.name = :name COLLATE NOCASE;"
+            "WHERE categories.id = var_1.category_id"
         );
+
         query.bindValue(":name", searchTerm);
     }
 
@@ -226,7 +264,7 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
     // SQLite can't indicate search result size, so checking query.size() here is useless.
 
     // Render the search results into a simple DocBook "book" document.
-    //   TODO: Also render the OFF category names into here.
+    //   TODO: Also render the OFF category names into here. They are already available via query.value(4)
     //   TODO: Also render the author names into here.
     //   TODO: Exchange this with a more readable single HTML string with %1, %2 etc. arguments.
     QString docbook;
