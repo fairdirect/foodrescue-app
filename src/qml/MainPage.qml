@@ -159,6 +159,10 @@ Kirigami.ScrollablePage {
                     onAccepted: {
                         var content = database.content(input)
                         browserPage.text = contentOrMessage(content, input)
+
+                        // AutoComplete gives up focus in its onAccepted handler. But if nothing was found
+                        // the user wants to search again instead of scroll. Then we take the focus back.
+                        if (content === "") focus = true
                     }
 
                     function normalize(searchString) {
