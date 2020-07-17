@@ -295,17 +295,31 @@ FocusScope {
             }
         }
 
-        // Because there is no TextField::onClicked(), we have to add that ourselves.
-        MouseArea {
-            anchors.fill: parent
-
-            // On click, show the suggestions box again. It is the complementary action to pressing
-            // "Esc" once, and does the same as pressing "Arrow Down" while completionsBox is hidden.
-            onClicked: {
-                console.log("AutoComplete: field: clicked() received")
-                completionsBox.visible = completions.model.length > 0 ? true : false
-            }
-        }
+        // Custom mouse event handler that will show the completions box when clicking into the
+        // text field. It is the complementary action to pressing "Esc" once, and does the same as
+        // pressing "Arrow Down" while completionsBox is hidden.
+        //
+        //   Due to a bug in Qt, "propagateComposedEvents: true" has no effect when used inside a
+        //   TextField in a StackView page (see https://forum.qt.io/topic/64041 ). There is a
+        //   workaround in C++, but it is complex (see https://forum.qt.io/post/312884 ). Since this
+        //   is non-essential behavior, we better watit for Qt to fix the bug.
+        //
+        //   TODO: Enable this code once Qt fixed the bug described above.
+//      MouseArea {
+//          anchors.fill: parent
+//          // By propagating events and not accepting them in the handlers, the parent TextEdit can
+//          // also react to them to set focus etc.. Source: https://stackoverflow.com/a/29765628
+//          // propagateComposedEvents: true
+//
+//          onClicked: {
+//              console.log("AutoComplete: field: clicked() received")
+//              completionsBox.visible = completions.model.length > 0 ? true : false
+//              mouse.accepted = false
+//          }
+//          // onPressed:         mouse.accepted = false
+//          onDoubleClicked:   mouse.accepted = false
+//          onPressAndHold:    mouse.accepted = false
+//      }
 
         // Autocomplete dropdown.
         //   Using Rectangle{Column{Repeater}} here because a ListView does not support setting its
@@ -346,7 +360,8 @@ FocusScope {
                         width: completionsBox.width
                         reserveSpaceForIcon: false
 
-                        // Remove any initial background coloring except on mouse-over.
+                        // Background coloring should be used only for the selected item.
+                        //   (Also, a lighter colored background automatically appears on mouse-over.)
                         highlighted: index == completions.currentIndex
 
                         onClicked: {
