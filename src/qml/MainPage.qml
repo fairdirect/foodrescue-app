@@ -16,19 +16,21 @@ Kirigami.ScrollablePage {
     //   TODO: Set the title as suitable for the current contents displayed in this window.
     title: "Food Rescue"
 
-    Layout.fillWidth: true
     horizontalScrollBarPolicy: ScrollBar.AlwaysOff
     supportsRefreshing: false
 
-    // Wraps a database search and returns the result or a "nothing found" message.
-    // TODO: Document the parameters.
-    function contentOrMessage(searchTerm) {
-        var content = database.content(searchTerm)
-        if (content === "")
-            // TODO: i18n this message properly.
-            return "No content found for \"" + searchTerm + "\"."
+    // Displays a database search result or a "nothing found" message, as appropriate.
+    // @param rawContent string  A raw database search result.
+    // @param searchTerm string  The search term that lead to finding rawContent. Optional.
+    // TODO: i18n the messages properly.
+    function contentOrMessage(rawContent, searchTerm = "") {
+        if (rawContent === "")
+            if (searchTerm === "")
+                return "No content found."
+            else
+                return "No content found for \"" + searchTerm + "\"."
         else
-            return content
+            return rawContent
     }
 
     // Interface to the food rescue content.
@@ -76,12 +78,14 @@ Kirigami.ScrollablePage {
     //   the element into the page. This is different from placing just the Flickable's content here
     //   and should be considered a bug in Kirigami. For now, just assume the Flickable takes up all
     //   available space up to its contentWidth × contentHeight.
+    //
+    //   TODO: Get the above mentioned bug in Kirigami fixed, then set the sizing and margins.
     Flickable {
         id: browser
 
         focus: !autocomplete.focus
-        contentWidth: mainLayout.width
-        contentHeight: mainLayout.height
+        contentWidth: browserUI.width
+        contentHeight: browserUI.height
 
         bottomMargin: 20
         leftMargin: 20
@@ -118,13 +122,17 @@ Kirigami.ScrollablePage {
             }
         }
 
-        ColumnLayout {
-            id: mainLayout
+        Column {
+            id: browserUI
 
             width: mainPage.width - browser.leftMargin - browser.rightMargin
 
             // Browser header toolbar: adress bar, "Go" button, "Scan" button.
             RowLayout {
+                id: headerBar
+
+                anchors.left: parent.left
+                anchors.right: parent.right
 
                 // Place the autocomplete suggestions box overlaying the content browser.
                 //   z indexes only work between sibling items, so we can't implement this
@@ -148,7 +156,10 @@ Kirigami.ScrollablePage {
                             database.updateCompletions(input, 10)
                     }
 
-                    onAccepted: browserContent.text = contentOrMessage(input)
+                    onAccepted: {
+                        var content = database.content(input)
+                        browserPage.text = contentOrMessage(content, input)
+                    }
 
                     function normalize(searchString) {
                         return database.normalize(searchString)
@@ -180,7 +191,8 @@ Kirigami.ScrollablePage {
                     function onBarcodeFound(code) {
                         console.log("MainPage: scanButton: 'barcodeFound()' received, code = " + code)
                         autocomplete.input = code
-                        browserContent.text = contentOrMessage(code)
+                        var content = database.content(code)
+                        browserPage.text = contentOrMessage(content, code)
                     }
 
                     // Create the barcode scanner page and connect its signal to this page.
@@ -209,25 +221,64 @@ Kirigami.ScrollablePage {
             }
 
             Text {
-                id: browserContent
+                id: browserPage
+
+                anchors.left: parent.left
+                anchors.right: parent.right
 
                 text: ""
-
                 textFormat: Text.RichText // Otherwise we get Text.StyledText, offering much fewer options.
-                Layout.fillWidth: true
                 wrapMode: Text.Wrap
                 onLinkActivated: Qt.openUrlExternally(link)
 
-                // Show a hand cursor when mousing over hyperlinks.
-                //   Source: "Creating working hyperlinks in Qt Quick Text", https://blog.shantanu.io/?p=135
                 MouseArea {
                     anchors.fill: parent
+
+                    // Show a hand cursor when mousing over hyperlinks.
+                    //   Source: "Creating working hyperlinks in Qt Quick Text", https://blog.shantanu.io/?p=135
                     cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    onClicked: browser.focus = true
+
+                    // Let clicking on browser content de-focus the autocomplete widget.
+                    onClicked: autocomplete.focus = false
                     // TODO: Check if consuming left-click events interferes with activating hyperlinks
                     // via parent.onLinActivated. Before adding the focus change behavior on click the
                     // MouseArea had "acceptedButtons: Qt.NoButton" to not eat click events. We might now
                     // have to forward the mouse event to the parent.
+                }
+            }
+
+            // Component to fill the empty space of the page so that clicking there will remove the focus
+            // from the autocomplete field.
+            //
+            //   The Rectangle is only here to allow outlining the area for debugging purposes. Otherwise,
+            //   replacing it with a MouseArea will also do.
+            //
+            //   TODO: Replace this with MouseArea { anchors.fill: parent; onClicked: autocomplete.focus = false; }
+            //   as a preceding sibling of Flickable. This has the advantage to fill the whole page, incl.
+            //   the Flickable's borders on which one cannot click right now. However, this is not possible
+            //   right now due to a Qt bug that makes any TextField unresponsive to clicks when underlaid or
+            //   overlaid with a MouseArea. It seems to be this issue: https://forum.qt.io/topic/64041 . So,
+            //   report this bug, get it fixed, then simplify the implementation as told above.
+            //
+            //   TODO: Other alternative implementations are presented in https://stackoverflow.com/a/55101935 .
+            //   So far we could not get any of them to work in a Kirigami.ScrollablePage, but we can try again.
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                color: "transparent" // For debugging sizing, use "white".
+                height: {
+                    var kirigamiHeaderHeight = 40 // TODO: Determine the exact value.
+                    var flickableVerticalBorder = 20 // TODO: Determine this value dynamically.
+                    var columnItemSpacing = 0 // TODO: Adjust once fixed to be non-zero
+                    var heightToFill = mainPage.height - kirigamiHeaderHeight - flickableVerticalBorder
+                        - headerBar.height - columnItemSpacing - browserPage.height - flickableVerticalBorder
+
+                    return (heightToFill > 0) ? heightToFill : 0
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: autocomplete.focus = false
                 }
             }
         }
