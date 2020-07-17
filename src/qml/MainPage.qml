@@ -126,6 +126,7 @@ Kirigami.ScrollablePage {
             id: browserUI
 
             width: mainPage.width - browser.leftMargin - browser.rightMargin
+            spacing: 20
 
             // Browser header toolbar: adress bar, "Go" button, "Scan" button.
             RowLayout {
@@ -161,8 +162,11 @@ Kirigami.ScrollablePage {
                         browserPage.text = contentOrMessage(content, input)
 
                         // AutoComplete gives up focus in its onAccepted handler. But if nothing was found
-                        // the user wants to search again instead of scroll. Then we take the focus back.
-                        if (content === "") focus = true
+                        // the user wants to search again instead of scroll. So we take the focus back here.
+                        if (content === "") {
+                            focus = true
+                            completionsVisible = false
+                        }
                     }
 
                     function normalize(searchString) {
@@ -273,7 +277,7 @@ Kirigami.ScrollablePage {
                 height: {
                     var kirigamiHeaderHeight = 40 // TODO: Determine the exact value.
                     var flickableVerticalBorder = 20 // TODO: Determine this value dynamically.
-                    var columnItemSpacing = 0 // TODO: Adjust once fixed to be non-zero
+                    var columnItemSpacing = 20 // TODO: Determine this value dynamically.
                     var heightToFill = mainPage.height - kirigamiHeaderHeight - flickableVerticalBorder
                         - headerBar.height - columnItemSpacing - browserPage.height - flickableVerticalBorder
 
