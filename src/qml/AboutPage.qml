@@ -5,9 +5,10 @@ import org.kde.kirigami 2.6
 // Shows application meta info and the copyright notice.
 AboutPage {
 
+    // Data for the "About" dialog, in visual order.
+    //   QML property values are written in JavaScript. This one contains just a JavaScript hash.
+    //   That's why, different from QML, keys must be in double quotes and commas are required.
     aboutData: {
-        // Values in visual order in the "About" dialog.
-        // Defining aboutData is special: keys must be in double quotes, commas are required.
 
         // Header section.
         "displayName": "Food Rescue App",
@@ -47,7 +48,8 @@ AboutPage {
         // Metadata not shown on the "About" page.
         "productName": "foodrescue-app",
         "componentName": "foodrescueapp",
-        "desktopFileName": "org.fairdirect.foodrescue", // TODO: Maybe this has to start with "org.kde."
+        // TODO: Maybe this has to start with "org.kde."
+        "desktopFileName": "org.fairdirect.foodrescue",
         // TODO: Find out if this works. It is meant to take an e-mail address.
         "bugAddress": "https://github.com/fairdirect/foodrescue-app/issues"
     }

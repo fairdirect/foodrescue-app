@@ -1,5 +1,7 @@
 /**
- * Barcode scanner component, originally from https://github.com/swex/QZXingNu
+ * Barcode-detecting QML video filter
+ *
+ * Part of a barcode scanner component, forked from https://github.com/swex/QZXingNu
  *
  * Authors and copyright:
  *   © Alexey Mednyy (https://github.com/swex) 2018-2020
@@ -15,8 +17,7 @@
  * limitations under the License.
  */
 
-#ifndef BARCODEFILTER_H
-#define BARCODEFILTER_H
+#pragma once
 
 #include <QAbstractVideoFilter>
 #include <QThreadPool>
@@ -58,5 +59,3 @@ signals:
     void scannerChanged(BarcodeScanner *scanner);
     void decodeResultChanged(Barcode::DecodeResult decodeResult);
 };
-
-#endif // BARCODEFILTER_H

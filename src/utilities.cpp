@@ -2,14 +2,13 @@
 #include <QFileInfo>
 #include <QSysInfo>
 #include <QStandardPaths>
-
 #include <QDebug>
 #include <QMetaProperty>
+#include <QtXml/QDomDocument>
+
 #include <vector>
 #include <utility>
 #include <algorithm>
-
-#include <QtXml/QDomDocument>
 
 #include "utilities.h"
 
@@ -31,7 +30,9 @@ QString androidAssetToFile(QString assetPath) {
 
     QFile asset(assetPath);
     if (!asset.exists()) {
-        qWarning() << "ContentDatabase::androidAssetToFile: ERROR: given asset does not exist:" << assetPath;
+        qWarning()
+            << "ContentDatabase::androidAssetToFile: ERROR: given asset does not exist:"
+            << assetPath;
         return "";
     }
 

@@ -1,5 +1,7 @@
 /**
- * Barcode scanner component, originally from https://github.com/swex/QZXingNu
+ * Main QML type of a QML barcode scanner component
+ *
+ * Part of a barcode scanner component, forked from https://github.com/swex/QZXingNu
  *
  * Authors and copyright:
  *   © Alexey Mednyy (https://github.com/swex) 2018-2020
@@ -24,6 +26,7 @@
 #include <ZXing/MultiFormatReader.h>
 #include <ZXing/Result.h>
 
+#include "Barcode.h"
 #include "BarcodeScanner.h"
 #include "BarcodeFilter.h"
 
@@ -34,6 +37,8 @@ using ZXing::HybridBinarizer;
 using ZXing::MultiFormatReader;
 using ZXing::Result;
 
+// TODO: Documentation.
+// TODO: Try to outsource this utility method to Barcode.h, since it's not part of class BarcodeScanner.
 static QVector<QPointF> toQVectorOfQPoints(const std::vector<ZXing::ResultPoint>& points) {
     QVector<QPointF> result;
     for (const auto& point : points) {
@@ -42,6 +47,8 @@ static QVector<QPointF> toQVectorOfQPoints(const std::vector<ZXing::ResultPoint>
     return result;
 }
 
+// TODO: Documentation.
+// TODO: Try to outsource this utility method to Barcode.h, since it's not part of class BarcodeScanner.
 static Barcode::DecodeResult toDecodeResult(const ZXing::Result& result) {
     return { static_cast<Barcode::DecodeStatus>(result.status()),
         static_cast<Barcode::Format>(result.format()),
@@ -51,6 +58,8 @@ static Barcode::DecodeResult toDecodeResult(const ZXing::Result& result) {
         result.isValid() };
 }
 
+// TODO: Documentation.
+// TODO: Try to outsource this utility method to Barcode.h, since it's not part of class BarcodeScanner.
 static ZXingFormats zxingFormats(const QVector<int>& from) {
     ZXingFormats result;
     result.reserve(static_cast<ZXingFormats::size_type>(from.size()));
@@ -64,28 +73,32 @@ static ZXingFormats zxingFormats(const QVector<int>& from) {
 }
 
 
-// BarcodeScanner implementation.
-
+// TODO: Documentation.
 BarcodeScanner::BarcodeScanner(QObject* parent) : QObject(parent) {
     connect(this, &BarcodeScanner::queueDecodeResult, this, &BarcodeScanner::setDecodeResult);
 }
 
+// TODO: Documentation.
 QVector<int> BarcodeScanner::formats() const {
     return m_formats;
 }
 
+// TODO: Documentation.
 bool BarcodeScanner::tryHarder() const {
     return m_tryHarder;
 }
 
+// TODO: Documentation.
 bool BarcodeScanner::tryRotate() const {
     return m_tryRotate;
 }
 
+// TODO: Documentation.
 Barcode::DecodeResult BarcodeScanner::decodeResult() const {
     return m_decodeResult;
 }
 
+// TODO: Documentation.
 // Reentrant implementation, allows decoding with multiple threads in parallel.
 Barcode::DecodeResult BarcodeScanner::decodeImage(const QImage& image) {
     auto luminanceSource = std::make_shared<GenericLuminanceSource>(image.width(), image.height(), image.bits(), image.bytesPerLine());
@@ -104,6 +117,7 @@ Barcode::DecodeResult BarcodeScanner::decodeImage(const QImage& image) {
     return {};
 }
 
+// TODO: Documentation.
 void BarcodeScanner::setFormats(QVector<int> formats) {
     if (m_formats == formats)
         return;
@@ -112,6 +126,7 @@ void BarcodeScanner::setFormats(QVector<int> formats) {
     emit formatsChanged(m_formats);
 }
 
+// TODO: Documentation.
 void BarcodeScanner::setTryHarder(bool tryHarder) {
     if (m_tryHarder == tryHarder)
         return;
@@ -120,6 +135,7 @@ void BarcodeScanner::setTryHarder(bool tryHarder) {
     emit tryHarderChanged(m_tryHarder);
 }
 
+// TODO: Documentation.
 void BarcodeScanner::setTryRotate(bool tryRotate) {
     if (m_tryRotate == tryRotate)
         return;
@@ -128,6 +144,7 @@ void BarcodeScanner::setTryRotate(bool tryRotate) {
     emit tryRotateChanged(m_tryRotate);
 }
 
+// TODO: Documentation.
 void BarcodeScanner::setDecodeResult(Barcode::DecodeResult decodeResult) {
     m_decodeResult = decodeResult;
     emit decodeResultChanged(m_decodeResult);

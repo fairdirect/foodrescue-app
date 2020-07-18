@@ -73,6 +73,10 @@ FocusScope {
     //   because the distinction between "input" and "text" is quite confusing.
     property alias text: field.text
 
+    // The text shown in light gray in an empty autocomplete field.
+    property alias placeholderText: field.placeholderText
+
+    // If the box with completions is visible below the autocomplete field.
     property alias completionsVisible: completionsBox.visible
 
     // This signal is emitted when the Return or Enter key is pressed in the autocomplete's underlying
@@ -153,7 +157,6 @@ FocusScope {
     TextField {
         id: field
         focus: true
-        placeholderText: "barcode number, or food name (plural form only)"
 
         // Our parent "Item {}" is not a layout, so we can't use "Layout.fillWidth: true".
         anchors.left: parent.left
@@ -184,7 +187,7 @@ FocusScope {
             //   TODO: Probably better implement this reactively via onModelChanged, if there is such a thing.
             completions.currentIndex = -1
 
-            completionsBox.visible = completions.model.length > 0 ? true : false;
+            completionsVisible = completions.model.length > 0 ? true : false;
         }
 
         // Handle the "text accepted" event, which sets the input from the text.
@@ -216,13 +219,13 @@ FocusScope {
 
         onActiveFocusChanged: {
             if (activeFocus && completions.model.length > 0)
-                completionsBox.visible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
+                completionsVisible = (text == "" || text.match("^[0-9 ]+$")) ? false : true
                 // TODO: Probably better use "input" instead of "text" in the line above.
                 // TODO: Perhaps initialize the completions with suggestions based on the current
                 // text. If the reason for not having the focus before was a previous
                 // search, then it has no completions at this point.
             else
-                completionsBox.visible = false
+                completionsVisible = false
         }
 
         // Process all keyboard events here centrally.
@@ -232,11 +235,11 @@ FocusScope {
         Keys.onPressed: {
             console.log("AutoComplete: field: Keys.pressed(): " + event.key + " : " + event.text)
 
-            if (completionsBox.visible) {
+            if (completionsVisible) {
                 switch (event.key) {
 
                 case Qt.Key_Escape:
-                    completionsBox.visible = false
+                    completionsVisible = false
                     completions.currentIndex = -1
                     event.accepted = true
                     break
@@ -287,7 +290,7 @@ FocusScope {
                     break
 
                 case Qt.Key_Down:
-                    completionsBox.visible = completions.model.length > 0 ? true : false
+                    completionsVisible = completions.model.length > 0 ? true : false
 
                     event.accepted = true
                     break
@@ -313,7 +316,7 @@ FocusScope {
 //
 //          onClicked: {
 //              console.log("AutoComplete: field: clicked() received")
-//              completionsBox.visible = completions.model.length > 0 ? true : false
+//              completionsVisible = completions.model.length > 0 ? true : false
 //              mouse.accepted = false
 //          }
 //          // onPressed:         mouse.accepted = false

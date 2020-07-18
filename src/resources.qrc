@@ -1,18 +1,20 @@
 <RCC>
     <qresource prefix="/">
-        <file>qml/MainPage.qml</file>
-        <file>qml/BaseApp.qml</file>
-        <file>qml/MobileApp.qml</file>
-        <file>qtquickcontrols2.conf</file>
-        <file>images/secondfood-applogo-256x188.png</file>
-        <file>qml/LicensePage.qml</file>
         <file>android/res/drawable-hdpi/icon.png</file>
         <file>android/res/drawable-ldpi/icon.png</file>
         <file>android/res/drawable-mdpi/icon.png</file>
+
+        <file>images/secondfood-applogo-256x188.png</file>
+
         <file>qml/AboutPage.qml</file>
-        <file>qml/ScannerPage.qml</file>
-        <file>qml/TestPage.qml</file>
-        <file>docbook-to-qthtml.xsl</file>
+        <file>qml/App.qml</file>
+        <file>qml/AppOnMobile.qml</file>
         <file>qml/AutoComplete.qml</file>
+        <file>qml/LicensePage.qml</file>
+        <file>qml/MainPage.qml</file>
+        <file>qml/ScannerPage.qml</file>
+
+        <file>docbook-to-qthtml.xsl</file>
+        <file>qtquickcontrols2.conf</file>        
     </qresource>
 </RCC>

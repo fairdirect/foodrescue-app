@@ -23,7 +23,7 @@ import org.kde.kirigami 2.10 as Kirigami
 Kirigami.ApplicationWindow {
     id: root
 
-    // The window title.
+    // Displayed in the window title on desktop platforms.
     title: "Food Rescue App"
 
     // Main content area.
@@ -93,9 +93,6 @@ Kirigami.ApplicationWindow {
                 text: "Help"
             },
             Kirigami.Action {
-                text: "Feedback"
-            },
-            Kirigami.Action {
                 text: "About"
                 icon.name: "help-about"
                 onTriggered: pageStack.layers.push(Qt.resolvedUrl("AboutPage.qml"))
@@ -104,10 +101,6 @@ Kirigami.ApplicationWindow {
                 text: "License Notes"
                 icon.name: "help-about"
                 onTriggered: pageStack.layers.push(Qt.resolvedUrl("LicensePage.qml"))
-            },
-            Kirigami.Action {
-                text: "Tests"
-                onTriggered: pageStack.layers.push(Qt.resolvedUrl("TestPage.qml"))
             }
         ]
     }

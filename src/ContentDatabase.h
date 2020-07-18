@@ -1,5 +1,4 @@
-#ifndef CONTENTDATABASE_H
-#define CONTENTDATABASE_H
+#pragma once
 
 #include <QSqlDatabase>
 #include <QSqlDriver>
@@ -12,9 +11,10 @@
 enum ContentFormat {DOCBOOK, HTML};
 
 class ContentDatabase : public QObject {
-   Q_OBJECT
 
+   Q_OBJECT
    Q_PROPERTY(QStringList completionModel MEMBER m_completionModel NOTIFY completionsChanged)
+
    QStringList m_completionModel;
 
 public:
@@ -41,5 +41,3 @@ public:
 signals:
     void completionsChanged();
 };
-
-#endif // CONTENTDATABASE_H

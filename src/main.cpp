@@ -57,8 +57,8 @@ int main(int argc, char *argv[]) {
 
     // Use different main files on desktop vs. mobile platform.
     // TODO: Switch to the "qrc:/something" URLs if possible. So far not working.
-    const QUrl desktopQML(QStringLiteral("qrc:///qml/BaseApp.qml"));
-    const QUrl mobileQML(QStringLiteral("qrc:///qml/MobileApp.qml"));
+    const QUrl desktopQML(QStringLiteral("qrc:///qml/App.qml"));
+    const QUrl mobileQML(QStringLiteral("qrc:///qml/AppOnMobile.qml"));
     const bool QQC_MOBILE_SET(qEnvironmentVariableIsSet("QT_QUICK_CONTROLS_MOBILE"));
     const QString QQC_MOBILE(QString::fromLatin1(qgetenv("QT_QUICK_CONTROLS_MOBILE")));
     if (QQC_MOBILE_SET && (QQC_MOBILE == QStringLiteral("1") || QQC_MOBILE == QStringLiteral("true"))) {

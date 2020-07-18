@@ -241,7 +241,6 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
             "            FROM ancestor_categories "
             "                INNER JOIN categories_structure ON ancestor_categories.ancestor_id = categories_structure.category_id "
             "    ) "
-            "    "
             "SELECT DISTINCT topic_contents.title, topics.section, topics.version, topic_contents.content, categories.name "
             "FROM categories, var_1 "
             "    INNER JOIN ancestor_categories ON ancestor_categories.category_id = categories.id "

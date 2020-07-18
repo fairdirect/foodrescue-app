@@ -1,5 +1,7 @@
 /**
- * Barcode scanner component, originally from https://github.com/swex/QZXingNu
+ * Barcode-detecting QML video filter
+ *
+ * Part of a barcode scanner component, forked from https://github.com/swex/QZXingNu
  *
  * Authors and copyright:
  *   © Alexey Mednyy (https://github.com/swex) 2018-2020
@@ -29,11 +31,12 @@
 #include <ZXing/MultiFormatReader.h>
 #include <ZXing/Result.h>
 
+#include "Barcode.h"
 #include "BarcodeFilter.h"
 #include "BarcodeScanner.h"
 
 /**
- * Code to convert video frames to images.
+ * Converter for obtaining images from video frames.
  *
  * The code originates from qzxing, another QML wrapper for the ZXing barcode scanner; see
  * https://github.com/ftylitak/qzxing . Previously, the Qt function qt_imageFromVideoFrame was
@@ -41,24 +44,31 @@
  *
  * Placed into an anonmymous namespace to prevent usage outside of this file.
  *
- * TODO: Provide proper attribution and licencing information, as this code was copied from QZXing.
+ * TODO: Provide proper attribution and licencing information, as this code was copied from QZXing
+ * into QZXingNu.
  */
 namespace {
+
+    // TODO: Documentation.
     struct CaptureRect;
 
+    // TODO: Documentation.
     static QImage* rgbDataToGrayscale(const uchar* data, const CaptureRect& captureRect,
         const int alpha, const int red,
         const int green, const int blue,
         const bool isPremultiplied = false);
 
+    // TODO: Documentation.
     bool isRectValid(const QRect& rect) {
         return rect.x() >= 0 && rect.y() >= 0 && rect.isValid();
     }
 
+    // TODO: Documentation.
     uchar gray(uchar r, uchar g, uchar b) {
         return (306 * (r & 0xFF) + 601 * (g & 0xFF) + 117 * (b & 0xFF) + 0x200) >> 10;
     }
 
+    // TODO: Documentation.
     uchar yuvToGray(uchar Y, uchar U, uchar V) {
         const int C = int(Y) - 16;
         const int D = int(U) - 128;
@@ -69,6 +79,7 @@ namespace {
             qBound(0, ((298 * C + 516 * D + 128) >> 8), 255));
     }
 
+    // TODO: Documentation.
     uchar yuvToGray2(uchar y, uchar u, uchar v) {
         double rD = y + 1.4075 * (v - 128);
         double gD = y - 0.3455 * (u - 128) - (0.7169 * (v - 128));
@@ -80,6 +91,7 @@ namespace {
             qBound<uchar>(0, (uchar)::floor(bD), 255));
     }
 
+    // TODO: Documentation.
     struct CaptureRect {
         CaptureRect(const QRect& captureRect, int sourceWidth, int sourceHeight)
             : isValid(isRectValid(captureRect))
@@ -107,6 +119,7 @@ namespace {
         int endY;
     };
 
+    // TODO: Documentation.
     struct VideoFrameData {
         QByteArray data;
         QSize size;
@@ -123,6 +136,7 @@ namespace {
         }
     };
 
+    // TODO: Documentation.
     QImage* convertFrameToImage(QVideoFrame* input) {
 
         VideoFrameData simpleFrame(input);
@@ -228,11 +242,12 @@ namespace {
         }
         return image_ptr;
     }
-    static QImage* rgbDataToGrayscale(const uchar* data, const CaptureRect& captureRect,
-        const int alpha, const int red,
-        const int green, const int blue,
-        const bool isPremultiplied)
-    {
+
+    // TODO: Documentation.
+    static QImage* rgbDataToGrayscale(
+        const uchar* data, const CaptureRect& captureRect,
+        const int alpha, const int red, const int green, const int blue, const bool isPremultiplied
+    ){
         const int stride = (alpha < 0) ? 3 : 4;
 
         const int endX = captureRect.sourceWidth - captureRect.startX - captureRect.targetWidth;
@@ -272,19 +287,19 @@ namespace {
 }
 
 
+// TODO: Documentation.
 class BarcodeFilterRunnable : public QObject, public QVideoFilterRunnable {
 
     BarcodeFilter *m_filter = nullptr;
 
 public:
+    // TODO: Documentation.
     explicit BarcodeFilterRunnable(BarcodeFilter *filter, QObject *parent = nullptr)
-        : QObject(parent)
-        , m_filter(filter) { }
+        : QObject(parent), m_filter(filter)
+    { /* empty implementation */ }
 
-    QVideoFrame run(QVideoFrame *input, const QVideoSurfaceFormat & /*surfaceFormat*/,
-        RunFlags /*flags*/
-    ) override {
-
+    // TODO: Documentation.
+    QVideoFrame run(QVideoFrame *input, const QVideoSurfaceFormat & /*surfaceFormat*/, RunFlags /*flags*/) override {
         static auto ourIdealThreadCount = m_filter->m_threadPool->maxThreadCount();
         if (m_filter == nullptr) {
             qWarning() << "filter null";
@@ -319,6 +334,7 @@ public:
 };
 
 
+// TODO: Documentation.
 BarcodeFilter::BarcodeFilter(QObject* parent)
     : QAbstractVideoFilter(parent)
     , m_threadPool(new QThreadPool(this)) {
@@ -334,21 +350,25 @@ BarcodeFilter::BarcodeFilter(QObject* parent)
 }
 
 
+// TODO: Documentation.
 QVideoFilterRunnable *BarcodeFilter::createFilterRunnable() {
     return new BarcodeFilterRunnable(this);
 }
 
 
+// TODO: Documentation.
 BarcodeScanner *BarcodeFilter::scanner() const {
     return m_scanner;
 }
 
 
+// TODO: Documentation.
 Barcode::DecodeResult BarcodeFilter::decodeResult() const {
     return m_decodeResult;
 }
 
 
+// TODO: Documentation.
 void BarcodeFilter::setScanner(BarcodeScanner *scanner) {
     if (m_scanner == scanner)
         return;
@@ -358,6 +378,7 @@ void BarcodeFilter::setScanner(BarcodeScanner *scanner) {
 }
 
 
+// TODO: Documentation.
 void BarcodeFilter::setDecodeResult(Barcode::DecodeResult decodeResult) {
     m_decodeResult = decodeResult;
     emit decodeResultChanged(m_decodeResult);

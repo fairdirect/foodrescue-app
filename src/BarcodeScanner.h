@@ -1,5 +1,7 @@
 /**
- * Barcode scanner component, originally from https://github.com/swex/QZXingNu
+ * Main QML type of a QML barcode scanner component
+ *
+ * Part of a barcode scanner component, forked from https://github.com/swex/QZXingNu
  *
  * Authors and copyright:
  *   © Alexey Mednyy (https://github.com/swex) 2018-2020
@@ -15,8 +17,7 @@
  * limitations under the License.
  */
 
-#ifndef BARCODESCANNER_H
-#define BARCODESCANNER_H
+#pragma once
 
 #include <QImage>
 #include <QObject>
@@ -53,6 +54,7 @@ signals:
     void tryRotateChanged(bool tryRotate);
     void decodeResultChanged(Barcode::DecodeResult decodeResult);
     void queueDecodeResult(Barcode::DecodeResult result);
+
 public slots:
     Barcode::DecodeResult decodeImage(const QImage &image);
     void setFormats(QVector<int> formats);
@@ -62,5 +64,3 @@ public slots:
 protected:
     void setDecodeResult(Barcode::DecodeResult decodeResult);
 };
-
-#endif // BARCODESCANNER_H

@@ -145,6 +145,7 @@ Kirigami.ScrollablePage {
 
                     model: database.completionModel
                     Layout.fillWidth: true
+                    placeholderText: "barcode number or food name"
 
                     onInputChanged: {
                         console.log("MainPage: autocomplete: 'inputChanged()' signal received")
