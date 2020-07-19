@@ -111,7 +111,7 @@ The following keyboard combinations are available:
 
 * **Auto-complete related.** It works the same as in a Google Search:
 
-    * **Edit mode.** F2 will always put the cursor back into the autocomplete field.
+    * **Edit mode.** F2 will always put the cursor back into the autocomplete field, and show the completions (if any).
     * **Next / previous completion.** Arrow Down / Arrow Up.
     * **Choose completion.** Return or Enter.
     * **Close completion box.** Escape.

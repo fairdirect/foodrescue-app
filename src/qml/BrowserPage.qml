@@ -7,10 +7,8 @@ import local 1.0 as Local // Our custom C++ based QML components, as exported in
 // Page shown at startup of the application.
 //   Shows the main area of the application, which contains every control element except the
 //   sidebar drawer and any layers / sheets / drawers added on top.
-//
-//   TODO: Rename this component from MainPage to BrowserPage.
 Kirigami.ScrollablePage {
-    id: mainPage
+    id: browserPage
 
     // Page title.
     //   TODO: Set the title as suitable for the current contents displayed in this window.
@@ -40,7 +38,7 @@ Kirigami.ScrollablePage {
         // Event handler for a dynamically created ScannerPage object.
         // TODO: Document the parameters.
         function onBarcodeFound(code) {
-            console.log("MainPage: scanButton: 'barcodeFound()' received, code = " + code)
+            console.log("BrowserPage: scanButton: 'barcodeFound()' received, code = " + code)
             autocomplete.input = code
             var content = database.content(code)
             browserContent.text = contentOrMessage(content, code)
@@ -167,7 +165,7 @@ Kirigami.ScrollablePage {
         Column {
             id: browserUI
 
-            width: mainPage.width - browser.leftMargin - browser.rightMargin
+            width: browserPage.width - browser.leftMargin - browser.rightMargin
             spacing: 20
 
             // Browser header toolbar: adress bar, "Go" button, "Scan" button.
@@ -190,7 +188,7 @@ Kirigami.ScrollablePage {
                     placeholderText: "food category or barcode"
 
                     onInputChanged: {
-                        console.log("MainPage: autocomplete: 'inputChanged()' signal received")
+                        console.log("BrowserPage: autocomplete: 'inputChanged()' signal received")
 
                         // Don't auto-complete nothing or barcode numbers.
                         if (input == "" || input.match("^[0-9 ]+$"))
@@ -224,7 +222,7 @@ Kirigami.ScrollablePage {
                     enabled: autocomplete.input === "" ? false : true;
                     Layout.alignment: Qt.AlignHCenter
                     onClicked: {
-                        console.log("MainPage: searchButton: 'clicked()' received")
+                        console.log("BrowserPage: searchButton: 'clicked()' received")
 
                         // Forward to the autocomplete widget to avoid duplicating code.
                         //   The autocomplete is the right element to handle its own input. This button
@@ -286,7 +284,7 @@ Kirigami.ScrollablePage {
                     var kirigamiHeaderHeight = 40 // TODO: Determine the exact value.
                     var flickableVerticalBorder = 20 // TODO: Determine this value dynamically.
                     var columnItemSpacing = 20 // TODO: Determine this value dynamically.
-                    var heightToFill = mainPage.height - kirigamiHeaderHeight - flickableVerticalBorder
+                    var heightToFill = browserPage.height - kirigamiHeaderHeight - flickableVerticalBorder
                         - headerBar.height - columnItemSpacing - browserContent.height - flickableVerticalBorder
 
                     return (heightToFill > 0) ? heightToFill : 0

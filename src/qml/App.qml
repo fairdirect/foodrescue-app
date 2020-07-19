@@ -26,17 +26,8 @@ Kirigami.ApplicationWindow {
     // Displayed in the window title on desktop platforms.
     title: "Food Rescue App"
 
-    // Main content area.
-    Component {
-        id: mainPageComponent
-        MainPage { } // See MainPage.qml.
-    }
-
-    // TODO: This can be simplified to: "pageStack.initialPage: MainPage {}". Because there is no
-    // need to create multiple MainPage objects of the same specialized type. And anyway, we just
-    // use the QML type as it is ("MainPage {}"), so to create another object like that one can
-    // just write "MainPage {}" again.
-    pageStack.initialPage: mainPageComponent
+    // The main page, displaying food rescue content.
+    pageStack.initialPage: BrowserPage { } // As implemented in BrowserPage.qml.
 
     // Set or restore the focus properly when showing a page or returning to a page.
     //   Source: https://stackoverflow.com/a/42299757 . Should workd, because MainPage also acts

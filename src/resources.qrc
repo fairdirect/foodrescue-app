@@ -9,7 +9,7 @@
         <file>qml/AppOnMobile.qml</file>
         <file>qml/AutoComplete.qml</file>
         <file>qml/LicensePage.qml</file>
-        <file>qml/MainPage.qml</file>
+        <file>qml/BrowserPage.qml</file>
         <file>qml/ScannerPage.qml</file>
         <file>docbook-to-qthtml.xsl</file>
         <file>qtquickcontrols2.conf</file>
