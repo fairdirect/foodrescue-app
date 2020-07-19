@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
+import QtQml 2.12 // Provides access to Qt.inputMethod.
 import org.kde.kirigami 2.10 as Kirigami
 import local 1.0 as Local // Our custom QML components, as exported in main.cpp.
 
@@ -298,6 +299,26 @@ FocusScope {
 
                     event.accepted = true
                     break
+                }
+            }
+        }
+
+        // Event handler for the non-instantiable QML object "Qt" resp. "Qt.inputMethod".
+        //   The details of detecting keyboard changes like this: https://stackoverflow.com/a/62986064
+        Connections {
+            target: Qt.inputMethod
+
+            // Hide the autocomplete's completions when the user hides the Android keyboard.
+            //   Because it probably means that the user wants to see the browser, not the
+            //   completions box. So we hide the completions box by removing the focus. We could
+            //   also keep the focus, but focus is useless without a keyboard.
+            onKeyboardRectangleChanged: {
+                // Contains QML Basic Type "rect", automatically converted from Qt QRectF as per
+                // https://doc.qt.io/qt-5/qml-rect.html
+                var newRect = Qt.inputMethod.keyboardRectangle
+
+                if (Qt.inputMethod.keyboardRectangle.height === 0) {
+                    autocomplete.focus = false
                 }
             }
         }
