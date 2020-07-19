@@ -89,6 +89,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
         configure
         dialog-warning
         help-about
+        view-barcode
     )
 endif()
 

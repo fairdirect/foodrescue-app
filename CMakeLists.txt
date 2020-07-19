@@ -67,7 +67,7 @@ endif()
 
 # Directories where Qt Creator can find QML files of Kirigami etc..
 #
-#   Needed to make Qt Creator code completion happy. Not needed for builds to succeed. In fact,
+#   Needed to make Qt Creator code completion happy. Not needed for builds to succeed.
 #   QML_IMPORT_PATH is ignored by the build process and only used by Qt Creator. See:
 #   https://bugreports.qt.io/browse/QTBUG-55259 . So there is no need to adapt it by target
 #   platform, just to give Qt Creator one set of directories to resolve QML imports.
@@ -110,7 +110,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 # include()s have to be up here because the new CMake functionality can only be used afterwards.
 
-# CPack available to easily generate binary packages.
+# Make CPack available to easily generate binary packages.
 include(CPack)
 
 # Include KDE-related CMake modules (ECM = Extended CMake Modules).

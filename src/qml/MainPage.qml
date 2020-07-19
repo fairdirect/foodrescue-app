@@ -8,7 +8,7 @@ import local 1.0 as Local // Our custom C++ based QML components, as exported in
 //   Shows the main area of the application, which contains every control element except the
 //   sidebar drawer and any layers / sheets / drawers added on top.
 //
-//   TODO: Rename this component from MainPage to ContentBrowser.
+//   TODO: Rename this component from MainPage to BrowserContent.
 Kirigami.ScrollablePage {
     id: mainPage
 
@@ -17,7 +17,70 @@ Kirigami.ScrollablePage {
     title: "Food Rescue"
 
     horizontalScrollBarPolicy: ScrollBar.AlwaysOff
+
     supportsRefreshing: false
+
+    // Define the page toolbar's contents.
+    //   A toolbar can have left / main / right / context buttons. The read-only property
+    //   org::kde::kirigami::Page::globalToolBarItem refers to this toolbar.
+    leftAction: Kirigami.Action {
+        iconName: "go-previous"
+        text: "Page Back"
+        onTriggered: { showPassiveNotification("Go back action triggered") }
+    }
+
+    mainAction: Kirigami.Action {
+        // TODO: Replace this with a custom icon because this is not part of the FreeDesktop
+        // icon naming specs (see https://specifications.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html#names ).
+        // So other themes than Breeze that the user might use might not have it. However, using
+        // a custom icon in Kirigami Page actions is currently prevented by a bug.
+        iconName: "view-barcode"
+        text: "Scan"
+
+        // Event handler for a dynamically created ScannerPage object.
+        // TODO: Document the parameters.
+        function onBarcodeFound(code) {
+            console.log("MainPage: scanButton: 'barcodeFound()' received, code = " + code)
+            autocomplete.input = code
+            var content = database.content(code)
+            browserContent.text = contentOrMessage(content, code)
+        }
+
+        // Create the barcode scanner page and connect its signal to this page.
+        //   Documentation for this technique: QtQuick.Controls.StackView::push()
+        //   and "Dynamic QML Object Creation from JavaScript",
+        //   https://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html and
+        //
+        //   By providing a component as URL and not an item, Kirigami takes care
+        //   of dynamic object creation and deletion. Deletion makes sure the camera
+        //   is stopped when the layer closes. This is simpler than creating a dynamic
+        //   object ourselves, but also slower than just hiding the camera for later re-use.
+        //   But as of Kirigami 2.10, there seems to be a bug preventing proper object
+        //   destruction on page close when providing an item here instead of a component.
+        //
+        //   TODO: Once the Kirigami bug mentioned above is fixed, switch to providing an
+        //   object that is not deleted (just hidden) when the page closes and keeps the
+        //   camera in Camera.LoadedState. That should speed up showing the barcode scanner
+        //   from the second time on. Not sure how much would be gained, though.
+        onTriggered: {
+            // On mobile platforms (and only there), Kirigami restores the focus after the scanner
+            // page closes again, to keep the status of the on-screen keyboard. Not intended
+            // because then the keyboard overlays the search results, so we give up that focus now.
+            autocomplete.focus = false
+
+            var scannerPage = pageStack.layers.push(Qt.resolvedUrl("ScannerPage.qml"));
+            scannerPage.barcodeFound.connect(onBarcodeFound)
+        }
+    }
+
+    rightAction: Kirigami.Action {
+        iconName: "go-next"
+        text: "Page Forward"
+        onTriggered: { showPassiveNotification("Go forward action triggered") }
+    }
+
+    // No contextual actions so far.
+    // contextualActions:
 
     // Displays a database search result or a "nothing found" message, as appropriate.
     // @param rawContent string  A raw database search result.
@@ -42,33 +105,6 @@ Kirigami.ScrollablePage {
         id: database
     }
 
-    // Define the page toolbar's contents.
-    //   A toolbar can have left / main / right / context buttons. The read-only property
-    //   org::kde::kirigami::Page::globalToolBarItem refers to this toolbar.
-    actions {
-        left: Kirigami.Action {
-            iconName: "go-previous"
-            text: "Page Back"
-            onTriggered: {
-                showPassiveNotification("Go back action triggered")
-            }
-        }
-
-        // No main action needed so far.
-        // main: Kirigami.Action { }
-
-        right: Kirigami.Action {
-            iconName: "go-next"
-            text: "Page Forward"
-            onTriggered: {
-                showPassiveNotification("Go forward action triggered")
-            }
-        }
-
-        // No contextual actions so far.
-        // contextualActions: [ ]
-    }
-
     // Scrollable element wrapping the content.
     //   This is necessary to allow scrolling with the keyboard in a Kirigami ScrollablePage.
     //   Details: https://stackoverflow.com/a/62853851
@@ -88,9 +124,9 @@ Kirigami.ScrollablePage {
         contentHeight: browserUI.height
 
         bottomMargin: 20
-        leftMargin: 20
-        rightMargin: 20
-        topMargin: 20
+        leftMargin:   20
+        rightMargin:  20
+        topMargin:    20
 
         // Scrolling in the browser page with the keyboard.
         Keys.onPressed: {
@@ -145,7 +181,7 @@ Kirigami.ScrollablePage {
 
                     model: database.completionModel
                     Layout.fillWidth: true
-                    placeholderText: "barcode number or food name"
+                    placeholderText: "food category or barcode"
 
                     onInputChanged: {
                         console.log("MainPage: autocomplete: 'inputChanged()' signal received")
@@ -160,7 +196,7 @@ Kirigami.ScrollablePage {
 
                     onAccepted: {
                         var content = database.content(input)
-                        browserPage.text = contentOrMessage(content, input)
+                        browserContent.text = contentOrMessage(content, input)
 
                         // AutoComplete gives up focus in its onAccepted handler. But if nothing was found
                         // the user wants to search again instead of scroll. So we take the focus back here.
@@ -190,47 +226,11 @@ Kirigami.ScrollablePage {
                     }
                 }
 
-                Button {
-                    id: scanButton
-                    text: "Scan"
-                    Layout.alignment: Qt.AlignHCenter
-
-                    // Event handler for a dynamically created ScannerPage object.
-                    // TODO: Document the parameters.
-                    function onBarcodeFound(code) {
-                        console.log("MainPage: scanButton: 'barcodeFound()' received, code = " + code)
-                        autocomplete.input = code
-                        var content = database.content(code)
-                        browserPage.text = contentOrMessage(content, code)
-                    }
-
-                    // Create the barcode scanner page and connect its signal to this page.
-                    //   Documentation for this technique: QtQuick.Controls.StackView::push()
-                    //   and "Dynamic QML Object Creation from JavaScript",
-                    //   https://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html and
-                    //
-                    //   By providing a component as URL and not an item, Kirigami takes care
-                    //   of dynamic object creation and deletion. Deletion makes sure the camera
-                    //   is stopped when the layer closes. This is simpler than creating a dynamic
-                    //   object ourselves, but also slower than just hiding the camera for later re-use.
-                    //   But as of Kirigami 2.10, there seems to be a bug preventing proper object
-                    //   destruction on page close when providing an item here instead of a component.
-                    //
-                    //   TODO: Once the Kirigami bug mentioned above is fixed, switch to providing an
-                    //   object that is not deleted (just hidden) when the page closes and keeps the
-                    //   camera in Camera.LoadedState. That should speed up showing the barcode scanner
-                    //   from the second time on. Not sure how much would be gained, though.
-                    onClicked: {
-                        var scannerPage = pageStack.layers.push(Qt.resolvedUrl("ScannerPage.qml"));
-                        scannerPage.barcodeFound.connect(onBarcodeFound)
-                    }
-                }
-
-                // TODO: Maybe add a "Bookmarks" button here.
+                // TODO: Maybe add an "Add Bookmark" button here, with a star icon.
             }
 
             Text {
-                id: browserPage
+                id: browserContent
 
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -280,7 +280,7 @@ Kirigami.ScrollablePage {
                     var flickableVerticalBorder = 20 // TODO: Determine this value dynamically.
                     var columnItemSpacing = 20 // TODO: Determine this value dynamically.
                     var heightToFill = mainPage.height - kirigamiHeaderHeight - flickableVerticalBorder
-                        - headerBar.height - columnItemSpacing - browserPage.height - flickableVerticalBorder
+                        - headerBar.height - columnItemSpacing - browserContent.height - flickableVerticalBorder
 
                     return (heightToFill > 0) ? heightToFill : 0
                 }

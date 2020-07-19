@@ -32,6 +32,10 @@ Kirigami.ApplicationWindow {
         MainPage { } // See MainPage.qml.
     }
 
+    // TODO: This can be simplified to: "pageStack.initialPage: MainPage {}". Because there is no
+    // need to create multiple MainPage objects of the same specialized type. And anyway, we just
+    // use the QML type as it is ("MainPage {}"), so to create another object like that one can
+    // just write "MainPage {}" again.
     pageStack.initialPage: mainPageComponent
 
     // Set or restore the focus properly when showing a page or returning to a page.
@@ -95,12 +99,12 @@ Kirigami.ApplicationWindow {
             Kirigami.Action {
                 text: "About"
                 icon.name: "help-about"
-                onTriggered: pageStack.layers.push(Qt.resolvedUrl("AboutPage.qml"))
+                onTriggered: pageStack.layers.push(Qt.resolvedUrl("qrc:///qml/AboutPage.qml"))
             },
             Kirigami.Action {
                 text: "License Notes"
                 icon.name: "help-about"
-                onTriggered: pageStack.layers.push(Qt.resolvedUrl("LicensePage.qml"))
+                onTriggered: pageStack.layers.push(Qt.resolvedUrl("qrc:///qml/LicensePage.qml"))
             }
         ]
     }
