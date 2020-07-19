@@ -230,15 +230,15 @@ While the Android platform and Qt library interfaces are mature and almost alway
     git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
     cd extra-cmake-modules
 
-    # Adapt to the commit of a stable version ≥5.68.0, here 5.70.0. As seen on
+    # Adapt to the commit of a stable version ≥5.68.0, here 5.72.0. Find the version tag commit hashes on
     # https://invent.kde.org/frameworks/extra-cmake-modules/-/tags
-    git checkout fca97c03
+    git checkout ada528dc
 
     mkdir build && cd build && cmake ..
     make
 
-    # Adapt to the version you checked out, here 5.70.0.
-    sudo checkinstall --pkgname extra-cmake-modules --pkgversion 5.70.0 make install
+    # Adapt to the version you checked out, here 5.72.0.
+    sudo checkinstall --pkgname extra-cmake-modules --pkgversion 5.72.0 make install
     ```
 
 3. **Install Qt 5.12.0 or up to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2) (see below). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
@@ -408,7 +408,7 @@ Download and unpack the package to the place that will later also host the Andro
 
         You can also install Qt 5.13 for Android or higher, but will need additional steps: for Qt 5.13.x or higher, you have to update your `extra-cmake-modules` package manually to 5.68.0 (see chapter [5.1. Version Compatibility Matrix](#51-version-compatibility-matrix)); and for Qt 5.14 or higher additionally you have to [adapt the Android Manifest file](https://stackoverflow.com/a/62108461) of this application. For Qt 5.15, additional steps may be necessary as that has not been tested yet. The next version after Qt 5.15 will probably be Qt 6, to which Kirigami and this application would have to be ported first.
 
-7. **Install Kirigami for Android.** We want to cross-compile an application for Android that depends on Kirigami. Ubuntu repositories do not provide Kirigami built for Android, so we have to do that ourselves. Instructions are mostly [from here](https://community.kde.org/Marble/AndroidCompiling#Setting_up_Kirigami).
+7. **Install Kirigami for Android.** We want to cross-compile an application for Android that depends on Kirigami. Ubuntu repositories do not provide Kirigami built for Android, so we have to do that ourselves. Instructions are mostly [from here](https://community.kde.org/Marble/AndroidCompiling#Setting_up_Kirigami). Note that for desktop builds, we use Kirigami from system packages instead.
 
     1. Clone the repository inside sub-directory `lib/` of your Food Rescue App project source tree. This is necessary [due to a limitation of the build process](https://stackoverflow.com/a/62326971).
 
@@ -424,24 +424,25 @@ Download and unpack the package to the place that will later also host the Andro
         git checkout f47bf906
         ```
 
-    3. Run CMake with the environment variables it requires. Be sure to adapt `CMAKE_INSTALL_PREFIX` to point to your installation directory defined above.
+    3. Run CMake with the environment variables it requires. Be sure to adapt `CMAKE_INSTALL_PREFIX` to point to your Android installation directory, relative to the Kirigami build directory. (You defined this in step "2. Create an Android installation directory".)
 
         ```
-        mkdir build && cd build
+        mkdir -p build/android && cd build/android
 
         export ANDROID_SDK_ROOT=/opt/android-sdk
         export ANDROID_NDK=/opt/android-sdk/ndk/18.1.5063045
         export ANDROID_ARCH_ABI=armeabi-v7a
-        export ANDROID_PLATFORM=23 # TODO: Might not be required.
+        export ANDROID_PLATFORM=23
 
-        cmake .. \
+        cmake ../.. \
           -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake \
           -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 \
-          -DECM_DIR=/usr/local/share/ECM/cmake \
-          -DCMAKE_INSTALL_PREFIX=../../foodrescue-app/install/android
+          -DCMAKE_INSTALL_PREFIX=../../../../install/android
         ```
 
         TODO: Explain what these variables mean.
+
+        TODO: `export ANDROID_PLATFORM=23` might not be required.
 
     4. Build and install:
 
@@ -458,7 +459,9 @@ Download and unpack the package to the place that will later also host the Andro
         cd /path-to-your/zxing-cpp/
         ```
 
-    2. **Configure the build.** Be sure to adapt `CMAKE_INSTALL_PREFIX` to point to your installation directory defined above. (Note: The command line options to not build the example applications prevent a build fail in step "Linking CXX executable ZXingWriter" with error message "ZXingWriter.cpp.o: requires unsupported dynamic reloc R_ARM_REL32". We don't need these examples for Android, and they are probably not made for Android anyway.)
+    2. **Configure the build.** Be sure to point `CMAKE_INSTALL_PREFIX` to your installation directory; the command below is aleready suitable if you defined it as instructed above.
+
+        Note: The command line options to not build the example applications prevent a build fail in step "Linking CXX executable ZXingWriter" with error message "ZXingWriter.cpp.o: requires unsupported dynamic reloc R_ARM_REL32". We don't need these examples for Android, and they are probably not made for Android anyway.)
 
         ```
         mkdir -p build/android && cd build/android
@@ -469,7 +472,6 @@ Download and unpack the package to the place that will later also host the Andro
         export ANDROID_PLATFORM=23
 
         cmake ../.. \
-          -DECM_DIR=/usr/local/share/ECM/cmake \
           -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake \
           -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 \
           -DBUILD_EXAMPLES=OFF \
@@ -553,11 +555,11 @@ The following instructions create and install an APK package that will run succe
 
     * **`ANDROID_SDK_BUILD_TOOLS_REVISION`:** TODO: Document.
 
-    * **`CMAKE_INSTALL_PREFIX`:** Adapt the value to the installation directory chosen at the start of this "Android Development Setup" section. The directory must be the same for the installation of ZXing, Kirigami and this application.
+    * **`CMAKE_INSTALL_PREFIX`:** Adapt the value to the installation directory chosen at the start of this "Android Development Setup" section. The directory must be the same for the installation of ZXing, Kirigami and this application. It must be given as an absolute path because the APK creation step after the compilation will fail otherwise. We use `readlink -f` to automatically translate a relative to an absolute path.
 
-    * **`KF5Kirigami2_DIR`:** A directory with the `KF5Kirigami2Config.cmake` file that defines the Kirigami CMake package. It is located in a sub-directory of the installation directory chosen above.
+    * **`KF5Kirigami2_DIR`:** An absolute path to a directory with the `KF5Kirigami2Config.cmake` file that defines the Kirigami CMake package. It is located in a sub-directory of the installation directory chosen above. CMake configuration with a relative path will fail at least with CMake 3.15.4 or newer. About creating the absolute path with `readlink -f` see on `CMAKE_INSTALL_PREFIX`.
 
-    * **`ZXing_DIR`:** A directory with the `ZXingConfig.cmake` file that defines the ZXing CMake package. It is located in a sub-directory of the installation directory chosen above.
+    * **`ZXing_DIR`:** An absolute path to a directory with the `ZXingConfig.cmake` file that defines the ZXing CMake package. It is located in a sub-directory of the installation directory chosen above. About the absolute path see on `CMAKE_INSTALL_PREFIX`.
 
     The code to run CMake (after you adapted the variables as explained above):
 
@@ -567,20 +569,21 @@ The following instructions create and install an APK package that will run succe
     export ANDROID_SDK_ROOT=/opt/android-sdk
     export ANDROID_NDK=/opt/android-sdk/ndk/18.1.5063045
     export ANDROID_ARCH_ABI=armeabi-v7a
-    export ANDROID_PLATFORM=23 # TODO: Check if this is required.
+    export ANDROID_PLATFORM=23
 
     cmake ../.. \
       -DQTANDROID_EXPORTED_TARGET=foodrescue \
       -DANDROID_APK_DIR=../../src/android \
-      -DECM_DIR=/usr/local/share/ECM/cmake \
       -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake \
       -DECM_ADDITIONAL_FIND_ROOT_PATH=/opt/qt/5.12.4/android_armv7 \
       -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 \
       -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 \
       -DCMAKE_INSTALL_PREFIX=../../install/android \
-      -DKF5Kirigami2_DIR=../../install/android/lib/cmake/KF5Kirigami2 \
-      -DZXing_DIR=../../install/android/lib/cmake/ZXing
+      -DKF5Kirigami2_DIR=$(readlink -f ../../install/android/lib/cmake/KF5Kirigami2) \
+      -DZXing_DIR=$(readlink -f ../../install/android/lib/cmake/ZXing)
     ```
+
+    TODO: The line `export ANDROID_PLATFORM=23` might not be needed.
 
 3. **Build the application.** You could also just `make` first to see if the compilation step is successful. Note that `make install` is necessary before every `make create-apk` as otherwise newly added files like icons would not land in the Android APK package. Only the files found in `${CMAKE_INSTALL_PREFIX}` when `make create-apk` runs will make it to the APK package! (This should be considered a bug in the build dependencies and we'll try to get it fixed.)
 
