@@ -52,7 +52,7 @@ Kirigami.ApplicationWindow {
         // Top-bar style "ToolBar" is not possible on mobile devices according to the
         // Kirigami Gallery App.
         //   Documentation: PageRow::globalToolBar, see https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1PageRow.html#a8d9e50b817d9d28e9322f9a6ac75fc8d
-        //   TOOD: Try to enable "ToolBar" style for tablets at least.
+        //   TOOD: Try to enable "ToolBar" style for tablets.
         if (Kirigami.Settings.isMobile)
             root.pageStack.globalToolBar.style = Kirigami.ApplicationHeaderStyle.Breadcrumb
         else

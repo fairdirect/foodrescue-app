@@ -8,7 +8,7 @@ import local 1.0 as Local // Our custom C++ based QML components, as exported in
 //   Shows the main area of the application, which contains every control element except the
 //   sidebar drawer and any layers / sheets / drawers added on top.
 //
-//   TODO: Rename this component from MainPage to BrowserContent.
+//   TODO: Rename this component from MainPage to BrowserPage.
 Kirigami.ScrollablePage {
     id: mainPage
 
@@ -128,9 +128,11 @@ Kirigami.ScrollablePage {
         rightMargin:  20
         topMargin:    20
 
-        // Scrolling in the browser page with the keyboard.
         Keys.onPressed: {
             switch (event.key) {
+
+            // Scrolling in the browser page with the keyboard.
+
             case Qt.Key_PageUp:
                 flick(0, 2400)
                 event.accepted = true;
@@ -151,8 +153,12 @@ Kirigami.ScrollablePage {
                 event.accepted = true;
                 break
 
-            case Qt.Key_F2: // F2 is typically used for "edit mode", so it fits well here.
+            // Starting to edit the autocomplete text field.
+            //   F2 typical as a shortcut for "go to edit mode".
+
+            case Qt.Key_F2:
                 autocomplete.focus = true;
+                autocomplete.completionsVisible = true;
                 event.accepted = true;
                 break
             }
@@ -211,13 +217,14 @@ Kirigami.ScrollablePage {
                     }
                 }
 
-                Button {
-                    id: goButton
-                    text: "Go"
+                ToolButton {
+                    id: searchButton
+                    icon.name: "system-search" // Other good options: checkmark, key-enter
+                    visible: !Kirigami.Settings.isMobile
                     enabled: autocomplete.input === "" ? false : true;
                     Layout.alignment: Qt.AlignHCenter
                     onClicked: {
-                        console.log("MainPage: goButton: 'clicked()' received")
+                        console.log("MainPage: searchButton: 'clicked()' received")
 
                         // Forward to the autocomplete widget to avoid duplicating code.
                         //   The autocomplete is the right element to handle its own input. This button
