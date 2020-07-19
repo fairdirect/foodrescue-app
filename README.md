@@ -91,19 +91,21 @@ Eventually you will be able to install the software comfortably as follows:
 
 # 3. Usage
 
-Tips for scanning a barcode:
+Tips for scanning a barcode, starting with the most important:
 
-* Hold the barcode orthogonal into the camera and keep it steady for several seconds. That is the best way to get a scan. The camera simply needs up to a few seconds to adjust exposure and focus to capture the barcode perfectly. This is a gradual process, so if you change something in the scene too early to "help" the camera, it will just slow down the barcode scanning as the camera has to start its adjustment process again.
+* **Align the lines.** Barcode scanning works only when the barcode lines are either vertical or horizontal on your screen, or slanted up to about 15° from that. When the lines are 45°, no barcodes are recognized due to software limitations.
 
-* It does not matter if the barcode's image is slightly distorted, means if the barcode's corners have somewhat different distances from the camera.
+* **Focus.** Barcodes cannot be recognized from out-of-focus camera images. So when you notice that the barcode lines appear blurred in your camera viewfinder, try the following: (1) Move the barcode further from the lens. Autofocus cameras have a minimum focus distance of 10-15 cm while manual focus webcams have to be adjusted by turning a focus ring and fixed focus webcams are usually configured to focus at 60 cm for a video call setup. (2) Move the barcode centrally into the viewfinder, because that is where an autofocus camera will try to focus on by default. (3) Get more light to shine on the barcode, because the autofocus has issues focusing when contrast is too low.
 
-* Barcode scanning works only when the barcode lines are either vertical or horizontal on your screen, or slanted up to about 15° from that. When the lines are 45°, no barcodes are recognized.
+* **Plain and steady.** Hold the barcode parallel to the camera lens and keep it steady for a few seconds. That is the best way to get a scan. The camera simply needs up to a few seconds to adjust exposure and focus to capture the barcode perfectly. This is a gradual process, so if you change something in the scene too early to "help" the camera, it will just slow down the barcode scanning as the camera has to start its adjustment process again.
 
-* Good and even lighting is important for fast barcode recognition.
+* **Not exactly parallel is ok.** It does not matter if the barcode plane is not exactly parallel to the camera lens. The barcode will appear slightly distorted in the camera viewfinder, but be detected with the same speed and precision.
 
-* Barcode recognition is very sensitive to overexposure of the barcode area, but not much to underexposure. A dark camera image background leads to overexposure of the barcode's white area, so prefer a lit / light background. Or try moving the barcode closer to the camera so that less background is visible and won't influence the exposure so much.
+* **Lighting.** Good and even lighting is important for fast barcode recognition. Barcode recognition usually works acceptably with usual indoor lighting levels, but can become difficult the smaller the barcodes are.
 
-* In rare cases there can be misreadings if more than one barcode is visible and barcodes overlap partially. Numbers would then not correspond to either barcode. Overlapping barcodes will not happen in live usage, but might when testing with pieces of paper.
+* **Exposure.** Barcode recognition is very sensitive to overexposure of the barcode area, but not much to underexposure. A dark camera image background leads to overexposure of the barcode's white area, so prefer a lit / light background. Or try moving the barcode closer to the camera so that less background is visible and won't influence the exposure so much.
+
+* **Multiple barcodes.** In rare cases there can be misreadings if more than one barcode is visible and barcodes overlap partially. Numbers would then not correspond to either barcode. Overlapping barcodes will not happen in live usage, but might when testing with pieces of paper.
 
 The following keyboard combinations are available:
 
