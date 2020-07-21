@@ -10,10 +10,11 @@
         <file>qml/AutoComplete.qml</file>
         <file>qml/BrowserPage.qml</file>
         <file>qml/LicensePage.qml</file>
-        <file>qml/LogoGrid.qml</file>
+        <file>qml/ImageNotice.qml</file>
         <file>qml/ScannerPage.qml</file>
         <file>docbook-to-qthtml.xsl</file>
         <file>qtquickcontrols2.conf</file>
-        <file>images/credits-test-en.svg</file>
+        <file>images/credits-all-de-3minified.svg</file>
+        <file>images/credits-all-en-3minified.svg</file>
     </qresource>
 </RCC>

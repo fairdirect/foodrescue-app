@@ -15,8 +15,11 @@ Kirigami.ScrollablePage {
     title: "Food Rescue"
 
     horizontalScrollBarPolicy: ScrollBar.AlwaysOff
-
     supportsRefreshing: false
+
+    // Use a white browser background for everything, because the BMBF logo shown at startup must
+    // be placed on white. Also it's ok for a content reader application to have a paper-like background.
+    background: Rectangle { color: "white" }
 
     // Define the page toolbar's contents.
     //   A toolbar can have left / main / right / context buttons. The read-only property
@@ -82,13 +85,13 @@ Kirigami.ScrollablePage {
 
     onWidthChanged: {
         // Configure the timer so it fires with a delay after the last resize.
-        logoGrid.redrawTimer.running ? logoGrid.redrawTimer.restart() : logoGrid.redrawTimer.start()
+        supporterLogos.redrawTimer.running ? supporterLogos.redrawTimer.restart() : supporterLogos.redrawTimer.start()
         // console.log("BrowserPage.qml: browserPage: widthChanged() received")
     }
 
     onHeightChanged: {
         // Configure the timer so it fires with a delay after the last resize.
-        logoGrid.redrawTimer.running ? logoGrid.redrawTimer.restart() : logoGrid.redrawTimer.start()
+        supporterLogos.redrawTimer.running ? supporterLogos.redrawTimer.restart() : supporterLogos.redrawTimer.start()
         // console.log("BrowserPage.qml: browserPage: heightChanged() received")
     }
 
@@ -275,7 +278,7 @@ Kirigami.ScrollablePage {
             }
 
             // Component to fill the empty space at the bottom of the page so that clicking there will
-            // remove the focus from the autocomplete field.
+            // remove the focus from the autocomplete field. Also contains supporter logos at startup.
             //
             //   Placing this into the Kirigami.ScrollablePage itself would be much simpler in terms of
             //   anchors, but is not possible because of re-parenting done by ScrollablePage, leading to
@@ -314,9 +317,16 @@ Kirigami.ScrollablePage {
                     onClicked: autocomplete.focus = false
                 }
 
-                LogoGrid {
-                    id: logoGrid
+                // A footer graphic crediting supporters, shown while no browser content is present.
+                ImageNotice {
+                    id: supporterLogos
+
                     anchors.fill: parent
+                    windowWidth: browserPage.width
+                    windowHeight: browserPage.height
+
+                    // TODO: i18n this, by using attributions-en.svg when the app language is German.
+                    imageSource: "qrc:///images/credits-all-en-3minified.svg"
 
                     // Hide permanently after the first search (as the browser always has content after that,
                     // and if only "No content found.").
