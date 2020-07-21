@@ -27,7 +27,7 @@ Kirigami.ApplicationWindow {
     title: "Food Rescue App"
 
     // The main page, displaying food rescue content.
-    pageStack.initialPage: BrowserPage { } // As implemented in BrowserPage.qml.
+    pageStack.initialPage: BrowserPage { id: browserPage }
 
     // Set or restore the focus properly when showing a page or returning to a page.
     //   Source: https://stackoverflow.com/a/42299757 . Should workd, because MainPage also acts

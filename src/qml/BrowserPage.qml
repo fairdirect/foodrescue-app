@@ -78,7 +78,19 @@ Kirigami.ScrollablePage {
     }
 
     // No contextual actions so far.
-    // contextualActions:
+    contextualActions: []
+
+    onWidthChanged: {
+        // Configure the timer so it fires with a delay after the last resize.
+        logoGrid.redrawTimer.running ? logoGrid.redrawTimer.restart() : logoGrid.redrawTimer.start()
+        // console.log("BrowserPage.qml: browserPage: widthChanged() received")
+    }
+
+    onHeightChanged: {
+        // Configure the timer so it fires with a delay after the last resize.
+        logoGrid.redrawTimer.running ? logoGrid.redrawTimer.restart() : logoGrid.redrawTimer.start()
+        // console.log("BrowserPage.qml: browserPage: heightChanged() received")
+    }
 
     // Displays a database search result or a "nothing found" message, as appropriate.
     // @param rawContent string  A raw database search result.
@@ -156,7 +168,8 @@ Kirigami.ScrollablePage {
 
             case Qt.Key_F2:
                 autocomplete.focus = true;
-                autocomplete.completionsVisible = true;
+                if (database.completionModel.length > 0)
+                    autocomplete.completionsVisible = true;
                 event.accepted = true;
                 break
             }
@@ -261,24 +274,30 @@ Kirigami.ScrollablePage {
                 }
             }
 
-            // Component to fill the empty space of the page so that clicking there will remove the focus
-            // from the autocomplete field.
+            // Component to fill the empty space at the bottom of the page so that clicking there will
+            // remove the focus from the autocomplete field.
+            //
+            //   Placing this into the Kirigami.ScrollablePage itself would be much simpler in terms of
+            //   anchors, but is not possible because of re-parenting done by ScrollablePage, leading to
+            //   errors "Cannot anchor to an item that isn't a parent or sibling." So instead we have to
+            //   make the Flickable's content as high as the page.
             //
             //   The Rectangle is only here to allow outlining the area for debugging purposes. Otherwise,
             //   replacing it with a MouseArea will also do.
             //
-            //   TODO: Replace this with MouseArea { anchors.fill: parent; onClicked: autocomplete.focus = false; }
+            //   TODO: Replace this with MouseArea { anchors.fill: parent; z: -1; onClicked: autocomplete.focus = false; }
             //   as a preceding sibling of Flickable. This has the advantage to fill the whole page, incl.
             //   the Flickable's borders on which one cannot click right now. However, this is not possible
             //   right now due to a Qt bug that makes any TextField unresponsive to clicks when underlaid or
             //   overlaid with a MouseArea. It seems to be this issue: https://forum.qt.io/topic/64041 . So,
-            //   report this bug, get it fixed, then simplify the implementation as told above.
+            //   report this bug, get it fixed, then simplify the implementation accordingly.
             //
             //   TODO: Other alternative implementations are presented in https://stackoverflow.com/a/55101935 .
             //   So far we could not get any of them to work in a Kirigami.ScrollablePage, but we can try again.
             Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
+
                 color: "transparent" // For debugging sizing, use "white".
                 height: {
                     var kirigamiHeaderHeight = 40 // TODO: Determine the exact value.
@@ -293,6 +312,15 @@ Kirigami.ScrollablePage {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: autocomplete.focus = false
+                }
+
+                LogoGrid {
+                    id: logoGrid
+                    anchors.fill: parent
+
+                    // Hide permanently after the first search (as the browser always has content after that,
+                    // and if only "No content found.").
+                    visible: browserContent.text == ""
                 }
             }
         }
