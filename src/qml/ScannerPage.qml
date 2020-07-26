@@ -29,7 +29,7 @@ import local 1.0 as Local // Our custom QML components, exported in main.cpp.
 
 Kirigami.ScrollablePage {
     id: scannerPage
-    title: "Scan a Barcode"
+    title: qsTr("Scan a Barcode")
 
     property int tagsFound: 0
     property string lastTag: ""
@@ -225,7 +225,8 @@ Kirigami.ScrollablePage {
 
             // TODO: Enable when in debugging mode.
             visible: false
-            text: "Barcodes found: " + tagsFound + (lastTag ? " Last barcode: " + lastTag : "")
+            text: qsTr("Barcodes found:)") + " " + tagsFound + " " +
+                (lastTag ? qsTr("Last barcode:") + " " + lastTag : "")
         }
     }
 }

@@ -107,6 +107,7 @@ Tips for scanning a barcode, starting with the most important:
 
 * **Multiple barcodes.** In rare cases there can be misreadings if more than one barcode is visible and barcodes overlap partially. Numbers would then not correspond to either barcode. Overlapping barcodes will not happen in live usage, but might when testing with pieces of paper.
 
+
 The following keyboard combinations are available:
 
 * **Auto-complete related.** It works the same as in a Google Search:
@@ -131,6 +132,17 @@ The following keyboard combinations are available:
     * **Close the application.** Ctrl + Q.
 
 * TODO: Complete this list. There should be an official list somewhere.
+
+
+The following command line options are available:
+
+* **`-style`, `-stylesheet`, `-widgetcount`, `-reverse`, `-qmljsdebugger`:** The default command line options available in every Qt application and [documented by Qt](https://doc.qt.io/qt-5/qapplication.html#QApplication).
+
+
+The following environment variables are available:
+
+* **Under Linux: `LANG`, `LANGUAGE`, `LC_ALL`:** Sets or overrides the application's locale using relatively convoluted rules [summarizes here](https://superuser.com/a/392466). Qt automatically completes any language specified as a two-lette language code (like `de`) to a full five-letter language code with country code. For example, `de` is expanded to `de_DE` and `en` to `en_US`.
+
 
 TODO: Complete the usage instructions.
 
@@ -257,10 +269,10 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
     Note that KDE Kirigami is a lightweight library independent of the KDE Plasma desktop environment – it has no dependencies beyond Qt, and you don't need KDE Plasma installed to use it or develop for it.
 
-5. **Install Qt5 development utilities.** Qt comes with some development tools. We'll need `xmlpatterns`, the XSLT processor utility, as it helps to test DocBook-to-HTML transformations developed for this software. Install it with:
+5. **Install Qt5 development utilities.** Qt comes with some development tools. We'll need `xmlpatterns`, the XSLT processor utility, as it helps to test DocBook-to-HTML transformations developed for this software. We'll also need `linguist`, the Qt user interface translation utility. Install them with:
 
     ```
-    sudo apt install qtxmlpatterns5-dev-tools
+    sudo apt install qtxmlpatterns5-dev-tools qttools5-dev-tools
     ```
 
 6. **Make Qt5 your default Qt version.** If you have installed both Qt4 and Qt5 on your system, only one of them will be the default for same-named Qt binaries that you'll need during the development process. Build tools are not affected by this, as they will always call Qt binaries with a `-qt=5` argument to make sure they use Qt4 tools. But when using Qt binaries manually, not having Qt 5 as the default version is annoying. On Ubuntu `sudo apt install qt5-default` will make Qt5 the default, while on other systems you might have to deal with `qtchooser` ([details](https://stackoverflow.com/a/39742962)).

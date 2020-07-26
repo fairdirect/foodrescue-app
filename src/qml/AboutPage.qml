@@ -1,10 +1,9 @@
 import QtQuick 2.6
-import org.kde.kirigami 2.6
+import org.kde.kirigami 2.6 as Kirigami
 
 // Page for "☰ → About".
 // Shows application meta info and the copyright notice.
-AboutPage {
-
+Kirigami.AboutPage {
     // Data for the "About" dialog, in visual order.
     //   QML property values are written in JavaScript. This one contains just a JavaScript hash.
     //   That's why, different from QML, keys must be in double quotes and commas are required.
@@ -13,7 +12,7 @@ AboutPage {
         // Header section.
         "displayName": "Food Rescue App",
         "version": "0.1",
-        "shortDescription": "Helps you decide which food is still edible.",
+        "shortDescription": qsTr("Helps you decide which food is still edible."),
 
         // "Copyright" section.
         // TODO: Fix that the "otherText" text will not be wrapped automatically. The usual solution
@@ -21,12 +20,12 @@ AboutPage {
         //   here because the corresponding QQ2.Label { } component in the Kirigami.AboutPage
         //   definition does not have an id that would allow overwriting it here. Needs overwriting
         //   the whole component and a bug report, probably.
-        "otherText": "A convergent application available for Android, iOS, Plasma Mobile, Windows, Mac OS X and Linux.",
-        "copyrightStatement": "© 2020 Matthias Ansorg",
+        "otherText": qsTr("A convergent application available for Android, iOS, Plasma Mobile, Windows, Mac OS X and Linux."),
+        "copyrightStatement": qsTr("© 2020 Matthias Ansorg"),
         "homepage": "https://fairdirect.org/food-rescue-app",
         "licenses": [ // TODO: Add all licenses, as that seems to be possible.
             {
-                "name": "MIT Licencse",
+                "name": qsTr("MIT Licencse"),
                 "text": "", // TODO: To be added.
                 "spdx": "MIT" // TODO: To be checked.
             }

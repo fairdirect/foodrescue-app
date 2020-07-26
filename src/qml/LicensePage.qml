@@ -7,16 +7,17 @@ import org.kde.kirigami 2.10
 // Shows required licence information.
 ScrollablePage {
     id: page
-    title: "License Notes"
+    title: qsTr("License Notes")
+    Layout.fillWidth: true
 
     Text {
         id: licenseNotes
 
         // License notes text.
         //   (The Open Food Facts license note is as required by OdBL sections 4.2 and 4.3.)
-        // TODO: Outsource this text to a HTML file.
-        text: '
-            <html>
+        //   TODO: Outsource this text to a HTML file.
+        text: qsTr(
+            '<html>
 
               <p>Food Rescue App is free software. You can copy, modify and distribute
                 <a href="https://github.com/fairdirect/foodrescue-app">its source code</a> under
@@ -58,6 +59,7 @@ ScrollablePage {
               <p>TODO</p>
 
             </html>'
+        )
 
         Layout.fillWidth: true
         wrapMode: Text.Wrap
@@ -71,6 +73,4 @@ ScrollablePage {
             cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
         }
     }
-
-    Layout.fillWidth: true
 }

@@ -64,36 +64,39 @@ Kirigami.ApplicationWindow {
     }
 
     // Left sidebar drawer with the main menu.
+    //   TODO: Try switching away from dynamic QML object instantiation (by loading QML from file),
+    //   as that prevents using pre-compiled QML, so it is much slower.
     globalDrawer: Kirigami.GlobalDrawer {
         title: "Food Rescue"
 
-        // TODO: Replace the icon with a circular, SVG version.
+        // TODO: Replace the icon with a circular version in SVG.
         titleIcon: "qrc:///images/secondfood-applogo-256x188.png"
 
         actions: [
             Kirigami.Action {
-                text: "History"
+                text: qsTr("History")
             },
             Kirigami.Action {
-                text: "Bookmarks"
+                text: qsTr("Bookmarks")
             },
             Kirigami.Action {
-                text: "Settings"
+                text: qsTr("Settings")
                 icon.name: "configure"
+                onTriggered: pageStack.layers.push(Qt.resolvedUrl("qrc:///qml/SettingsPage.qml"))
             },
             Kirigami.Action {
                 separator: true
             },
             Kirigami.Action {
-                text: "Help"
+                text: qsTr("Help")
             },
             Kirigami.Action {
-                text: "About"
+                text: qsTr("About")
                 icon.name: "help-about"
                 onTriggered: pageStack.layers.push(Qt.resolvedUrl("qrc:///qml/AboutPage.qml"))
             },
             Kirigami.Action {
-                text: "License Notes"
+                text: qsTr("License Notes")
                 icon.name: "help-about"
                 onTriggered: pageStack.layers.push(Qt.resolvedUrl("qrc:///qml/LicensePage.qml"))
             }

@@ -26,7 +26,7 @@ Kirigami.ScrollablePage {
     //   org::kde::kirigami::Page::globalToolBarItem refers to this toolbar.
     leftAction: Kirigami.Action {
         iconName: "go-previous"
-        text: "Page Back"
+        text: qsTr("Last Search")
         onTriggered: { showPassiveNotification("Go back action triggered") }
     }
 
@@ -36,7 +36,7 @@ Kirigami.ScrollablePage {
         // So other themes than Breeze that the user might use might not have it. However, using
         // a custom icon in Kirigami Page actions is currently prevented by a bug.
         iconName: "view-barcode"
-        text: "Scan"
+        text: qsTr("Scan")
 
         // Event handler for a dynamically created ScannerPage object.
         // TODO: Document the parameters.
@@ -76,7 +76,7 @@ Kirigami.ScrollablePage {
 
     rightAction: Kirigami.Action {
         iconName: "go-next"
-        text: "Page Forward"
+        text: qsTr("Next Search")
         onTriggered: { showPassiveNotification("Go forward action triggered") }
     }
 
@@ -102,9 +102,9 @@ Kirigami.ScrollablePage {
     function contentOrMessage(rawContent, searchTerm = "") {
         if (rawContent === "")
             if (searchTerm === "")
-                return "No content found."
+                return qsTr("No content found.")
             else
-                return "No content found for \"" + searchTerm + "\"."
+                return qsTr("No content found for") + " \"" + searchTerm + "\"."
         else
             return rawContent
     }
@@ -201,7 +201,7 @@ Kirigami.ScrollablePage {
 
                     model: database.completionModel
                     Layout.fillWidth: true
-                    placeholderText: "food category or barcode"
+                    placeholderText: qsTr("food category or barcode")
 
                     onInputChanged: {
                         console.log("BrowserPage: autocomplete: 'inputChanged()' signal received")

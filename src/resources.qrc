@@ -16,5 +16,7 @@
         <file>qtquickcontrols2.conf</file>
         <file>images/credits-all-de-3minified.svg</file>
         <file>images/credits-all-en-3minified.svg</file>
+        <file>qml/SettingsPage.qml</file>
+        <file>i18n/foodrescue_de.qm</file>
     </qresource>
 </RCC>
