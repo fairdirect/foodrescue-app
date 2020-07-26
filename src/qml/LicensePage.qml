@@ -1,11 +1,11 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
-import org.kde.kirigami 2.10
+import org.kde.kirigami 2.10 as Kirigami
 
 // Page for "☰ → License Notes".
 // Shows required licence information.
-ScrollablePage {
+Kirigami.ScrollablePage {
     id: page
     title: qsTr("License Notes")
     Layout.fillWidth: true

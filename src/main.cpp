@@ -86,13 +86,13 @@ int main(int argc, char *argv[]) {
     // Determine the target language to switch to.
     //   Using .left(2) fetches the language portion from a full locale code, which can be something
     //   like de_DE. Note that Qt does never include the encoding into the locale, unlike Linux.
-    //   So starting the application with "LANGUAGE= LC_ALL=de_AT.utf8 ./foodrescue" will still
-    //   result in QLocale::system().name() == "de_AT".
+    //   So starting the application with "env LANGUAGE= LC_ALL=de_AT.utf8 ./foodrescue" will still
+    //   result in QLocale().name() == "de_AT".
     //
     //   TODO: Once providing translation files with regional variation (such as de_DE and de_AT),
     //   extend the selection mechanism accordingly to QLocale::system().name().left(5).
-    qDebug() << "Detected application locale: " + QLocale::system().name();
-    QString targetLanguage(QLocale::system().name().left(2));
+    qDebug() << "Detected application locale: " + QLocale().name();
+    QString targetLanguage(QLocale().name().left(2));
 
     // Switch the user interface to use the right language.
     //   Qt determines the locale the application was started with and makes it available in
