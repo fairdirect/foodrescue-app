@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
     //   them into src/qml/i18n/qml_{lang}.ts
     //
     //   TODO: Reference the bug report above once it's reported.
-    localeChanger.changeLanguage(targetLanguage);
+    localeChanger.changeLocale(targetLanguage);
 
     return app.exec();
 }

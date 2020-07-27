@@ -31,22 +31,29 @@ LocaleChanger::LocaleChanger(QQmlEngine* engine, QString pathPrefix, QString fil
 /**
  * @brief LanguageSwitcher::selectLanguage  Switch the user interface language of the application
  *   to the specified language.
- * @param language  A two-letter language code, such as "en", "de".
+ * @param locale  A Qt locale name, as defined in https://doc.qt.io/qt-5/qlocale.html#QLocale-1 .
+ *   Note that a simple two-letter language code like "en" is also a valid locale name.
  * @todo Make this a more independent class by not hardcoding the path template.
  */
-void LocaleChanger::changeLanguage(QString language) {
+void LocaleChanger::changeLocale(QString locale) {
 
     // TODO: Fix that the file is not found when using the qrc:/ or qrc:/// prefix, even though it
     // should be completely synonymous.
-    const QString translationFile(QString(":%1/%2%3.qm").arg(pathPrefix).arg(filePrefix).arg(language));
+    const QString translationFile(
+        QString(":%1/%2%3.qm").arg(pathPrefix).arg(filePrefix).arg(locale.left(2))
+    );
 
     // Chaning the language works also without removing the old translator first, since the new
     // translation file is loaded into the old translator below. But the wiki example removes it first:
     // https://wiki.qt.io/How_to_create_a_multi_language_application#Switching_the_language
     qApp->removeTranslator(translator);
 
-    if (!translator->load(translationFile))
+    if (translator->load(translationFile))
+        QLocale::setDefault(locale);
+    else {
         qWarning() << "Failed to load translation file" << translationFile << ". Falling back to English.";
+        QLocale::setDefault(QLocale("en"));
+    }
 
     // Note: installTranslator() emits a QEvent::LanguageChange event, which may be handled by other
     // components of the application that also need to react to language changes, such as topic language.

@@ -11,7 +11,7 @@ public:
     LocaleChanger(QQmlEngine* engine, QString pathPrefix, QString filePrefix);
 
     Q_INVOKABLE
-    void changeLanguage(QString language);
+    void changeLocale(QString language);
 
 private:
     QQmlEngine* engine;
