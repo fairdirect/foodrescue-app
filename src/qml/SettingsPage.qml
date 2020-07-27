@@ -79,6 +79,9 @@ Kirigami.ScrollablePage {
                     localeChanger.changeLocale(nextLanguage)
 
                     // TODO: Also exchange the frontpage logo graphic with the proper i18n'ed version.
+                    // That's a bit complicated though as we'd have to send a signal between two
+                    // dynamically created QML objects. Better to make the logo graphic adapt itself
+                    // according to locale changes, as indicated there as a TODO already.
                 }
             }
         }
