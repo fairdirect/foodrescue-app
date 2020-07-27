@@ -20,3 +20,6 @@
 # This is managed in another repository, so not redundantly included into this one. See:
 # https://github.com/fairdirect/foodrescue-apphttps://github.com/fairdirect/foodrescue-app
 /src/android/assets/foodrescue-content.sqlite3
+
+# Ignore compiled versions of translation files
+src/i18n/*.qm
