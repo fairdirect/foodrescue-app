@@ -195,11 +195,13 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
         //   categories of those.
         query.prepare(
             "WITH RECURSIVE all_product_categories (product_id, category_id) AS ( "
+            //   -- Add the product's directly assigned categories to seed the recursion.
             "    SELECT product_id, category_id "
             "        FROM product_categories "
             "            INNER JOIN products ON products.id = product_categories.product_id "
             "        WHERE products.code = :code "
             "    UNION ALL "
+            //   -- Recursively add all the product's categories assigned indirectly via ancestry relations.
             "    SELECT (SELECT id FROM products WHERE code = :code ), category_structure.parent_id "
             "        FROM all_product_categories "
             "            INNER JOIN category_structure ON all_product_categories.category_id = category_structure.category_id "
@@ -221,7 +223,7 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
     }
     else {
         // Set up the query for a category name.
-        //   Again, the query uses a recursive CTE (see https://sqlite.org/lang_with.html ). It first builds
+        //   As above, the query uses a recursive CTE (see https://sqlite.org/lang_with.html ). It first builds
         //   up a table ancestor_categories containing the category in question and all its ancestors, and then
         //   uses that in the main SELECT at the end to find topics connected to any of these ancestor categories.
         //
@@ -232,26 +234,22 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
         //   ######### IMPORTANT ######### IMPORTANT ######### IMPORTANT ######### IMPORTANT ######### IMPORTANT
         query.prepare(
             "WITH RECURSIVE "
-            //   -- Defining a reusable single-value 'variable', as seen at https://stackoverflow.com/a/56179189
+            //   -- Defining a reusable 'variable' var_1.category_id, as seen at https://stackoverflow.com/a/56179189
             "    var_1 (category_id) AS (SELECT category_id FROM category_names WHERE name = :name COLLATE NOCASE LIMIT 1), "
             "    "
-            //   -- TODO: Rename ancestor_categories since the searched-for category is also included in them.
-            "    ancestor_categories (category_id, ancestor_id) AS ( "
-            //       -- First SELECT includes the search term category itself, as it's also relevant for finding topics.
+            "    category_ancestry (category_id, ancestor_category_id) AS ( "
+            //       -- Add the search term category as the root of its ancestry.
             "        SELECT var_1.category_id, var_1.category_id FROM var_1 "
-            "        UNION "
-            "        SELECT category_structure.category_id, category_structure.parent_id "
-            "            FROM category_structure, var_1 "
-            "            WHERE category_structure.category_id = var_1.category_id "
             "        UNION ALL "
-            "        SELECT ancestor_categories.category_id, category_structure.parent_id "
-            "            FROM ancestor_categories "
-            "                INNER JOIN category_structure ON ancestor_categories.ancestor_id = category_structure.category_id "
+            //       -- Recursively add all ancestors of the search term category.
+            "        SELECT category_ancestry.category_id, category_structure.parent_id "
+            "            FROM category_ancestry "
+            "                INNER JOIN category_structure ON category_ancestry.ancestor_category_id = category_structure.category_id "
             "    ) "
             "SELECT DISTINCT topic_contents.title, topics.section, topics.version, topic_contents.content, category_names.category_id "
             "FROM category_names, var_1 "
-            "    INNER JOIN ancestor_categories ON ancestor_categories.category_id = category_names.category_id "
-            "    INNER JOIN topic_categories ON ancestor_categories.ancestor_id = topic_categories.category_id "
+            "    INNER JOIN category_ancestry ON category_ancestry.category_id = category_names.category_id "
+            "    INNER JOIN topic_categories ON category_ancestry.ancestor_category_id = topic_categories.category_id "
             "    INNER JOIN topics ON topics.id = topic_categories.topic_id "
             "    INNER JOIN topic_contents ON topic_contents.topic_id = topics.id "
             "WHERE category_names.category_id = var_1.category_id"
