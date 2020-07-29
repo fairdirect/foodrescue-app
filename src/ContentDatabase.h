@@ -26,7 +26,7 @@ public:
     QString normalize(QString searchTerm);
 
     Q_INVOKABLE
-    void updateCompletions(QString nameFragments, int limit);
+    void updateCompletions(QString nameFragments, QString language, int limit);
 
     Q_INVOKABLE
     void clearCompletions();

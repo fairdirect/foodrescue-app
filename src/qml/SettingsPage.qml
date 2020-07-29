@@ -50,8 +50,8 @@ Kirigami.ScrollablePage {
                 var currentLanguage = Qt.locale().name.substring(0,2)
                 console.log("SettingsPage.qml: Detected current language: " + currentLanguage)
 
-                // Initialize the current item coresponding to the current language.
-                //   TODO: When moving to Qt 5.14, replace this with indexOfValue(). See:
+                // Initialize the current item with the current UI language.
+                //   TODO: When moving to Qt 5.14, replace this code with indexOfValue(). See:
                 //   https://doc.qt.io/qt-5/qml-qtquick-controls2-combobox.html#indexOfValue-method
                 //   That also requires setting valueRole, see:
                 //   https://doc.qt.io/qt-5/qml-qtquick-controls2-combobox.html#valueRole-prop
@@ -75,7 +75,7 @@ Kirigami.ScrollablePage {
                 var currentLanguage = Qt.locale().name.substring(0,2)
                 var nextLanguage = languageModel.get(currentIndex).language
                 if (currentLanguage !== nextLanguage) {
-                    // localeChanger is a custom context object provided in main.cpp.
+                    // localeChanger is a custom context object made available in main.cpp.
                     localeChanger.changeLocale(nextLanguage)
 
                     // TODO: Also exchange the frontpage logo graphic with the proper i18n'ed version.

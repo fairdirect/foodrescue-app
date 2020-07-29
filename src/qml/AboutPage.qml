@@ -22,7 +22,7 @@ Kirigami.AboutPage {
         //   the whole component and a bug report, probably.
         "otherText": qsTr("A convergent application available for Android, iOS, Plasma Mobile, Windows, Mac OS X and Linux."),
         "copyrightStatement": qsTr("© 2020 Matthias Ansorg"),
-        "homepage": "https://fairdirect.org/food-rescue-app",
+        "homepage": qsTr("https://fairdirect.org/food-rescue-app"), // Links to the correct translated version.
         "licenses": [ // TODO: Add all licenses, as that seems to be possible.
             {
                 "name": qsTr("MIT Licencse"),

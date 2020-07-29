@@ -209,9 +209,20 @@ Kirigami.ScrollablePage {
                         // Don't auto-complete nothing or barcode numbers.
                         if (input == "" || input.match("^[0-9 ]+$"))
                             database.clearCompletions()
-                        // Auto-complete a category name fragment (and in the future other search term types).
-                        else
-                            database.updateCompletions(input, 10)
+                        // Auto-complete a category name fragment.
+                        else {
+                            // Can't be made into a custom property "uiLanguage" since Qt.locale()
+                            // does not have a change notification signal connected to it.
+                            //   TODO: Make QML receive a custom signal for language and locale changes,
+                            //   and use that to update a custom property "uiLanguage". Instructions:
+                            //   Create a QEvent::LanguageChange event handler using the technique
+                            //   shown in https://forum.qt.io/post/276252 . Make it emit a signal that
+                            //   QML components can then react to. The signal can be the same that was
+                            //   previously present in the translating-qml demo application, see
+                            //   https://github.com/retifrav/translating-qml/blob/1a97871/trans.h#L25
+                            var uiLanguage = Qt.locale().name.substring(0,2)
+                            database.updateCompletions(input, uiLanguage, 10)
+                        }
                     }
 
                     onAccepted: {

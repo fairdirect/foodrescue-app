@@ -55,6 +55,7 @@ void ContentDatabase::connect() {
     if (QSysInfo::productType() == "android") {
         // Under Android, the database is located in the "assets" folder of the APK package. Assets
         // can only be accessed via Qt's "assets" scheme, not directly via the file system.
+        //   TODO: Make the database name configurable via a parameter, to make this class more generic.
         dbName = "assets:/foodrescue-content.sqlite3";
 
         // At first start under Android, copy the database to an ordinary file.
@@ -127,18 +128,20 @@ QString ContentDatabase::normalize(QString searchTerm) {
  *   auto-completion results.
  * @param limit  Maximum number of completion results to provide.
  */
-void ContentDatabase::updateCompletions(QString fragments, int limit) {
+void ContentDatabase::updateCompletions(QString fragments, QString language, int limit) {
     QSqlQuery query;
     QString searchTerm =  "%" + fragments.replace(" ", "%") + "%";
+    QString languageTerm = language + "%";
 
     // TODO Use a full-text index in this search for speed.
     query.prepare(
         "SELECT name "
-        "FROM categories "
-        "WHERE lang LIKE 'en%' AND name LIKE :searchTerm "
+        "FROM category_names "
+        "WHERE lang LIKE :languageTerm AND name LIKE :searchTerm "
         "ORDER BY LENGTH(name) "
         "LIMIT :limit"
     );
+    query.bindValue(":languageTerm", languageTerm);
     query.bindValue(":searchTerm", searchTerm);
     query.bindValue(":limit", limit);
 
@@ -197,15 +200,15 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
             "            INNER JOIN products ON products.id = product_categories.product_id "
             "        WHERE products.code = :code "
             "    UNION ALL "
-            "    SELECT (SELECT id FROM products WHERE code = :code ), categories_structure.parent_id "
+            "    SELECT (SELECT id FROM products WHERE code = :code ), category_structure.parent_id "
             "        FROM all_product_categories "
-            "            INNER JOIN categories_structure ON all_product_categories.category_id = categories_structure.category_id "
+            "            INNER JOIN category_structure ON all_product_categories.category_id = category_structure.category_id "
             ") "
-            "SELECT DISTINCT topic_contents.title, topics.section, topics.version, topic_contents.content, categories.name "
+            "SELECT DISTINCT topic_contents.title, topics.section, topics.version, topic_contents.content, category_names.category_id "
             "FROM products "
             "    INNER JOIN all_product_categories ON products.id = all_product_categories.product_id "
-            "    INNER JOIN categories ON all_product_categories.category_id = categories.id "
-            "    INNER JOIN topic_categories ON categories.id = topic_categories.category_id "
+            "    INNER JOIN category_names ON all_product_categories.category_id = category_names.category_id "
+            "    INNER JOIN topic_categories ON category_names.category_id = topic_categories.category_id "
             "    INNER JOIN topics ON topic_categories.topic_id = topics.id "
             "    INNER JOIN topic_contents ON topics.id = topic_contents.topic_id "
             "WHERE products.code = :code"
@@ -223,31 +226,35 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
         //   uses that in the main SELECT at the end to find topics connected to any of these ancestor categories.
         //
         //   TODO: It might be possible to build up the ancestor_categories table with just a single column.
+        //
+        //   ######### IMPORTANT ######### IMPORTANT ######### IMPORTANT ######### IMPORTANT ######### IMPORTANT
+        //   TODO: Fill var_1.category_id by searching also for the category's language.
+        //   ######### IMPORTANT ######### IMPORTANT ######### IMPORTANT ######### IMPORTANT ######### IMPORTANT
         query.prepare(
             "WITH RECURSIVE "
             //   -- Defining a reusable single-value 'variable', as seen at https://stackoverflow.com/a/56179189
-            "    var_1 (category_id) AS (SELECT id FROM categories WHERE name = :name COLLATE NOCASE LIMIT 1), "
+            "    var_1 (category_id) AS (SELECT category_id FROM category_names WHERE name = :name COLLATE NOCASE LIMIT 1), "
             "    "
             //   -- TODO: Rename ancestor_categories since the searched-for category is also included in them.
             "    ancestor_categories (category_id, ancestor_id) AS ( "
             //       -- First SELECT includes the search term category itself, as it's also relevant for finding topics.
             "        SELECT var_1.category_id, var_1.category_id FROM var_1 "
             "        UNION "
-            "        SELECT categories_structure.category_id, categories_structure.parent_id "
-            "            FROM categories_structure, var_1 "
-            "            WHERE categories_structure.category_id = var_1.category_id "
+            "        SELECT category_structure.category_id, category_structure.parent_id "
+            "            FROM category_structure, var_1 "
+            "            WHERE category_structure.category_id = var_1.category_id "
             "        UNION ALL "
-            "        SELECT ancestor_categories.category_id, categories_structure.parent_id "
+            "        SELECT ancestor_categories.category_id, category_structure.parent_id "
             "            FROM ancestor_categories "
-            "                INNER JOIN categories_structure ON ancestor_categories.ancestor_id = categories_structure.category_id "
+            "                INNER JOIN category_structure ON ancestor_categories.ancestor_id = category_structure.category_id "
             "    ) "
-            "SELECT DISTINCT topic_contents.title, topics.section, topics.version, topic_contents.content, categories.name "
-            "FROM categories, var_1 "
-            "    INNER JOIN ancestor_categories ON ancestor_categories.category_id = categories.id "
+            "SELECT DISTINCT topic_contents.title, topics.section, topics.version, topic_contents.content, category_names.category_id "
+            "FROM category_names, var_1 "
+            "    INNER JOIN ancestor_categories ON ancestor_categories.category_id = category_names.category_id "
             "    INNER JOIN topic_categories ON ancestor_categories.ancestor_id = topic_categories.category_id "
             "    INNER JOIN topics ON topics.id = topic_categories.topic_id "
             "    INNER JOIN topic_contents ON topic_contents.topic_id = topics.id "
-            "WHERE categories.id = var_1.category_id"
+            "WHERE category_names.category_id = var_1.category_id"
         );
 
         query.bindValue(":name", searchTerm);
@@ -263,7 +270,8 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
     // SQLite can't indicate search result size, so checking query.size() here is useless.
 
     // Render the search results into a simple DocBook "book" document.
-    //   TODO: Also render the OFF category names into here. They are already available via query.value(4)
+    //   TODO: Also render the OFF category names into here, in the correct language. Their IDs are
+    //   already available via query.value(4)
     //   TODO: Also render the author names into here.
     //   TODO: Exchange this with a more readable single HTML string with %1, %2 etc. arguments.
     QString docbook;
