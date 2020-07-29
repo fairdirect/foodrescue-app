@@ -18,5 +18,8 @@
         <file>images/credits-all-en-3minified.svg</file>
         <file>qml/SettingsPage.qml</file>
         <file>i18n/foodrescue_de.qm</file>
+        <file>i18n/foodrescue_en.qm</file>
+        <file>i18n/foodrescue_es.qm</file>
+        <file>i18n/foodrescue_fr.qm</file>
     </qresource>
 </RCC>

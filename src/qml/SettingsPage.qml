@@ -42,7 +42,9 @@ Kirigami.ScrollablePage {
                 id: languageModel
                 // TODO: Maybe automatically initialize this based on the available .qm translation files.
                 ListElement { label: qsTr("English"); language: "en" }
+                ListElement { label: qsTr("French");  language: "fr" }
                 ListElement { label: qsTr("German");  language: "de" }
+                ListElement { label: qsTr("Spanish"); language: "es" }
             }
 
             Component.onCompleted: {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de_DE">
+<TS version="2.1" language="en_US">
     <extra-po-header-language>en</extra-po-header-language>
     <extra-po-header-project_id_version>Food Rescue App UI</extra-po-header-project_id_version>
     <extra-po-header-x_generator>POEditor.com</extra-po-header-x_generator>
@@ -10,12 +10,12 @@
     <message>
         <location filename="../AboutPage.qml" line="15"/>
         <source>Helps you decide which food is still edible.</source>
-        <translation>Hilft zu entscheiden ob Lebensmittel noch genießbar sind.</translation>
+        <translation>Helps you decide which food is still edible.</translation>
     </message>
     <message>
         <location filename="../AboutPage.qml" line="23"/>
         <source>A convergent application available for Android, iOS, Plasma Mobile, Windows, Mac OS X and Linux.</source>
-        <translation>Eine konvergente Anwendung für Android, iOS, Plasma Mobile, Windows, macOS und Linux.</translation>
+        <translation>A convergent application available for Android, iOS, Plasma Mobile, Windows, Mac OS X and Linux.</translation>
     </message>
     <message>
         <location filename="../AboutPage.qml" line="24"/>
@@ -30,7 +30,7 @@
     <message>
         <location filename="../AboutPage.qml" line="28"/>
         <source>MIT Licencse</source>
-        <translation>MIT-Lizenz</translation>
+        <translation>MIT Licencse</translation>
     </message>
 </context>
 <context>
@@ -38,32 +38,32 @@
     <message>
         <location filename="../App.qml" line="75"/>
         <source>History</source>
-        <translation>Verlauf</translation>
+        <translation>History</translation>
     </message>
     <message>
         <location filename="../App.qml" line="78"/>
         <source>Bookmarks</source>
-        <translation>Lesezeichen</translation>
+        <translation>Bookmarks</translation>
     </message>
     <message>
         <location filename="../App.qml" line="81"/>
         <source>Settings</source>
-        <translation>Einstellungen</translation>
+        <translation>Settings</translation>
     </message>
     <message>
         <location filename="../App.qml" line="88"/>
         <source>Help</source>
-        <translation>Hilfe</translation>
+        <translation>Help</translation>
     </message>
     <message>
         <location filename="../App.qml" line="91"/>
         <source>About</source>
-        <translation>Über</translation>
+        <translation>About</translation>
     </message>
     <message>
         <location filename="../App.qml" line="96"/>
         <source>License Notes</source>
-        <translation>Lizenz-Hinweise</translation>
+        <translation>License Notes</translation>
     </message>
 </context>
 <context>
@@ -71,32 +71,32 @@
     <message>
         <location filename="../BrowserPage.qml" line="29"/>
         <source>Last Search</source>
-        <translation>Vorige Suche</translation>
+        <translation>Last Search</translation>
     </message>
     <message>
         <location filename="../BrowserPage.qml" line="39"/>
         <source>Scan</source>
-        <translation>Strichcode einlesen</translation>
+        <translation>Scan</translation>
     </message>
     <message>
         <location filename="../BrowserPage.qml" line="79"/>
         <source>Next Search</source>
-        <translation>Nächste Suche</translation>
+        <translation>Next Search</translation>
     </message>
     <message>
         <location filename="../BrowserPage.qml" line="105"/>
         <source>No content found.</source>
-        <translation>Keine Inhalte gefunden.</translation>
+        <translation>No content found.</translation>
     </message>
     <message>
         <location filename="../BrowserPage.qml" line="107"/>
         <source>No content found for</source>
-        <translation>Keine Inhalte gefunden für</translation>
+        <translation>No content found for</translation>
     </message>
     <message>
         <location filename="../BrowserPage.qml" line="204"/>
         <source>food category or barcode</source>
-        <translation>Lebensmittel-Kategorie oder Strichcode</translation>
+        <translation>food category or barcode</translation>
     </message>
 </context>
 <context>
@@ -104,7 +104,7 @@
     <message>
         <location filename="../LicensePage.qml" line="10"/>
         <source>License Notes</source>
-        <translation>Lizenz-Hinweise</translation>
+        <translation>License Notes</translation>
     </message>
 </context>
 <context>
@@ -112,7 +112,7 @@
     <message>
         <location filename="../ScannerPage.qml" line="32"/>
         <source>Scan a Barcode</source>
-        <translation>Strichcode einlesen</translation>
+        <translation>Scan a Barcode</translation>
     </message>
     <message>
         <location filename="../ScannerPage.qml" line="209"/>
@@ -122,12 +122,12 @@
     <message>
         <location filename="../ScannerPage.qml" line="228"/>
         <source>Barcodes found:)</source>
-        <translation>Strichcodes gefunden:</translation>
+        <translation>Barcodes found:)</translation>
     </message>
     <message>
         <location filename="../ScannerPage.qml" line="229"/>
         <source>Last barcode:</source>
-        <translation>Letzter Strichcode:</translation>
+        <translation>Last barcode:</translation>
     </message>
 </context>
 <context>
