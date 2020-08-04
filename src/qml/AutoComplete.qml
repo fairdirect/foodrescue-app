@@ -167,6 +167,8 @@ FocusScope {
         //   A workaround for multiple Qt bugs. See: https://stackoverflow.com/a/62526369
         inputMethodHints: Qt.ImhSensitiveData
 
+        selectByMouse: !Kirigami.Settings.isMobile
+
         // Necessary to have a blinking cursor in text field at application startup.
         //   Not done on mobile platforms because it would show the onscreen keyboard at startup,
         //   hiding half of the window.
