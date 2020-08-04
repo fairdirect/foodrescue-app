@@ -67,13 +67,12 @@ Kirigami.ScrollablePage {
 
             onCurrentIndexChanged: {
                 // Change the locale according to the new current entry.
-                //   But don't change the locale if it's the same as the current locale. That case
-                //   happens when the component is initialized and sets the current index according
-                //   to the current locale. Changing the locale *then* would mean changing it while
-                //   the KDE Kirigami GlobalDrawer menu where the user clicked "Settings" is still open.
-                //   And that leads to a weird error "GlobalDrawerActionItem.qml:132: ReferenceError:
-                //   modelData is not defined", with the drawer staying open as a result. So as a rule,
-                //   don't change the locale while certain components are doing their stuff.
+                //   But don't change the locale if it's the same as the current locale. That condition
+                //   applies when this event handler is called in Component.onCompleted. Changing the
+                //   locale inside Component.onCompleted would change it while the KDE Kirigami
+                //   GlobalDrawer menu is still open. And that leads to a weird error
+                //   "GlobalDrawerActionItem.qml:132: ReferenceError: modelData is not defined", with
+                //   the drawer staying open as a result.
                 var currentLanguage = Qt.locale().name.substring(0,2)
                 var nextLanguage = languageModel.get(currentIndex).language
                 if (currentLanguage !== nextLanguage) {

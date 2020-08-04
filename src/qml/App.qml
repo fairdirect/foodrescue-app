@@ -40,6 +40,15 @@ Kirigami.ApplicationWindow {
     }
 
     Component.onCompleted: {
+
+        // Replace the initial window size bindings with static values, preventing messups on language changes.
+        //   All bindings are revaluated on a language change in QmlEngine::retranslate(),
+        //   which would here result in changing the window size back to it's initial size. And since
+        //   some Kirigami window contents like ScrollablePage do not use bindings for size, they
+        //   then fail to adapt to the changed window size, creating a bad layout mess.
+        width = width
+        height = height
+
         // Top-bar style "ToolBar" is not possible on mobile devices according to the
         // Kirigami Gallery App.
         //   Documentation: PageRow::globalToolBar, see https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1PageRow.html#a8d9e50b817d9d28e9322f9a6ac75fc8d
