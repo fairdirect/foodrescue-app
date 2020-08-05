@@ -109,6 +109,11 @@ Kirigami.ScrollablePage {
             return rawContent
     }
 
+    // Clean up a search string a user entered into the browser's "address bar".
+    function normalize(searchString) {
+        return database.normalize(searchString)
+    }
+
     // Interface to the food rescue content.
     //   This is a C++ defined QML type, see ContentDatabase.h. Interface: method content(string).
     //   Note that this is not the same ContentDatabase object that is created in main.cpp. It still
@@ -237,6 +242,11 @@ Kirigami.ScrollablePage {
                         }
                     }
 
+                    // Clean up a search string a user entered into the browser's "address bar".
+                    //   TODO: Somehow merge this with the function normalize() at the top of thils file.
+                    //   There has to be a function in autocomplete to overwrite its internal
+                    //   implementation. But also there has to be a function higher up in the
+                    //   nesting structure of this page because it is called in searchButton#onClicked.
                     function normalize(searchString) {
                         return database.normalize(searchString)
                     }
@@ -251,9 +261,17 @@ Kirigami.ScrollablePage {
                     onClicked: {
                         console.log("BrowserPage: searchButton: 'clicked()' received")
 
+                        // Prepare the search just as in the onAccepted event handler of the
+                        // autocomplete text field itself.
+                        var searchTerm = normalize(autocomplete.text)
+                        autocomplete.input = searchTerm
+
                         // Forward to the autocomplete widget to avoid duplicating code.
                         //   The autocomplete is the right element to handle its own input. This button
                         //   is just an independent element providing a convenience action.
+                        //
+                        //   TODO: This is necessary somehow, but probably also is the cause for
+                        //   rendering the page twice, as this event will somehow call itself. To be fixed.
                         autocomplete.accepted()
                     }
                 }
