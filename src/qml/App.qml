@@ -82,11 +82,14 @@ Kirigami.ApplicationWindow {
         titleIcon: "qrc:///images/secondfood-applogo-256x188.png"
 
         actions: [
+            // TODO: Implement a browser history mechanism, then enable this menu item.
+//          Kirigami.Action {
+//              text: qsTr("History")
+//          },
             Kirigami.Action {
-                text: qsTr("History")
-            },
-            Kirigami.Action {
-                text: qsTr("Bookmarks")
+                text: qsTr("Starred Articles")
+                icon.name: "star-shape"
+                onTriggered: pageStack.layers.push(Qt.resolvedUrl("qrc:///qml/StarsPage.qml"))
             },
             Kirigami.Action {
                 text: qsTr("Settings")
@@ -95,9 +98,6 @@ Kirigami.ApplicationWindow {
             },
             Kirigami.Action {
                 separator: true
-            },
-            Kirigami.Action {
-                text: qsTr("Help")
             },
             Kirigami.Action {
                 text: qsTr("About")

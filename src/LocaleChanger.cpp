@@ -59,10 +59,14 @@ void LocaleChanger::changeLocale(QString locale) {
     // components of the application that also need to react to language changes, such as topic language.
     qApp->installTranslator(translator); // qApp is a global variable made available by QGuiApplication
 
-    // TODO It seems cleaner to instead send a QEvent::LanguageChange event to engine, as documented here:
-    // https://doc.qt.io/qt-5/qtquick-internationalization.html#9-prepare-for-dynamic-language-changes .
-    // That can be done by implementing an event filter for this event when it is emitted by
-    // installTranslator() above, as per https://forum.qt.io/post/276252 . Maybe the engine then passes
-    // it to other QML components, allowing them to react as well.
-    engine->retranslate();  // Render the QML UI with translations in the new language.
+    // Render the QML UI with translations in the new language.
+    //   This will re-evaluate all (!) QML bindings. If this causes weird effects, you might want to
+    //   remove certain bindings before calling retranslate(), and potentially restore them later.
+    //
+    //   TODO It seems cleaner to instead send a QEvent::LanguageChange event to engine, as documented here:
+    //   https://doc.qt.io/qt-5/qtquick-internationalization.html#9-prepare-for-dynamic-language-changes .
+    //   That can be done by implementing an event filter for this event when it is emitted by
+    //   installTranslator() above, as per https://forum.qt.io/post/276252 . Maybe the engine then passes
+    //   it to other QML components, allowing them to react as well.
+    engine->retranslate();
 }

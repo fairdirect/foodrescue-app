@@ -9,34 +9,38 @@
     * custom tags, see https://stackoverflow.com/q/62684658
     * style element in the header, with CSS styling for tags and classes
 
-    Remarks about the quirks and limitations of Qt's Text.RichText rendering:
+    Remarks about the quirks and limitations of Qt's HTML rendering using rendering. All of the below
+    is about the Qt's HTML rendering using "textFormat: Text.RichText" (in QML); the other HTML
+    rendering formats available provide much fewer options and different default CSS styling.
 
     * CSS "font-weight" has limited visually distinct settings, depending on the available fonts:
-    * Ubuntu Linux 19:10: "light" (100-200), "normal" (300-500), bold (600-900)
-    * Android 6: "light" (100-300), "normal" (400), demibold (500), bold (600), extra bold (700-900)
+        * Ubuntu Linux 19.10: light (100-200), normal (300-500), bold (600-900)
+        * Android 6: light (100-300), normal (400), demibold (500), bold (600), extra bold (700-900)
     * CSS "margin" creates an empty space when used with block-level elements like "h1" but creates a
-      space filled with the background color when used on a table; it has no effect on table cells
+      space filled with the background color when used on a table; it has no effect on table cells.
     * CSS "padding" configures the empty space around table cells, not the CSS padding in any block
-      level element like "h1"; it can only be used on table cells
-    * "width" has to be an attribute for the "table" tag, it cannot be used as a CSS property
-    * HTML entities like &nbsp; cannot be used (only after defining them somehow, perhaps)
+      level element like "h1"; it can only be used on table cells.
+    * "width" has to be an attribute for the "table" tag, it cannot be used as a CSS property.
+    * HTML entities like `&nbsp;` cannot be used (only after defining them somehow, perhaps).
     * Block elements containing nothing or only whitespace are not rendered (also not their margin etc.).
       To create a spacer element, you can set color:transparent.
-    * The height of a "p" element does not shrink below ist normal height, independent of what
+    * The height of a "p" element does not shrink below its normal height, independent of what
       you set for the "font-size" and "line-height" CSS attributes. It seems that the font size
-      can be increased, but not decreased below its default size.
-    * As a vertical spacer, <table style="margin-bottom: 4px"/> works best.
+      can be increased, but not decreased below its default size. To be able to use empty "p" elements
+      as spacers of configurable height, you could try starting with a very small default font size
+      for everything.
+    * As a vertical spacer, `<table style="margin-bottom: 4px"/>` works best.
     * By default, there is a vertical margin between "p" elements. It can be removed with margin:0px.
     * There is no default vertical margin around "div" or "table" elements.
-    * The minimum vertical space taken up by any element is ~16 px (one height of normal text). That
-      applies even for a simple, empty <br/> and cannot be fixed by CSS.
-    * An inline element (like img) after a block-level element (p, div) is added to the last line of the
+    * The minimum vertical space taken up by any element is approx. 16 px (one height of normal text). That
+      applies even for a simple, empty `br` element and cannot be fixed by CSS.
+    * An inline element (like "img") after a block-level element ("p", "div") is added to the last line of the
       block-level element.
-    * A <hr> tag produces no visible output, and it is not clear how to fix that.
-    * For a <div> between two tables, "margin-top" works but "margin-bottom" has no effect. However for
-      a <div> between two "div" or "p" elements, both variants work.
-    * It is possible to use images with src="qrc:/…".
-    * A pixel can be considered ~1/16 of the default line height, roughly indepenent of device screen density.
+    * A "hr" element tag produces no visible output, and it is not clear how to fix that.
+    * For a "div" element between two tables, "margin-top" works but "margin-bottom" has no effect. However for
+      a "div" element between two "div" or "p" elements, both variants work.
+    * It is possible to use images with `src="qrc:/…"`.
+    * A pixel can be considered approx. 1/16 of the default line height, roughly indepenent of device screen density.
 
     Remarks about the quirks and limitations of Qt's XSLT implementation:
 

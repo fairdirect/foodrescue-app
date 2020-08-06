@@ -124,10 +124,11 @@ The following keyboard combinations are available:
     * **Scroll one page.** Page Up / Page Down.
 
 * **Kirigami defaults.**
-    * **Activate menu item.** Alt + highlighted letter while menu drawer is open.
     * **Page back / forward.** Alt + Arrow Left / Alt + Arrow Right. You can also use the hardware keys "Page Back" and "Page Forward" if you have them. Not found often, but for example some Lenovo ThinkPad models have these above the Arrow Left / Arrow Right keys.
+    * **Select all.** Ctrl + A selects all content of the focused element, for example a text field.
     * **Move focus.** Tab moves the keyboard focus to the next element, Shift + Tab moves it to the previous element.
     * **Click on focused element.** The Space bar key is like clicking on the element currently having the keyboard focus. Except for text fields, where you need Return or Enter.
+    * **Activate menu item.** Alt + highlighted letter while menu drawer is open.
     * **Close overlay sheet.** There is no default key binding for this. Esc does not work. Some applications bind the "Alt + Left" and "Page Back" keys to this, for example the Kirigami Gallery demo application.
     * **Close the application.** Ctrl + Q.
 
@@ -294,7 +295,7 @@ While the Android platform and Qt library interfaces are mature and almost alway
     sudo ldconfig
     ```
 
-8. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packaged on demand, you can install all the Qt header files already:
+8. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packages on demand, you can install all the Qt header files already:
 
     ```
     sudo apt install \
@@ -826,16 +827,43 @@ TODO
 
 TODO
 
+As a contributor, you will have to sign a contributor licensing agreement that allows the person or organization directing the development of Food Rescue App to re-license the program under terms of their choice in the future without having to contact you first. This is done in preparation for the worst case, which is that we cannot establish a working sustainability model for Food Rescue App as an open source software. Of course, all previous versions including the one to which you contributed will remain under the open source licenses applied at the time when the contributions were made.
+
 
 # 9. License and Credits
 
 **Licenses.** This repository exclusively contains material under free software licencses and open content licenses. Unless otherwise noted in a specific file, all files are licensed under the MIT license. A copy of the license text is provided in [LICENSE.md](https://github.com/fairdirect/foodrescue-app/blob/master/LICENSE.md).
 
 
-**Credits.** Within the rights granted by the applicable licenses, this repository contains works of the following open source projects, authors or groups, which are hereby credited for their contributions and for holding the copyright to their contributions:
+**Credits, third-party licenses.** Within the rights granted by the applicable licenses, this repository contains works of the following open source projects, authors or groups, which are hereby credited for their contributions and for holding the copyright to their contributions. For the required formal license notes, see menu item "License Notes" in the application itself, or see the corresponding file `src/qml/LicensePage.qml`.
 
 * **[Open Food Facts](https://openfoodfacts.org/).** This project relies heavily on the groundwork done by the open source [Open Food Facts](https://openfoodfacts.org/) project for creating a data commons for food products identified by a GTIN barcode. Actual content from Open Food Facts is included only via the [foodrescue-content](https://github.com/fairdirect/foodrescue-content) repository; see there for licencing details.
 
-* **[IQAndreas/markdown-licenses](https://github.com/IQAndreas/markdown-licenses).** Provides orginal open source licenses in Markdown format. The `LICENSE.md` file uses one of them.
+* **[Qt](https://qt.io/).** The best framework for cross-platform native applications. Licensed under the [GNU LGPL v3 license](https://www.gnu.org/licenses/lgpl-3.0.html). The Qt framework also contains multiple third-party libraries, licenced under various free software licences. For the full list, see [Licenses Used in Qt](https://doc.qt.io/qt-5/licenses-used-in-qt.html).
 
-* **[Qt](https://qt.io/) and [KDE Kirigami](https://kde.org/products/kirigami/) developers.** For creating the world's best framework for convergent application development 😊
+* **[Kirigami](https://kde.org/products/kirigami/).** A framework for mobile/desktop convergent applications, building on Qt Quick ("QML"). Licensed under the [LGPL v2 license](https://invent.kde.org/frameworks/kirigami/-/blob/master/LICENSE.LGPL-2).
+
+* **[ZXing-C++](https://github.com/nu-book/zxing-cpp).** The most mature C++ version of the well-known barcode scanner library ZXing. Licensed under the [Apache License Version 2.0](https://github.com/nu-book/zxing-cpp/blob/master/LICENSE.ZXing).
+
+* **[QZXingNu](https://github.com/swex/QZXingNu).** Provides a QML interface for the ZXing-C++ library.
+
+* **[IQAndreas/markdown-licenses](https://github.com/IQAndreas/markdown-licenses).** Provides original open source licenses in Markdown format. The `LICENSE.md` file uses one of them.
+
+
+**License issue: GPL add-ons.** The Qt framework comes with [multiple optional add-ons](https://doc.qt.io/qt-5/qtmodules.html#gpl-licensed-addons) that are licensed under the GPL v3 license. Some of them (esp. Qt Quick WebGL) can be used with this program. We are of the opinion that this fact does not bring Food Rescue App under the requirements of the GPL license; these requirements would be:
+
+1. That the program itself is licensed under a GPL v3 compatible license ([see](https://www.gnu.org/licenses/gpl-faq.en.html#LinkingWithGPL)). While this is currently met by using MIT license, we want to keep the freedom of re-licensing it later.
+
+2. That the binary distribution of the program is licensed under GPL v3 if that distribution includes the GPL'ed add-ons. This is currently met because no distribution of this program includes a Qt add-on that is GPL v3 licensed.
+
+Our argument goes as follows: Food Rescue App is not designed to be used with any of the GPL-licensed add-ons. It does not call any code in any of them directly – the Qt framework itself does. Food Rescue App does also not distribute the GPL-licensed code of these add-ons, neither in source nor binary form. For this reason, Food Rescue App and these add-ons shall be considered [separate works](https://www.gnu.org/licenses/gpl-faq.en.html#GPLPlugins) and given that status, the GPL license of the add-on makes no requirement about the license of the main program ([see](https://www.gnu.org/licenses/gpl-faq.en.html#NFUseGPLPlugins)).
+
+In fact, the program and these add-ons must be separate works because the authors of Food Rescue App are not necessarily aware of the existence of these add-ons and did not use them during development, which makes it impossible to create a combined work. The Qt WebGL add-on uses the standardized [Qt Platform Abstraction](https://doc.qt.io/qt-5/qpa.html) interface for rendering the program in a WebGL environment. Since this is a standard interface used by Qt used by all its non-GPL'ed other platform renderers as well, the fact that a GPL'ed add-on can be used with this program does not mean that the program was designed for it, and does not force the program under the GPL. If it were, on the other hand, possible to force a program under the GPL by writing an add-on that the authors of the original program are not even aware of, it would be clearly absurd.
+
+Users are still free to install the WebGL add-on alongside this program and use them together. Using a program in any way does not force adopting the GPL, so you are not bound by the GPL in such a case. Users should however be aware that it is not legal to *distribute* this combination of programs, should Food Rescue App adopt a license in the future that is not compatible with the GPL v3.
+
+For further reference:
+
+* https://opensource.stackexchange.com/a/9438
+* https://opensource.stackexchange.com/a/7259
+* https://softwareengineering.stackexchange.com/a/367850
