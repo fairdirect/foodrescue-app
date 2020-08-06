@@ -25,9 +25,8 @@ Kirigami.ScrollablePage {
             '<html>' +
 
             '<head><style>
-                h2 { font-weight: normal; }
-                p { margin-left: 16px }
-                em { font-style: italic; font-weight: bold; }
+                h2 { font-weight: normal; margin-top: 32px; }
+                p  { margin-left: 16px; }
             </style></head>' +
 
             qsTr(
