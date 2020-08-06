@@ -198,7 +198,7 @@ FocusScope {
         }
 
         // Handle the "text accepted" event, which sets the input from the text.
-        //   This event is also artificially emitted by the "Go" button and by clicking on
+        //   This event is also artificially emitted by the "Search" button and by clicking on
         //   an auto-suggest proposal.
         //
         //   This event is emitted by a TextField when the user finishes editing it.
