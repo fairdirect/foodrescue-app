@@ -10,6 +10,9 @@ Kirigami.ScrollablePage {
     title: qsTr("License Notes")
     Layout.fillWidth: true
 
+    // Let's use the same background as in BrowserPage.qml.
+    background: Rectangle { color: "white" }
+
     Text {
         id: licenseNotes
 

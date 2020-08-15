@@ -11,6 +11,9 @@ Kirigami.ScrollablePage {
     title: qsTr("Settings")
     Layout.fillWidth: true
 
+    // Let's use the same background as in BrowserPage.qml.
+    background: Rectangle { color: "white" }
+
     // A two-column layout with form elements and their labels.
     //   See file FormLayoutGallery.qml in application Kirigami Gallery for a usage example.
     Kirigami.FormLayout {
