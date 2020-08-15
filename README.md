@@ -18,7 +18,7 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
 **[2. Installation](#2-installation)**<br/>
 **[3. Usage](#3-usage)**<br/>
 **[4. Repository Layout](#4-repository-layout)**<br/>
-**[5. Development Guide](#5-development)**
+**[5. Development Guide](#5-development-guide)**
 
   * [5.1. Dependencies Overview](#51-dependencies-overview)
   * [5.2. Desktop Development Setup](#52-desktop-development-setup)
@@ -27,7 +27,7 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
   * [5.5. Android Build Process](#55-android-build-process)
   * [5.6. Qt Creator Setup](#56-qt-creator-setup)
 
-**[6. Release Process](#6-release-process)**<br/>
+**[6. Release Guide](#6-release-guide)**<br/>
 
   * [6.1. Desktop Linux](#61-desktop-linus)
   * [6.2. F-Droid](#62-f-droid)
@@ -48,28 +48,50 @@ The code does not provide a useful application just yet. Check back at 2020-08-3
 
 # 1. Overview
 
-This repository contains an open source application to help assess if food is still edible or not. The actual content shown inside this application is contained and processed in repository [foodrescue-content](https://github.com/fairdirect/foodrescue-content).
+This repository contains an open source application to help assess if food is still edible. When you scan a food product’s barcode or search for a food category, the application will collect and show whatever it knows about assessing the edibility of this food item. The main innovation is to combine barcode scanning with food rescue information, which makes that information more accessible than through any existing solution.
+
+The application is built with KDE Kirigami, a rather unknown but powerful base technology that makes this a native, cross-platform, desktop/mobile convergent application. See below for the full list of features enabled by this choice.
+
 
 **Features:**
 
-* **Convergent.** The application runs from the same codebase and with the same user interface as a native (!) application on both phones, tablets and desktop computers. This is made possible by Qt5 and, based on that, the [KDE Kirigami](https://kde.org/products/kirigami/) framework.
+* **Mobile/desktop Convergent.** The application runs from the same codebase and with the same user interface as a native (!) application on both phones, tablets and desktop computers. This is made possible by Qt 5 and, based on that, the [KDE Kirigami](https://kde.org/products/kirigami/) framework. Kirigami is a niche technology right now and not advertised much, but it totally works and allows an efficient "write once, run everywhere" development mode that also reduces software maintenance costs because there is only one codebase.
 
-* **Cross-platform.** The application is cross-platform, running on all platforms supported by the KDE Kirigami framework. As of 2020-06, these are: Android, iOS, Windows, Mac OS X, Linux, FreeBSD ([see](https://invent.kde.org/frameworks/kirigami/-/blob/master/metainfo.yaml#L5)).
+* **Cross-platform.** Currently, Food Rescue App has been tested under both Android and Ubuntu Linux. But it supports also all other platforms where Qt is available. That includes the [officially supported platforms](https://doc.qt.io/qt-5/supported-platforms.html) Linux, macOS, Windows, Android, iOS and UWP (“Windows Mobile”). In addition, it is possible to use the application under FreeBSD, which is also supported by the Kirigami framework ([see](https://invent.kde.org/frameworks/kirigami/-/blob/master/metainfo.yaml#L5)) and on minor mobile platforms such as [Ubuntu Touch](https://en.wikipedia.org/wiki/Ubuntu_Touch), [Sailfish OS](https://en.wikipedia.org/wiki/Sailfish_OS) and [LineageOS](https://lineageos.org/), all of which are prepared to run Qt applications. To note, the application is a native compiled cross-platform application, *not* using any cross-platform technology built around web technologies (such as Electron) that would rather make it a packaged web application.
 
 * **Scan to check.** To quickly find the required information about a food item, scan its GTIN barcode with the camera of your device.
 
+* **Offline use.** The application obtains all its data from an on-device SQLite3 database, so you can use it without the Internet, whether that means in a supermarket in the basement, on a sailing trip where you caught too much fish, or if you happen to live in a sparsely populated area where Internet access is expensive or unreliable.
+
+* **Multi-lingual.** The application’s user interface and content are available in German and English, and any number of additional languages can be added in the same way. With at least 1000 entries each, the food category names are right now complete enough for real-world use in seven languages (German, English, French, Dutch, Spanish, Italian, Finnish).
+
 * **Keyboard control.** The application can be fully controlled by keyboard shortcuts. That also works in the mobile variant, such as for Android based netbooks.
 
-* **Desktop touch control.** As a side effect of convergent application development, the user interface is touch control friendly even on the desktop version. That's useful for the considerable amount of notebook computers with touchscreens.
+* **Desktop touch friendly.** As a side effect of convergent application development, the user interface is touch control friendly even in the desktop version. That's useful for the considerable amount of notebook computers with touchscreens.
+
+* **Works on old or slow hardware.** The application is designed to be usable on low-resourced hardware, whether that means entry-level or old mobile devices. This is made possible by relying on compiled C++ code, resulting in native applications on all platforms. The native performance is esp. relevant for the barcode scanner feature. It exceeds that of any barcode scanner in JavaScript, and also that of any barcode scanner in Java, which is otherwise the default choice in an Android application.
+
+* **Compact size.** The application's database is relatively compact, so that it is not (yet) necessary to split it into several databased by world region. As of 2020-08, the current installation size of the database is 27 MiB, containing 448&nbsp;224 food products, 9818 food categories and 674&nbsp;021 assignments of categories to products. [We collected techniques](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA#z=CbJves6WjN7La8VqenFe0zjE) that allow to bring this size down to 6 MiB in the future. Even if in the future all the world's food products with barcodes would be contained in that database, wit these techniques the size would then probably not exceed 40 MiB, which is still very acceptable even for entry-level smartphones.
+
+* **Web application ready.** Food Rescue App can be used over the Internet from within a web browser, using [Qt WebGL Streaming](https://doc.qt.io/qt-5/webgl.html). This is slower than a "normal" web application and only suitable for demonstration purposes. However, [Viridity](https://github.com/evilJazz/viridity/tree/v3) or [other interesting technologies](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA#z=E34d0t1guv-W5DImJF1zldh9) would allow to extend Food Rescue App to also be a native web application in the future.
+
+
+**Limitation:**
+
+This architecture is still not perfect, though. Due to Qt QML, the technology used for the Kirigami based user interface, the application contains some JavaScript code and a JavaScript virtual machine. This does not provide native performance, but is not used for performance-critical code either. The situation will be resolved in the future with Qt 6, which will support compiling QML to native C++ code.i Another challenge is that on systems without a proper package manager, the full Qt libraries have to be included when distributing the application. This increases the installation size from 400 kiB (on Linux) to 37 MiB (on Android). But even when distributing the Qt libraries, they do not have to be that large. It’s just that nobody really cared about the Qt installation size under Android and iOS. But I already discovered techniques that should reduce that size by at least 75% in a future release (details).
 
 
 **Documentation:**
 
 * **Project website.** The project's website with introductory information and relevant links is [fairdirect.org/food-rescue-app](https://fairdirect.org/food-rescue-app).
 
-* **API documentation.** The project's C++ source files contain in-code documentation that you can compile into full API docs with [Doxygen](https://www.doxygen.nl/).
+* **Project README.** You're reading the project README right now. It includes all the essential documentation, including a datasheet, installation, usage and build process.
 
-* **Other documentation.** Extensive project documentation about planned features, used technologies, frequent tasks and related projects and initiatives is available as a Dynalist document ["Food Rescue App Documentation"](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA). The same content is also available as an exported version under `doc/doc.html` in this repository. But the export is still rough and does not support proper navigation in the document, so at this time the Dynalist live document is preferable.
+* **Developer knowledge base.** Extensive documentation about planned features, used technologies, frequent tasks and related projects and initiatives is available as a Dynalist document ["Food Rescue App Documentation"](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA). The same content is also available as an exported version under `doc/doc.html` in this repository. But the export is still rough and does not support proper navigation in the document, so at this time the Dynalist live document is preferable.
+
+* **Code documentation.** The project's C++ source files contain in-code documentation that you can compile into full API docs with [Doxygen](https://www.doxygen.nl/).
+
+* **Database documentation.** The database used by Food Rescue App is developed in its own project [Food Rescue Content](https://github.com/fairdirect/foodrescue-content), which comes with its own set of documentation.
 
 
 # 2. Installation
@@ -222,7 +244,7 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
 * **Qt 5.13 support.** The [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) message tells that even in that version, Qt 5.13 has issues with "older NDKs", which we assume here to mean versions before Android NDK 19. In the commits until 2020-06-08, there is no indication that these issues were fixed.
 
-* **Qt 5.14 support.** When trying Qt ≥5.14 for Android with ECM 5.62, you would see `androiddeployqt` fail during the build process with the error message "No target architecture defined in json file". This seems to be due to the same change in Qt that also caused the equivalent issues [#35](https://github.com/LaurentGomila/qt-android-cmake/issues/35) in [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake) and [#23306](https://bugreports.qt.io/browse/QTCREATORBUG-23306) in the CMake scripts for Android deployment that come with Qt Creator. It has to be fixed in every set of CMake scripts that for Android deployment, and ECM is yet another one of these. It was fixed with ECM [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) – see the commit message there. That commit was on 2020-03-03 and the [Git tag list](https://invent.kde.org/frameworks/extra-cmake-modules/-/tags) shows it landed in 5.68.0.
+* **Qt 5.14 support.** When trying Qt ≥5.14 for Android with ECM 5.62, you would see `androiddeployqt` fail during the build process with the error message "No target architecture defined in json file". This seems to be due to the same change in Qt that also caused the equivalent issues [#35](https://github.com/LaurentGomila/qt-android-cmake/issues/35) in [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake) and [#23306](https://bugreports.qt.io/browse/QTCREATORBUG-23306) in the CMake scripts for Android deployment that come with Qt Creator. It has to be fixed in every set of CMake scripts that are used for Android deployment, and ECM is yet another one of these. It was fixed with ECM [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) – see the commit message there. That commit was on 2020-03-03 and the [Git tag list](https://invent.kde.org/frameworks/extra-cmake-modules/-/tags) shows it landed in 5.68.0.
 
 
 ## 5.2. Desktop Development Setup
@@ -726,7 +748,7 @@ If you use Qt Creator as your IDE, here are ways to make developing for this (an
    ```
 
 
-# 6. Release Process
+# 6. Release Guide
 
 The default build type is "Debug". To create a release build that is ready for packaging and uploading, follow the process below:
 
