@@ -68,7 +68,7 @@ Kirigami.ScrollablePage {
             ) +
             qsTr(
                 '<p>To fulfill the requirements of Qt\'s LGPL v3 licence, the source code and compilation instructions ' +
-                'of this program are available in the Github repository' +
+                'of this program are available in the Github repository ' +
                 '<a href="https://github.com/fairdirect/foodrescue-app">fairdirect/foodrescue-app</a>.</p>'
             ) +
             qsTr(

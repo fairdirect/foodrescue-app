@@ -215,7 +215,11 @@ In all the above cases, dependencies are connected to this application only via 
 
 # 5. Development Guide
 
-The following chapters provide a setup to build Food Rescue App under Ubuntu Linux 20.04 LTS. The instructions are mostly the same under Ubuntu 19.10 and under other Ubuntu flavors and other [Debian (Testing) based Linux distributions](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian_%28Testing%29_based). But if you are setting up your development environment under Windows or Mac OS X, you are so far on your own; you can however learn the required versions of Android SDK, NDK, Qt, KDE ECM and Kirigami from the instructions below.
+The following chapters provide a setup to build Food Rescue App under Ubuntu Linux 20.04 LTS. The instructions are mostly the same under other Ubuntu flavors and other [Debian (Testing) based Linux distributions](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian_%28Testing%29_based).
+
+Do not try to do this setup under earlier versions of Ubuntu Linux, such as Ubuntu 19.10. Kirigami 5.68.0 will require ECM 5.68.0 which will require cmake 3.16 which is not available in the repositories of that distro. Trying to install the cmake package from Ubuntu 20.04 will also not be possible. It is somehow possible to make this setup (I made it once under Ubuntu 19.10), but the time is better invested updating the development system.
+
+If you are setting up your development environment under Windows or Mac OS X, you are so far on your own; you can however learn the required versions of Android SDK, NDK, Qt, KDE ECM and Kirigami from the instructions below.
 
 
 ## 5.1. Dependencies Overview
@@ -262,16 +266,16 @@ While the Android platform and Qt library interfaces are mature and almost alway
 1. **Install basic development tooling.** Under Ubuntu 20.04 LTS, install with:
 
      ```
-     sudo apt install build-essential cmake
+     sudo apt install build-essential cmake checkinstall
      ```
 
-2. **Install Extra CMake Modules (ECM).** Under Ubuntu 20.04 LTS, you can install them with:
+2. **Install Extra CMake Modules (ECM).** Under Ubuntu 20.04 LTS, you can install ECM 5.68.0 with:
 
     ```
     sudo apt install extra-cmake-modules
     ```
 
-    However, if you want to work with Qt ≥5.14 and / or Android NDK ≥19, you need ECM ≥5.68.0. In that case, install them with:
+    ECM ≥5.68.0 is required for Qt ≥5.14, for Android NDK ≥19 and for Kirigami 5.68.0 (as installed below). There is no need for an even newer version. But if you encounter that need, or if your distribution does not provide ECM ≥5.68.0, you can install ECM manually as follows:
 
     ```
     git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
@@ -298,7 +302,7 @@ While the Android platform and Qt library interfaces are mature and almost alway
     sudo apt install kirigami2-dev libkf5kirigami2-doc
     ```
 
-    If you have to install Kirigami 5.68.0 manually, choose the corresponding commit `f47bf906` ([source](https://invent.kde.org/frameworks/kirigami/-/tags)). Avoiding a higher version can be necessary if it does not build with your system's Qt libraries otherwise.
+    Under other distributions, you may have to install Kirigami 5.68.0 manually; in that case choose the corresponding commit `f47bf906` ([source](https://invent.kde.org/frameworks/kirigami/-/tags)). Avoiding a higher version can be necessary as that higher version may require newer Qt libraries than provided by your system.
 
     Note that KDE Kirigami is a lightweight library independent of the KDE Plasma desktop environment – it has no dependencies beyond Qt, and you don't need KDE Plasma installed to use it or develop for it.
 
@@ -316,16 +320,18 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
     ```
     cd /some/out-of-source/path/
-    git clone --depth 1 https://github.com/nu-book/zxing-cpp.git
-    git checkout 57c4a89
+    git clone https://github.com/nu-book/zxing-cpp.git
     cd zxing-cpp
-    mkdir -p build/linux-amd64 && cd build/linux-amd64
+    git checkout 57c4a89
 
+    mkdir -p build/linux-amd64 && cd build/linux-amd64
     cmake ../..
     make
     sudo checkinstall --pkgname zxing-cpp --pkgversion "1.0.8+57c4a89" --nodoc make install
     sudo ldconfig
     ```
+
+    TODO: In the above instructions, do a shallow clone that contains the history only starting from the relevant commit 57c4a89. Not sure if there is any good solution for that, though. See: https://stackoverflow.com/q/31278902.
 
 8. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packages on demand, you can install all the Qt header files already:
 
@@ -342,13 +348,11 @@ While the Android platform and Qt library interfaces are mature and almost alway
 
     1. To build that database, follow [the project's README](https://github.com/fairdirect/foodrescue-content#readme). To install it.
 
-    2. Select the directory where to install the database. This depends on your operating system. Select a suitable location with path type `AppLocalDataLocation` from [Qt's list of standard locations](https://doc.qt.io/qt-5/qstandardpaths.html#StandardLocation-enum). For Linux, this would be `~/.local/share/foodrescue/` or `/usr/local/share/foodrescue/`.
+    2. Select the directory where to install the database. This depends on your operating system. Select a suitable location with path type `AppLocalDataLocation` from [Qt's list of standard locations](https://doc.qt.io/qt-5/qstandardpaths.html#StandardLocation-enum). For Linux, this would be `/usr/local/share/foodrescue/` or `~/.local/share/foodrescue/`.
 
     3. Copy the database there, using filename `foodrescue-content.sqlite3`.
 
     4. Add the relevant indexes to the database. They increase database size by ~12% but reduce the query time of the typical queries in Food Rescue App from 44 s to 0.2 s.
-
-        TODO: Add these indexes by default in the database build process, then remove the instruction from here.
 
         ```
         sqlite3 foodrescue-content.sqlite3 <<SQLEND
@@ -356,6 +360,8 @@ While the Android platform and Qt library interfaces are mature and almost alway
             CREATE INDEX idx_categories_topics ON topic_categories(category_id,topic_id);
         SQLEND
         ```
+
+        TODO: Add these indexes by default in the database build process, then remove the instruction from here.
 
 
 ## 5.3. Desktop Build Process
@@ -368,7 +374,20 @@ You can also build this the Android application from inside Qt Creator. See chap
     git clone git@github.com:fairdirect/foodrescue-app.git
     ```
 
-2. **Build the application.**
+    Or if working on a host where you did not set up your SSH key you use for Github:
+
+    ```
+    git clone git://github.com/fairdirect/foodrescue-app
+    ```
+
+2. **Build the translation files.** (Context: [process to update translation files](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA#z=b4LNy6sLKwEfTkXtMVXP9NlP).)
+
+    ```
+    cd foodrescue-app
+    lrelease src/i18n/foodrescue_*.ts
+    ```
+
+3. **Build the application.**
 
     ```
     cd foodrescue-app
@@ -382,7 +401,7 @@ You can also build this the Android application from inside Qt Creator. See chap
 
     As an alternative to `cmake --build .`, you can also simply run `make`, because CMake is a tool that generates GNU Make makefiles.
 
-3. **Run the application.** To run the application in place without installing it, you'd do:
+4. **Run the application.** To run the application in place without installing it, you'd do:
 
     ```
     ./bin/foodrescue
@@ -397,7 +416,9 @@ You can also build this the Android application from inside Qt Creator. See chap
 
 ## 5.4. Android Development Setup
 
-1. **Make the development setup for the desktop version.** Follow all steps from chapter "[5.2. Desktop Version Development Setup](#52-desktop-version-development-setup)". Make sure you can build and execute a desktop version; you can also do that during Android development to quickly test code that is not Android-specific.
+The following instructions set up all dependencies for Food Rescue App. The commands as shown below are for the `armeabi-v7a` Android ABI, but you can adapt them to your targeted ABI; the instructions have been tested successfully for both `armeabi-v7a` and `x86` already.
+
+1. **Make the development setup for the desktop version.** Follow all steps from chapter "[5.2. Desktop Version Development Setup](#52-desktop-version-development-setup)". Ideally also make sure you can build and execute a desktop version; you can also do that during Android development to quickly test code that is not specific to Android. (If you want to build for Android only, you don't have to follow the steps to install Qt or Kirigami for the desktop version. But then you can't test with the desktop version either, obviously.)
 
 2. **Create an Android installation directory.** Different from development of a desktop software, all components of the Android software must be installed. This is required for building an Android APK package with `make create-apk`. Note that Food Rescue App and all its custom libraries must be installed into the *same* directory for the Android APK building to succeed (TODO: Confirm that with a fresh build). We'll create an installation directory inside the repository directory of `foodrescue-app` (which you already have from the desktop setup):
 
@@ -413,11 +434,12 @@ You can also build this the Android application from inside Qt Creator. See chap
     sudo update-alternatives --config java
     ```
 
-4. **Install `sdk-tools-linux-4333796.zip`.** Do not install the new edition of this, called "commandlinetools 1.0" as provided on the [Android Studio download page](https://developer.android.com/studio) ([reasons](https://stackoverflow.com/a/62073804)).
-Download and unpack the package to the place that will later also host the Android SDK:
+4. **Install `sdk-tools-linux-4333796.zip`.** Do not install the newer replacement for this, called "commandlinetools 1.0" as provided on the [Android Studio download page](https://developer.android.com/studio) ([reasons](https://stackoverflow.com/a/62073804)).
+
+    Download and unpack the package to the place that will later also host the Android SDK:
 
     ```
-    cd /opt/android-sdk/
+    mkdir -p /opt/android-sdk/ && cd /opt/android-sdk/
     wget https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
     unzip sdk-tools-linux-4333796.zip
     ```
@@ -428,32 +450,45 @@ Download and unpack the package to the place that will later also host the Andro
     sudo ln -s /opt/android-sdk/tools/bin/sdkmanager /usr/local/bin/
     ```
 
-5. **Install the Android stack.** Use the now-installed `sdkmanager` to download the SDK packages required for Android development ([source](https://doc.qt.io/qtcreator/creator-developing-android.html#requirements)).
-
-    Choose an Android SDK platform (like `platforms;android-29`) that provides at least the API level of your device. Choosing a newer SDK here is no problem, as restricting created APK packages to require a lower API level for installation is possible. The API level number supported by your Android testing device can be found [here](https://developer.android.com/studio/releases/platforms).
-
-
-    The version of the build tools has to correspond to the version of the Android SDK platform, but will not be the same version. For example in the versions chosen below, indeed, build tools 28.0.2 are required to go together with Android platform SDK 29. The requirements can be found on [this page](https://developer.android.com/studio/releases/platforms).
-
-    According to the [official Qt Creator installation instructions](https://doc.qt.io/qtcreator/creator-developing-android.html#setting-up-the-development-environment), for Qt 5.12.0 to 5.12.5 (which we use here), the correct versions of Android stack packages are installed with the commands below. Except, we stick with Android NDK 18 due to an open issue (TODO: link) in KDE's `extra-cmake-modules` with finding the C++ standard library when using Android NDK ≥19.
-
-    ```
-    sdkmanager --install "platform-tools" "platforms;android-29" "build-tools;28.0.2" "ndk;18.1.5063045"
-    ```
-
-    Then batch-accept the licences ([see](https://stackoverflow.com/a/4682241)):
+5. **Install the Android stack.** Use the now-installed `sdkmanager` to download the SDK packages required for Android development ([source](https://doc.qt.io/qtcreator/creator-developing-android.html#requirements)). It starts with batch-accepting all the licences so we don't have to bother with that stuff ever again later ([see](https://stackoverflow.com/a/4682241)).
 
     ```
     yes | sdkmanager --licenses
+    sdkmanager --install "platform-tools" "platforms;android-29" "build-tools;28.0.2" "ndk;18.1.5063045"
     ```
 
-6. **Install Qt for Android.** Needed because the Ubuntu repositories contain only the desktop variant "Qt 5.12.5 (GCC 5.3.1 … 64 bit)". For Android, we need a variant compiled for ARMv7 / ARMv8 architecture instead. The below is the most comfortable way to install Qt for Android; for other options, [see here](https://stackoverflow.com/a/62090264).
+    Explanations:
+
+    We choose an Android SDK platform (like `platforms;android-29`) that provides at least the API level of your device. Choosing a newer SDK here is no problem, as restricting created APK packages to require a lower API level for installation is possible. The API level number supported by your Android testing device can be found [here](https://developer.android.com/studio/releases/platforms).
+
+    The version of the build tools has to correspond to the version of the Android SDK platform, but will not be the same version. For example in the versions chosen below, indeed, build tools 28.0.2 are required to go together with Android platform SDK 29. The requirements can be found on [this page](https://developer.android.com/studio/releases/platforms).
+
+    According to the [official Qt Creator installation instructions](https://doc.qt.io/qtcreator/creator-developing-android.html#setting-up-the-development-environment), for Qt 5.12.0 to 5.12.5 (which we use here), the correct versions of Android stack packages are installed with the commands used above. Except, we stick with Android NDK 18 due to an open issue (TODO: link) in KDE's `extra-cmake-modules` with finding the C++ standard library when using Android NDK ≥19.
+
+6. **Install Qt for Android.** Needed because the Ubuntu repositories contain only the desktop variant "Qt 5.12.5 (GCC 5.3.1 … 64 bit)". For Android, we need a variant compiled for ARMv7 and / or ARMv8 architecture instead, and / or even a variant for x86 Android if you intend the application to be used on Android emulators. The below is the most comfortable way to install Qt for Android; for other options, [see here](https://stackoverflow.com/a/62090264).
 
     1. **Install [`aqtinstall`](https://github.com/miurahr/aqtinstall/).** This is an unofficial installer to install any platform version of Qt on any platform. This is needed because the version of Qt provided in the Ubuntu repositories does not provide the Qt Maintenance Tool that could be used as an alternative.
 
-    2. **Install Qt for Android.** Use `aqtinstall` to install Qt 5.12.5 for Android. This is the version contained in Ubuntu 20.04 LTS, matching the version you use for desktop development. Matching versions exactly is not strictly necessary, but avoids surprises and keeping two sets of documentation at hand.
+        ```
+        sudo apt install python3-pip
+        pip3 install aqtinstall
+        ```
 
-        You can also install Qt 5.13 for Android or higher, but will need additional steps: for Qt 5.13.x or higher, you have to update your `extra-cmake-modules` package manually to 5.68.0 (see chapter [5.1. Version Compatibility Matrix](#51-version-compatibility-matrix)); and for Qt 5.14 or higher additionally you have to [adapt the Android Manifest file](https://stackoverflow.com/a/62108461) of this application. For Qt 5.15, additional steps may be necessary as that has not been tested yet. The next version after Qt 5.15 will probably be Qt 6, to which Kirigami and this application would have to be ported first.
+    2. **Install Qt for Android.** Use `aqtinstall` to install Qt 5.12.5 for Android.
+
+        ```
+        mkdir /opt/qt/
+        aqt install --outputdir /opt/qt/ 5.12.5 linux android android_armv7
+
+        # Optionally, if you also want to compile for the "minor" Android architectures:
+        aqt install --outputdir /opt/qt/ 5.12.5 linux android android_arm64_v8a
+        aqt install --outputdir /opt/qt/ 5.12.5 linux android android_x86
+
+        # The following architecture also exists, but not in all Qt versions:
+        aqt install --outputdir /opt/qt/ 5.12.5 linux android android_x86_64
+        ```
+
+        Explanations: This is the version contained in Ubuntu 20.04 LTS, matching the version you use for desktop development. Matching versions exactly is not strictly necessary, but avoids surprises and keeping two sets of documentation at hand. You can also install Qt 5.13 for Android or higher, but will need additional steps: for Qt 5.13.x or higher, you have to update your `extra-cmake-modules` package manually to 5.68.0 (see chapter [5.1. Version Compatibility Matrix](#51-version-compatibility-matrix)); and for Qt 5.14 or higher additionally you have to [adapt the Android Manifest file](https://stackoverflow.com/a/62108461) of this application. For Qt 5.15, additional steps may be necessary as that has not been tested yet. The next version after Qt 5.15 will probably be Qt 6, to which Kirigami and this application would have to be ported first.
 
 7. **Install Kirigami for Android.** We want to cross-compile an application for Android that depends on Kirigami. Ubuntu repositories do not provide Kirigami built for Android, so we have to do that ourselves. Instructions are mostly [from here](https://community.kde.org/Marble/AndroidCompiling#Setting_up_Kirigami). Note that for desktop builds, we use Kirigami from system packages instead.
 
@@ -471,25 +506,24 @@ Download and unpack the package to the place that will later also host the Andro
         git checkout f47bf906
         ```
 
-    3. Run CMake with the environment variables it requires. Be sure to adapt `CMAKE_INSTALL_PREFIX` to point to your Android installation directory, relative to the Kirigami build directory. (You defined this in step "2. Create an Android installation directory".)
+    3. Run CMake with the environment variables it requires. For the explanation of the variables, see the documentation for the foodrescue-app CMake run in [5.5. Android Build Process](#55-android-build-process).
 
         ```
-        mkdir -p build/android && cd build/android
+        # Adapt to your Android architecture. We use the aqtinstall architecture names here by convention:
+        # android_armv7, android_arm64_v8a, android_x86, android_x86_64
+        mkdir -p build/android_armv7 && cd build/android_armv7
 
         export ANDROID_SDK_ROOT=/opt/android-sdk
         export ANDROID_NDK=/opt/android-sdk/ndk/18.1.5063045
-        export ANDROID_ARCH_ABI=armeabi-v7a
         export ANDROID_PLATFORM=23
+        export ANDROID_ARCH_ABI=armeabi-v7a
 
         cmake ../.. \
-          -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake \
+          -DCMAKE_SYSROOT=/opt/android-sdk/ndk/18.1.5063045/platforms/android-21/arch-arm \
+          -DCMAKE_TOOLCHAIN_FILE=/usr/share/ECM/toolchain/Android.cmake \
           -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 \
           -DCMAKE_INSTALL_PREFIX=../../../../install/android
         ```
-
-        TODO: Explain what these variables mean.
-
-        TODO: `export ANDROID_PLATFORM=23` might not be required.
 
     4. Build and install:
 
@@ -506,9 +540,11 @@ Download and unpack the package to the place that will later also host the Andro
         cd /path-to-your/zxing-cpp/
         ```
 
-    2. **Configure the build.** Be sure to point `CMAKE_INSTALL_PREFIX` to your installation directory; the command below is aleready suitable if you defined it as instructed above.
+    2. **Configure the build.** Explanations of the variables:
 
-        Note: The command line options to not build the example applications prevent a build fail in step "Linking CXX executable ZXingWriter" with error message "ZXingWriter.cpp.o: requires unsupported dynamic reloc R_ARM_REL32". We don't need these examples for Android, and they are probably not made for Android anyway.)
+        * **`BUILD_…`**. Setting the CMake variables `BUILD_…=OFF` prevents building the ZXing-C++ examples, which would fail in step "Linking CXX executable ZXingWriter" with error message "ZXingWriter.cpp.o: requires unsupported dynamic reloc R_ARM_REL32". We don't need these examples for Android, and they are probably not made for Android anyway.
+
+        * *(For all other variables, see the documentation for the foodrescue-app CMake run in [5.5. Android Build Process](#55-android-build-process).)*
 
         ```
         mkdir -p build/android && cd build/android
@@ -519,7 +555,7 @@ Download and unpack the package to the place that will later also host the Andro
         export ANDROID_PLATFORM=23
 
         cmake ../.. \
-          -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake \
+          -DCMAKE_TOOLCHAIN_FILE=/usr/share/ECM/toolchain/Android.cmake \
           -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 \
           -DBUILD_EXAMPLES=OFF \
           -DBUILD_BLACKBOX_TESTS=OFF \
@@ -562,21 +598,24 @@ if it's not found. However, it would clone it into the build directory, and that
         * **If you use another desktop environment:** Change the icon theme in the ways your desktop environment wants it to be done. Qt applications should pick up this change.
         * **If nothing else works:** Install the Qt5 Configuration Tool (`sudo apt install qt5ct`) and in tab "Icon Theme" select "Breeze".
 
-9. **Install the database.** Since we installed the food rescue database in the desktop development setup already, we only have to symlink it now into the `src/android/assets/` directory. That will cause it to be included as a file when `make create-apk` creates the Android APK package later. And we'll not have yet another version of the database to keep up to date.
+10. **Install the database.** Since we installed the food rescue database in the desktop development setup already, we only have to symlink it now into the `src/android/assets/` directory. That will cause it to be included as a file when `make create-apk` creates the Android APK package later. And we'll not have yet another version of the database to keep up to date.
 
     ```
-    ln -s /path/to/your/foodrescue-content.sqlite3 src/android/assets/
+    mkdir src/android/assets/
+    ln -s /usr/local/foodrescue/foodrescue-content.sqlite3 src/android/assets/
     ```
 
+    TODO: Include the directory `src/android/assets/` into the repo, then remove the step above to create it.
 
-10. **Adapt the makefile.** Due to open issues with the build process, right now you have to adapt `src/CMakeLists.txt` to your system as follows:
+
+11. **Adapt the makefile.** Due to open issues with the build process, right now you have to adapt `src/CMakeLists.txt` to your system as follows:
 
     * In `set(foodrescue_EXTRA_LIBS …)` adapt the path to `libQt5Concurrent.so` for your system.
 
 
 ## 5.5. Android Build Process
 
-The following instructions create and install an APK package that will run successfully as an app under Android.
+The following instructions create and install an APK package that will run successfully as an app under Android. The commands as shown below are for the `armeabi-v7a` Android ABI, but you can adapt them to your targeted ABI; the instructions have been tested successfully for both `armeabi-v7a` and `x86` already.
 
 1. **Enter into the repository directory.**
 
@@ -584,34 +623,51 @@ The following instructions create and install an APK package that will run succe
     cd foodrescue-app
     ```
 
-2. **Run CMake with the environment variables it requires.** The variables and how to adapt them to your system if needed::
+2. **Build the translation files.** (Context: [process to update translation files](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA#z=b4LNy6sLKwEfTkXtMVXP9NlP).)
 
-    * **`QTANDROID_EXPORTED_TARGET`:** A name component that will appear in Makefile targets to create the Android APK package define by a corresponding variable via `${ANDROID_APK_DIR}/AndroidManifest.xml`. Since we will only run `make && make install` later this name can be anything as it's not used directly, but it has to be define for CMake to not complain.
+    ```
+    cd foodrescue-app
+    lrelease src/i18n/foodrescue_*.ts
+    ```
 
-    * **`ANDROID_APK_DIR`:** A path to the directory in your source tree that contains `AndroidManifest.xml` and also any other files that you want included into the Android APK package. Especially, files placed into an `assets/` sub-directory in here will be available in the Android app's [`assets/` directory](https://developer.android.com/guide/topics/resources/providing-resources#OriginalFiles).
+3. **Run CMake with the environment variables it requires.** All paths should be given as absolute paths; it may work with relative paths in some cases, but has lead to so many issues time and again that it's not worth trying. Better just use `$(readlink -f …)` to convert a relative path to an absolute one at runtime. The variables and how to adapt them to your system if needed, in order of appearance:
+
+    * **`ANDROID_SDK_ROOT`.** TODO: Document.
+
+    * **`ANDROID_NDK`.** TODO: Document.
+
+    * **`ANDROID_ARCH_ABI`:** Adapt to the ABI ("application binary interface") of the targeted Android devices. The [available values](https://developer.android.com/ndk/guides/abis) are: `armeabi-v7a` (compatible with more or less all physical Android devices), `arm64-v8a` (newer physical Android devices), `x86` (Android emulators running on PCs, using 32 bit, including [appetize.io](https://appetize.io/)), `x86_64` (Android emulators running on PCs, using 64 bit).
+
+    * **`ANDROID_PLATFORM`.** API version of your Android SDK. TODO: Check if this is needed to be set at all; maybe it is not.
+
+    * **`QTANDROID_EXPORTED_TARGET`.** A name component that will appear in Makefile targets to create the Android APK package define by a corresponding variable via `${ANDROID_APK_DIR}/AndroidManifest.xml`. Since we will only run `make && make install` later this name can be anything as it's not used directly, but it has to be define for CMake to not complain.
+
+    * **`ANDROID_APK_DIR`.** A path to the directory in your source tree that contains `AndroidManifest.xml` and also any other files that you want included into the Android APK package. Especially, files placed into an `assets/` sub-directory in here will be available in the Android app's [`assets/` directory](https://developer.android.com/guide/topics/resources/providing-resources#OriginalFiles). Symlinks will be de-referenced and included as the files they point to.
 
         Placing your `AndroidManifest.xml` here is required in ECM's [`Android.cmake` toolchain l. 211](https://invent.kde.org/frameworks/extra-cmake-modules/-/blob/master/toolchain/Android.cmake#L211). If this is not set correctly, ECM will use Qt's default manifest template, causing your app package to be named `org.qtproject.example.appname`, the app icons to be missing etc.. While you can use a path relative to the current directory here, it is better to use an absolute path because only that will give an error instead of silently using Qt's default manifest ([see](https://invent.kde.org/frameworks/extra-cmake-modules/-/blob/13a1161/toolchain/Android.cmake#L200)).
 
-    * **`CMAKE_ANDROID_ASSETS_DIRECTORIES`**: Points to directories that will be also be included into the Android `assets/` folder of the Android APK package. Files from here will not be found in the installation directory (`CMAKE_INSTALL_PREFIX`), just in the APK package. You do not need to mention `${ANDROID_APK_DIR}/assets/` here, as that is automatically included into the APK's assets directory.
+    * **`CMAKE_SYSROOT`.** Defaults to `/opt/android-sdk/ndk/18.1.5063045/platforms/android-21/arch-arm` and thus not necessary when compiling for ARM-based Android. However, when compiling for Android for the `x86` platform, you have to set this to `/opt/android-sdk/ndk/18.1.5063045/platforms/android-21/arch-x86`.
 
-    * **`ECM_DIR`:** TODO: Document.
+    * **`CMAKE_TOOLCHAIN_FILE`.** If you installed ECM manually, adapt this accordingly.
 
-    * **`CMAKE_TOOLCHAIN_FILE`:** TODO: Document.
+    * **`ECM_ADDITIONAL_FIND_ROOT_PATH`.** TODO: Document.
 
-    * **`ECM_ADDITIONAL_FIND_ROOT_PATH`:** TODO: Document.
+    * **`CMAKE_PREFIX_PATH`.** TODO: Document.
 
-    * **`ANDROID_SDK_BUILD_TOOLS_REVISION`:** TODO: Document.
+    * **`ANDROID_SDK_BUILD_TOOLS_REVISION`.** TODO: Document.
 
-    * **`CMAKE_INSTALL_PREFIX`:** Adapt the value to the installation directory chosen at the start of this "Android Development Setup" section. The directory must be the same for the installation of ZXing, Kirigami and this application. It must be given as an absolute path because the APK creation step after the compilation will fail otherwise. We use `readlink -f` to automatically translate a relative to an absolute path.
+    * **`CMAKE_INSTALL_PREFIX`.** Adapt the value to the installation directory chosen at the start of section [5.4. Android Development Setup](#54-android-development-setup). The directory must be the same for the installation of ZXing, Kirigami and this application. For Food Rescue App it must be given as an absolute path because the APK creation step after the compilation will fail otherwise. For other builds you can use relative paths but better always use `readlink -f` to automatically translate a relative to an absolute path.
 
-    * **`KF5Kirigami2_DIR`:** An absolute path to a directory with the `KF5Kirigami2Config.cmake` file that defines the Kirigami CMake package. It is located in a sub-directory of the installation directory chosen above. CMake configuration with a relative path will fail at least with CMake 3.15.4 or newer. About creating the absolute path with `readlink -f` see on `CMAKE_INSTALL_PREFIX`.
+    * **`KF5Kirigami2_DIR`.** An absolute path to a directory with the `KF5Kirigami2Config.cmake` file that defines the Kirigami CMake package. It is located in a sub-directory of the installation directory chosen above. CMake configuration with a relative path will fail at least with CMake 3.15.4 or newer. About creating the absolute path with `readlink -f` see on `CMAKE_INSTALL_PREFIX`.
 
-    * **`ZXing_DIR`:** An absolute path to a directory with the `ZXingConfig.cmake` file that defines the ZXing CMake package. It is located in a sub-directory of the installation directory chosen above. About the absolute path see on `CMAKE_INSTALL_PREFIX`.
+    * **`ZXing_DIR`.** An absolute path to a directory with the `ZXingConfig.cmake` file that defines the ZXing CMake package. It is located in a sub-directory of the installation directory chosen above. About the absolute path see on `CMAKE_INSTALL_PREFIX`.
+
+    * **`CMAKE_ANDROID_ASSETS_DIRECTORIES`.** Optional. Points to directories that will be also be included into the Android `assets/` folder of the Android APK package. Files from here will not be found in the installation directory (`CMAKE_INSTALL_PREFIX`), just in the APK package. You do not need to mention `${ANDROID_APK_DIR}/assets/` here, as that is automatically included into the APK's assets directory.
 
     The code to run CMake (after you adapted the variables as explained above):
 
     ```
-    mkdir -p build/Android.ConsoleKit && cd build/Android.ConsoleKit3
+    mkdir -p build/Android.ConsoleKit && cd build/Android.ConsoleKit
 
     export ANDROID_SDK_ROOT=/opt/android-sdk
     export ANDROID_NDK=/opt/android-sdk/ndk/18.1.5063045
@@ -620,26 +676,46 @@ The following instructions create and install an APK package that will run succe
 
     cmake ../.. \
       -DQTANDROID_EXPORTED_TARGET=foodrescue \
-      -DANDROID_APK_DIR=../../src/android \
-      -DCMAKE_TOOLCHAIN_FILE=/usr/local/share/ECM/toolchain/Android.cmake \
+      -DANDROID_APK_DIR=$(readlink -f ../../src/android) \
+      -DCMAKE_SYSROOT=/opt/android-sdk/ndk/18.1.5063045/platforms/android-21/arch-arm \
+      -DCMAKE_TOOLCHAIN_FILE=/usr/share/ECM/toolchain/Android.cmake \
       -DECM_ADDITIONAL_FIND_ROOT_PATH=/opt/qt/5.12.4/android_armv7 \
       -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 \
       -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 \
-      -DCMAKE_INSTALL_PREFIX=../../install/android \
+      -DCMAKE_INSTALL_PREFIX=$(readlink -f../../install/android) \
       -DKF5Kirigami2_DIR=$(readlink -f ../../install/android/lib/cmake/KF5Kirigami2) \
       -DZXing_DIR=$(readlink -f ../../install/android/lib/cmake/ZXing)
     ```
 
-    TODO: The line `export ANDROID_PLATFORM=23` might not be needed.
-
-3. **Build the application.** You could also just `make` first to see if the compilation step is successful. Note that `make install` is necessary before every `make create-apk` as otherwise newly added files like icons would not land in the Android APK package. Only the files found in `${CMAKE_INSTALL_PREFIX}` when `make create-apk` runs will make it to the APK package! (This should be considered a bug in the build dependencies and we'll try to get it fixed.)
+4. **Build the application.** Note that `make install` is necessary before every `make create-apk` as otherwise newly added files like icons would not land in the Android APK package. Only the files found in `${CMAKE_INSTALL_PREFIX}` at the time when `make create-apk` runs will make it to the APK package! (TODO: This seems to be a bug in the build dependencies, we should try to get it fixed.)
 
     ```
+    make
     make install
     make create-apk
     ```
 
-4. **Install the application to your Android device.** First enable `adb` debug mode on your Android device, pair it with `adb` on the computer, and then execute:
+    You can ignore all the following error messages during the `make create-apk` step; they do not lead to any failures at runtime. (TODO: Investigate and fix the cause of these error messages.)
+
+    ```
+    could not find libm.so in
+      …/foodrescue-app/build/…/bin
+      …/foodrescue-app/install/android/lib/
+      /opt/qt/5.12.5/android_armv7
+    could not find libc++_shared.so in [… as above]
+    could not find libdl.so in [… as above]
+    could not find libc.so in [… as above]
+
+    readelf: Error: '/opt/qt/5.12.5/android_armv7/lib/' is not an ordinary file
+
+    Warning: QML import could not be resolved in any of the import paths: local
+    Warning: QML import could not be resolved in any of the import paths: org.kde.kirigami
+    Warning: QML import could not be resolved in any of the import paths: org.kde.kirigami.private
+    Warning: QML import could not be resolved in any of the import paths: QtQuick.Controls.…
+    Warning: QML import could not be resolved in any of the import paths: Qt.test.qtestroot
+    ```
+
+5. **Install the application to your Android device.** First enable `adb` debug mode on your Android device, pair it with `adb` on the computer, and then execute:
 
     ```
     make install-apk-foodrescue
@@ -648,18 +724,15 @@ The following instructions create and install an APK package that will run succe
     This command might not work due to an unresolved issue in ECM about naming the APK file. In that case, you can run the following command to install the APK:
 
     ```
-    adb install -r ./foodrescue_build_apk//build/outputs/apk/debug/foodrescue_build_apk-debug.apk
+    adb install -r ./foodrescue_build_apk/build/outputs/apk/debug/foodrescue_build_apk-debug.apk
     ```
 
     Both commands will first remove a previous version of the app from the device if necessary, but without removing application data or granted permissions. If you rather want to do a completely clean install (for example because you want to force using a new version of the database that is bundled into the APK package), then rather use do this:
 
     ```
     adb uninstall org.fairdirect.foodrescue
-    adb install ./foodrescue_build_apk//build/outputs/apk/debug/foodrescue_build_apk-debug.apk
+    adb install ./foodrescue_build_apk/build/outputs/apk/debug/foodrescue_build_apk-debug.apk
     ```
-
-
-You can also build this the Android application from inside Qt Creator. See chapter [5.4. Qt Creator configuration](54-qt-creator-configuration).
 
 
 ## 5.6. Qt Creator Setup
