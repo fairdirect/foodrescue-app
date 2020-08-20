@@ -53,6 +53,15 @@ This repository contains an open source application to help assess if food is st
 The application is built with KDE Kirigami, a rather unknown but powerful base technology that makes this a native, cross-platform, desktop/mobile convergent application. See below for the full list of features enabled by this choice.
 
 
+**Demo:** An online demo of the Android version of Food Rescue App is [available on appetize.io](https://appetize.io/app/hkw36e77yj8bqra3mufde078ug?device=nexus7&scale=75&orientation=landscape&osVersion=8.1). This gives you a complete, browser based Android emulator with Food Rescue App pre-installed to try it out. Due to the nature of operating an Android device through the browser, not all features are available. Notes:
+
+* The "scan barcode" button only shows a dummy camera view and you cannot scan barcodes.
+
+* To look up content associated with barcodes, you can however type their numbers directly into the search field. Good examples are: `1000110007387`, `2165741004149`, `2205873003013`.
+
+* The most interesting way to interact with the demo is to look up the content for food categories by entering the categories into auto-complete search field. Type whatever English food category names you can think of; or also names in other languages after changing the application language in the settings.
+
+
 **Features:**
 
 * **Mobile/desktop Convergent.** The application runs from the same codebase and with the same user interface as a native (!) application on both phones, tablets and desktop computers. This is made possible by Qt 5 and, based on that, the [KDE Kirigami](https://kde.org/products/kirigami/) framework. Kirigami is a niche technology right now and not advertised much, but it totally works and allows an efficient "write once, run everywhere" development mode that also reduces software maintenance costs because there is only one codebase.
@@ -88,7 +97,7 @@ The application is built with KDE Kirigami, a rather unknown but powerful base t
 
 * **Memory consumption due to Qt.** Applications are supposed to use the UI libraries of the operating system. This is quite memory efficient, as the shared library system means that the code of these libraries is mapped into the virtual memory spaces of all processes accessing them, without duplicating them in the main memory. However, Qt is a cross-platform library made in such a way that it provides its own UI library, implemented down to the level of OpenGL rendering. This duplicates functionality provided by the operating system and can only be shared between other processes also using the Qt libraries. Except under Desktop Linux (where Qt is widespread), Food Rescue App will often be the only Qt based process in the memory. So the memory used by the Qt libraries can be counted as additional memory use compared to an application using the OS libraries. (On the other hand, one could also argue that the problem starts with operating systems using different UI libraries and that a cross-platform UI library like Qt is the right way to do things.)
 
-    The amount of this (unavoidable) additional memory usage is about 18-20 MiB, as gauged from the SHR memory usage of a Qt 5 widget-based application (here: `tom-ui`) that does not use any libraries beyond Qt.
+    The amount of this (unavoidable) additional memory usage of "barebones Qt" is about 18-20 MiB. This has been determined from the amount of Linux shared memory of a Qt 5 widget-based application that does not use any libraries beyond Qt (here: `tom-ui`). Basically look up the process in `top` and find the value in column `SHR`. To be exact, some more would have to be added on top of the 18-20 MiB, to account for the variables associated with the Qt code in shared memory.
 
 
 **Documentation:**
