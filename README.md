@@ -4,16 +4,6 @@
 
 &nbsp;
 
-
-🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧
-
-**This application is under construction.**
-
-The code does not provide a useful application just yet. Check back at 2020-08-31 to find the first full release here, or a few weeks earlier for beta releases.
-
-🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧
-
-
 **[1. Overview](#1-overview)**<br/>
 **[2. Installation](#2-installation)**<br/>
 **[3. Usage](#3-usage)**<br/>
