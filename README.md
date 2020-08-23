@@ -53,13 +53,19 @@ This repository contains an open source application to help assess if food is st
 The application is built with KDE Kirigami, a rather unknown but powerful base technology that makes this a native, cross-platform, desktop/mobile convergent application. See below for the full list of features enabled by this choice.
 
 
-**Demo:** An online demo of the Android version of Food Rescue App is [available on appetize.io](https://appetize.io/app/hkw36e77yj8bqra3mufde078ug?device=nexus7&scale=75&orientation=landscape&osVersion=8.1). This gives you a complete, browser based Android emulator with Food Rescue App pre-installed to try it out. Due to the nature of operating an Android device through the browser, not all features are available. Notes:
+**Online Demo:** An online demo of the Android version of Food Rescue App is [available on appetize.io](https://appetize.io/app/hkw36e77yj8bqra3mufde078ug?device=nexus7&scale=75&orientation=portrait&osVersion=8.1). This gives you a complete, browser based Android emulator with Food Rescue App pre-installed to try it out. Due to the nature of operating an Android device through the browser, not all features are available. Notes:
 
-* The "scan barcode" button only shows a dummy camera view and you cannot scan barcodes.
+* **No camera.** The "scan barcode" button only shows a dummy camera view and you cannot scan barcodes.
 
-* To look up content associated with barcodes, you can however type their numbers directly into the search field. Good examples are: `1000110007387`, `2165741004149`, `2205873003013`.
+* **Search for barcodes.** To look up content associated with barcodes, you can however type their numbers directly into the search field. Good examples are: `1000110007387`, `2165741004149`, `2205873003013`.
 
-* The most interesting way to interact with the demo is to look up the content for food categories by entering the categories into auto-complete search field. Type whatever English food category names you can think of; or also names in other languages after changing the application language in the settings.
+* **Search for food categories.** The most interesting way to interact with the demo is to look up the content for food categories by entering the categories into auto-complete search field. Type whatever English food category names you can think of; or also names in other languages after changing the application language in the settings.
+
+* **Disable the virtual keyboard.** Since you have a proper keyboard on a desktop computer to type, it helps with screen space to disable the Android on-screen keyboard completely. You can do that after clicking on the keyboard symbol in the bottom right.
+
+* **Avoid landscape mode.** Due to a bug in the appetize.io product, the directions of the arrow keys are switched in landscape mode: <kbd>→</kbd> moves down, <kbd>↓</kbd> moves right etc.. Until that is fixed, better avoid landscape mode, or only navigate with the mouse in there.
+
+* **Avoid Android ≥9.** In this application's online demo, landscape mode does not work at all when you choose Android 9.0 or 10.0.
 
 
 **Features:**
