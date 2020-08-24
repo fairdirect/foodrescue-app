@@ -27,7 +27,7 @@ Kirigami.ScrollablePage {
     leftAction: Kirigami.Action {
         iconName: "go-previous"
         text: qsTr("Last Search")
-        onTriggered: { showPassiveNotification("Go back action triggered") }
+        onTriggered: { showPassiveNotification("History back action (soon …)") }
     }
 
     mainAction: Kirigami.Action {
@@ -77,7 +77,7 @@ Kirigami.ScrollablePage {
     rightAction: Kirigami.Action {
         iconName: "go-next"
         text: qsTr("Next Search")
-        onTriggered: { showPassiveNotification("Go forward action triggered") }
+        onTriggered: { showPassiveNotification("History forward action (soon …)") }
     }
 
     // No contextual actions so far.
@@ -347,34 +347,35 @@ Kirigami.ScrollablePage {
                 }
 
                 // A footer graphic crediting supporters, shown while no browser content is present.
-                ImageNotice {
-                    id: supporterLogos
+                //   Temporarily disabled because it does not work yet in the web-based demo.
+//                ImageNotice {
+//                    id: supporterLogos
 
-                    anchors.fill: parent
-                    windowWidth: browserPage.width
-                    windowHeight: browserPage.height
+//                    anchors.fill: parent
+//                    windowWidth: browserPage.width
+//                    windowHeight: browserPage.height
 
-                    // Show the correct localized version of the supporter logos graphic.
-                    //   If no localized version is available, the English version is shown.
-                    //
-                    //   TODO: Make this work as a dynamic binding to adapt when the locale changes.
-                    //   This binding depends on Qt.locale() but does not react when the locale
-                    //   changes due to a limitation of Qt (the QEvent::LocaleChanged signal is
-                    //   not automatically forwarded to Qt).
-                    imageSource: {
-                        var lang = Qt.locale().name.substring(0,2)
-                        if (lang === "de" || lang === "en")
-                            return "qrc:///images/credits-all-" + lang + "-3minified.svg"
-                        else
-                            return "qrc:///images/credits-all-en-3minified.svg"
-                    }
+//                    // Show the correct localized version of the supporter logos graphic.
+//                    //   If no localized version is available, the English version is shown.
+//                    //
+//                    //   TODO: Make this work as a dynamic binding to adapt when the locale changes.
+//                    //   This binding depends on Qt.locale() but does not react when the locale
+//                    //   changes due to a limitation of Qt (the QEvent::LocaleChanged signal is
+//                    //   not automatically forwarded to Qt).
+//                    imageSource: {
+//                        var lang = Qt.locale().name.substring(0,2)
+//                        if (lang === "de" || lang === "en")
+//                            return "qrc:///images/credits-all-" + lang + "-3minified.svg"
+//                        else
+//                            return "qrc:///images/credits-all-en-3minified.svg"
+//                    }
 
-                    // Hide permanently after the first search (as the browser always has content after that,
-                    // and if only "No content found.").
-                    //   TODO: Better destroy the instance, or remove the image source, as it probably eats
-                    //   CPU time and memory even while invisible.
-                    visible: browserContent.text == ""
-                }
+//                    // Hide permanently after the first search (as the browser always has content after that,
+//                    // and if only "No content found.").
+//                    //   TODO: Better destroy the instance, or remove the image source, as it probably eats
+//                    //   CPU time and memory even while invisible.
+//                    visible: browserContent.text == ""
+//                }
             }
         }
     }
