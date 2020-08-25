@@ -49,6 +49,7 @@
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:db="http://docbook.org/ns/docbook"
+    xmlns:xl="http://www.w3.org/1999/xlink"
 >
     <xsl:output method="html"/>
 
@@ -68,7 +69,7 @@
                     table.h2 td { padding: 4px; padding-left: 8px; }
                     table.h2 h2 { color: dimgray; font-weight: normal; }
 
-                    em { font-style: italic; font-weight: bold; }
+                    em { font-style: normal; font-weight: bold; color: gb(70, 70, 70); }
 
                     div.spacer-16 { color: transparent; margin-top: 0px; }
                     div.spacer-20 { color: transparent; margin-top: 4px; }
@@ -203,7 +204,9 @@
     </xsl:template>
 
 
-    <!-- Render all topics within one content section, such as "pantry storage". -->
+    <!-- Render all topics within one topic type section, such as "pantry_storage". -->
+    <!-- TODO: Rename this template to "topic" because it matches a topic. Otherwise it's confusing
+      because DocBook also has an element "section". -->
     <xsl:template name="section">
         <xsl:param name="header"/>
         <xsl:param name="topictype"/>
@@ -225,6 +228,8 @@
                 <table class="h2" width="100%">
                     <tr><td><h2><xsl:value-of select="./db:info/db:title"/></h2></td></tr>
                 </table>
+
+                <div class="spacer-16">.</div>
 
                 <xsl:apply-templates/>
             </xsl:for-each>
@@ -255,8 +260,20 @@
     </xsl:template>
 
 
-    <xsl:template match="db:simpara">
-        <p><xsl:apply-templates/></p>
+    <!-- TODO: Also support nested sections, then using h4-h6 elements. However, these are not yet used in
+      the database. -->
+    <xsl:template match="db:section">
+        <!-- Not wrapping the <h3> into a table as for the superordinate headings, as this messes up the
+        vertical spacing. It would have to be configured different for the first and subsequent h3 headings.
+        And since h3 headings are very rare anyway and the default formatting is ok, it's not worth the effort. -->
+        <h3><xsl:value-of select="./db:title"/></h3>
+
+        <xsl:apply-templates select="* except ./db:title"/>
+    </xsl:template>
+
+
+    <xsl:template match="db:orderedlist">
+        <ul><xsl:apply-templates/></ul>
     </xsl:template>
 
 
@@ -265,12 +282,39 @@
     </xsl:template>
 
 
-    <xsl:template match="db:listitem">
+    <!-- In DocBook, <listitem> cannot contain text directly, but <li> in HTML can. So we can ignore
+      ignore <simpara> inside <listitem> and proceed with the processing from the content of the <simpara>.
+      See: https://tdg.docbook.org/tdg/5.1/listitem.html (where "text" is not one of the possible child elements).
+    -->
+    <xsl:template match="db:listitem[db:simpara]">
+        <li><xsl:apply-templates select="./db:simpara/node()"/></li>
+    </xsl:template>
+
+
+    <xsl:template match="db:listitem[not(db:simpara)]">
         <li><xsl:apply-templates/></li>
     </xsl:template>
 
 
-    <xsl:template match="db:emphasis">
+    <xsl:template match="db:simpara">
+        <p><xsl:apply-templates/></p>
+    </xsl:template>
+
+
+    <xsl:template match="db:emphasis[@role='strong']">
+        <strong><xsl:apply-templates/></strong>
+    </xsl:template>
+
+
+    <xsl:template match="db:emphasis[not(@role='strong')]">
         <em><xsl:apply-templates/></em>
     </xsl:template>
+
+
+    <xsl:template match="db:link">
+        <!-- The {…} syntax is a XSLT attribute value template, see:
+          https://www.w3.org/TR/2017/REC-xslt-30-20170608/#attribute-value-templates -->
+        <a href="{@xl:href}"><xsl:apply-templates/></a>
+    </xsl:template>
+
 </xsl:stylesheet>

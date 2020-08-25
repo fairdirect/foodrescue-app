@@ -297,6 +297,9 @@ Kirigami.ScrollablePage {
                     //   Source: "Creating working hyperlinks in Qt Quick Text", https://blog.shantanu.io/?p=135
                     cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
 
+                    // Don't eat clicks but forward them to the Text parent element. Otherwise links won't work.
+                    acceptedButtons: Qt.NoButton
+
                     // Let clicking on browser content de-focus the autocomplete widget.
                     onClicked: autocomplete.focus = false
                     // TODO: Check if consuming left-click events interferes with activating hyperlinks

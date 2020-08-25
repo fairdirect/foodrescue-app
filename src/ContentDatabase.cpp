@@ -288,7 +288,7 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
     else
         // TODO: Exchange this with a more readable single HTML string with %1 arguments.
         return docbook
-            .prepend("<book xmlns=\"http://docbook.org/ns/docbook\" version=\"5.1\">\n")
+            .prepend("<book xmlns=\"http://docbook.org/ns/docbook\" xmlns:xl=\"http://www.w3.org/1999/xlink\" version=\"5.1\">\n")
             .append("</book>");
 }
 
