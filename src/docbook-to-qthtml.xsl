@@ -273,7 +273,7 @@
 
 
     <xsl:template match="db:orderedlist">
-        <ul><xsl:apply-templates/></ul>
+        <ol><xsl:apply-templates/></ol>
     </xsl:template>
 
 
@@ -282,17 +282,19 @@
     </xsl:template>
 
 
-    <!-- In DocBook, <listitem> cannot contain text directly, but <li> in HTML can. So we can ignore
-      ignore <simpara> inside <listitem> and proceed with the processing from the content of the <simpara>.
-      See: https://tdg.docbook.org/tdg/5.1/listitem.html (where "text" is not one of the possible child elements).
-    -->
-    <xsl:template match="db:listitem[db:simpara]">
-        <li><xsl:apply-templates select="./db:simpara/node()"/></li>
+    <xsl:template match="db:listitem">
+        <li><xsl:apply-templates /></li>
     </xsl:template>
 
 
-    <xsl:template match="db:listitem[not(db:simpara)]">
-        <li><xsl:apply-templates/></li>
+    <!-- Ignore ignore <simpara> if inside <listitem>.
+      We can simplify the output this way because <li> in HTML can contain text elements. <listitem>
+      in DocBook can not; see the list of child elements at https://tdg.docbook.org/tdg/5.1/listitem.html .
+      Order relative to <xsl:template match="db:simpara"> is not important as the most specific template
+      matches.
+    -->
+    <xsl:template match="db:listitem/db:simpara">
+        <xsl:apply-templates />
     </xsl:template>
 
 
