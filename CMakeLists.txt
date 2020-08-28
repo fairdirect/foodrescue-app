@@ -103,7 +103,7 @@ add_definitions(
 )
 
 # Enable C++11 features for clang and gcc.
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 
 # ################# CMake module includes ##########################################################
