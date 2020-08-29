@@ -5,7 +5,7 @@
   See also: https://developer.android.com/studio/publish/versioning  -->
 <!-- installLocation="auto" means the application can be installed on external storage if the
   Android system wants to -->
-<manifest package="org.fairdirect.foodrescue" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.1" android:versionCode="100" android:installLocation="auto">
+<manifest package="org.fairdirect.foodrescue" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.2" android:versionCode="200" android:installLocation="auto">
 
     <!-- Values 16 and 28 as seen in the Qt template for AndroidManifest.xml -->
     <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="28"/>
