@@ -7,8 +7,16 @@
   Android system wants to -->
 <manifest package="org.fairdirect.foodrescue" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.2" android:versionCode="200" android:installLocation="auto">
 
-    <!-- Values 16 and 28 as seen in the Qt template for AndroidManifest.xml -->
-    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="28"/>
+    <!-- Values "min SDK = 16" and "target SDK = 28" seen in the Qt template for AndroidManifest.xml.
+      Modified to "target SDK = 29" according to Google Play recommendations as of 2020-08, see
+      https://developer.android.com/distribute/best-practices/develop/target-sdk.html . Note that
+      "target SDK = 29" is different from "build SDK = 28", which is mentioned in the Qt documentation:
+      "For Qt 5.12.0 to 5.12.5 and Qt 5.13.0 to 5.13.1, Android build SDK 28 should be used. For [more]
+      recent versions than the latter, build SDK 29, or the most recent should be used. This field does
+      not specify the minimum supported API level nor the target API level, which you can specify in
+      the Android manifest." (https://doc.qt.io/qtcreator/creator-deploying-android.html#selecting-api-level)
+    -->
+    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="29"/>
 
     <!-- Default permissions (automatically inserted on deployment based on app dependencies). -->
     <!-- Either this or manually listing the right permissions is needed. Otherwise you get a
