@@ -14,12 +14,13 @@
         <file>qml/ScannerPage.qml</file>
         <file>docbook-to-qthtml.xsl</file>
         <file>qtquickcontrols2.conf</file>
-        <file>images/credits-all-de-3minified.svg</file>
-        <file>images/credits-all-en-3minified.svg</file>
         <file>qml/SettingsPage.qml</file>
         <file>i18n/foodrescue_de.qm</file>
         <file>i18n/foodrescue_en.qm</file>
         <file>i18n/foodrescue_es.qm</file>
         <file>i18n/foodrescue_fr.qm</file>
+        <file>qml/StarsPage.qml</file>
+        <file>images/credits-de-3_minified.svg</file>
+        <file>images/credits-en-3_minified.svg</file>
     </qresource>
 </RCC>

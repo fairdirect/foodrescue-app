@@ -367,9 +367,9 @@ Kirigami.ScrollablePage {
                     imageSource: {
                         var lang = Qt.locale().name.substring(0,2)
                         if (lang === "de" || lang === "en")
-                            return "qrc:///images/credits-all-" + lang + "-3minified.svg"
+                            return "qrc:///images/credits-" + lang + "-3_minified.svg"
                         else
-                            return "qrc:///images/credits-all-en-3minified.svg"
+                            return "qrc:///images/credits-en-3_minified.svg"
                     }
 
                     // Hide permanently after the first search (as the browser always has content after that,
