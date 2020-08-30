@@ -19,10 +19,12 @@
 
 **[6. Release Guide](#6-release-guide)**<br/>
 
-  * [6.1. Desktop Linux](#61-desktop-linus)
-  * [6.2. F-Droid](#62-f-droid)
-  * [6.3. Google Play](#63-google-play)
-  * [6.4. Apple AppStore](#64-apple-appstore)
+  * [6.1. Initial Setup](#61-initial-setup)
+  * [6.2. All Platforms](#62-all-platforms)
+  * [6.3. Desktop Linux](#63-desktop-linux)
+  * [6.4. F-Droid](#64-f-droid)
+  * [6.5. Google Play](#65-google-play)
+  * [6.6. Apple AppStore](#66-apple-appstore)
 
 **[7. Style Guide](#7-style-guide)**
 
@@ -266,7 +268,9 @@ While the Android platform and Qt library interfaces are mature and almost alway
 * **Qt 5.14 support.** When trying Qt ≥5.14 for Android with ECM 5.62, you would see `androiddeployqt` fail during the build process with the error message "No target architecture defined in json file". This seems to be due to the same change in Qt that also caused the equivalent issues [#35](https://github.com/LaurentGomila/qt-android-cmake/issues/35) in [qt-android-cmake](https://github.com/LaurentGomila/qt-android-cmake) and [#23306](https://bugreports.qt.io/browse/QTCREATORBUG-23306) in the CMake scripts for Android deployment that come with Qt Creator. It has to be fixed in every set of CMake scripts that are used for Android deployment, and ECM is yet another one of these. It was fixed with ECM [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39) – see the commit message there. That commit was on 2020-03-03 and the [Git tag list](https://invent.kde.org/frameworks/extra-cmake-modules/-/tags) shows it landed in 5.68.0.
 
 
-## 5.2. Desktop Development Setup
+## 5.2. Linux Development Setup
+
+This assumes you want to use a Linux host for development and build the desktop version.
 
 1. **Install basic development tooling.** Under Ubuntu 20.04 LTS, install with:
 
@@ -329,7 +333,7 @@ While the Android platform and Qt library interfaces are mature and almost alway
     cd zxing-cpp
     git checkout 57c4a89
 
-    mkdir -p build/linux-amd64 && cd build/linux-amd64
+    mkdir -p build/linux_amd64 && cd build/linux_amd64
     cmake ../..
     make
     sudo checkinstall --pkgname zxing-cpp --pkgversion "1.0.8+57c4a89" --nodoc make install
@@ -369,9 +373,9 @@ While the Android platform and Qt library interfaces are mature and almost alway
         TODO: Add these indexes by default in the database build process, then remove the instruction from here.
 
 
-## 5.3. Desktop Build Process
+## 5.3. Linux Build Process
 
-You can also build this the Android application from inside Qt Creator. See chapter [5.6. Qt Creator Setup](#56-qt-creator-setup).
+You can also build the Linux desktop application from inside Qt Creator. See chapter [5.6. Qt Creator Setup](#56-qt-creator-setup).
 
 1. **Get the application source code** by cloning its repository:
 
@@ -396,7 +400,7 @@ You can also build this the Android application from inside Qt Creator. See chap
 
     ```
     cd foodrescue-app
-    mkdir -p build/Desktop.CommandLineBuild && cd build/Desktop.CommandLineBuild
+    mkdir -p build/linux_amd64_cli && cd build/linux_amd64_cli
     cmake ../..
     cmake --build .
 
@@ -421,15 +425,17 @@ You can also build this the Android application from inside Qt Creator. See chap
 
 ## 5.4. Android Development Setup
 
-The following instructions set up all dependencies for Food Rescue App. The commands as shown below are for the `armeabi-v7a` Android ABI, but you can adapt them to your targeted ABI; the instructions have been tested successfully for both `armeabi-v7a` and `x86` already.
+This assumes you want to use a Linux host for development and build the Android version. This section will being you up to the point where you an actually build the application and start developing it further.
+
+The commands below are shown for the armeabi-v7a Android ABI, but you can adapt them to your targeted ABI easily. This has been tested for armeabi-v7a, arm64-v8a and x86 already. One clone of the Git repository can be used to build for all Android ABIs by following these instructions multiple times but choosing separate build directories (`build/android_armv7`, `install/android_arm64_v8a` etc.) and install directories (`install/android_armv7`, `install/android_arm64_v8a` etc.).
 
 1. **Make the development setup for the desktop version.** Follow all steps from chapter "[5.2. Desktop Version Development Setup](#52-desktop-version-development-setup)". Ideally also make sure you can build and execute a desktop version; you can also do that during Android development to quickly test code that is not specific to Android. (If you want to build for Android only, you don't have to follow the steps to install Qt or Kirigami for the desktop version. But then you can't test with the desktop version either, obviously.)
 
-2. **Create an Android installation directory.** Different from development of a desktop software, all components of the Android software must be installed. This is required for building an Android APK package with `make create-apk`. Note that Food Rescue App and all its custom libraries must be installed into the *same* directory for the Android APK building to succeed (TODO: Confirm that with a fresh build). We'll create an installation directory inside the repository directory of `foodrescue-app` (which you already have from the desktop setup):
+2. **Create an Android installation directory.** Different from development of a desktop software, all components of the Android software must be installed. This is required for building an Android APK package with `make create-apk`. Note that Food Rescue App and all its custom libraries must be installed into the *same* directory for the Android APK building to succeed. We'll create an installation directory inside the repository directory `foodrescue-app` (which you already have from the desktop setup):
 
     ```
     cd foodrescue-app
-    mkdir -p install/android
+    mkdir -p install/android_armv7
     ```
 
 3. **Install OpenJDK 8.** This is a dependency of the Android stack and of Qt Creator. Later versions will not work – [see](https://doc.qt.io/qtcreator/creator-developing-android.html#requirements). And when not doing the `update-alternatives` step, command line utilities that do not inherit the Qt Creator Java path (such as `sdkmanager` when started manually) will fail to run.
@@ -464,7 +470,7 @@ The following instructions set up all dependencies for Food Rescue App. The comm
 
     Explanations:
 
-    We choose an Android SDK platform (like `platforms;android-29`) that provides at least the API level of your device. Choosing a newer SDK here is no problem, as restricting created APK packages to require a lower API level for installation is possible. The API level number supported by your Android testing device can be found [here](https://developer.android.com/studio/releases/platforms).
+    We choose an Android SDK platform (like `platforms;android-29`) that provides at least the API level of your device. The API level supported by your Android testing device can be found [here](https://developer.android.com/studio/releases/platforms). The Qt documentation tells to choose API level 28 for the build SDK of a Qt 5.12.0 - 5.13.1 application ([see](https://doc.qt.io/qtcreator/creator-deploying-android.html#selecting-api-level)). However it works fine with API level 29 here, probably because we use CMake here and not Qt's default build system qmake. Also, choosing a newer SDK here than your targeted devices provide is no problem, as APK packages are configured via `AndroidManifect.xml` to accept a minimum API level of 16 and target API level 29 for installation.
 
     The version of the build tools has to correspond to the version of the Android SDK platform, but will not be the same version. For example in the versions chosen below, indeed, build tools 28.0.2 are required to go together with Android platform SDK 29. The requirements can be found on [this page](https://developer.android.com/studio/releases/platforms).
 
@@ -484,12 +490,11 @@ The following instructions set up all dependencies for Food Rescue App. The comm
         ```
         mkdir /opt/qt/
         aqt install --outputdir /opt/qt/ 5.12.5 linux android android_armv7
+        aqt install --outputdir /opt/qt/ 5.12.5 linux android android_arm64_v8a
 
         # Optionally, if you also want to compile for the "minor" Android architectures:
-        aqt install --outputdir /opt/qt/ 5.12.5 linux android android_arm64_v8a
+        # (android_x86_64 may not be available for some older Qt versions)
         aqt install --outputdir /opt/qt/ 5.12.5 linux android android_x86
-
-        # The following architecture also exists, but not in all Qt versions:
         aqt install --outputdir /opt/qt/ 5.12.5 linux android android_x86_64
         ```
 
@@ -514,20 +519,19 @@ The following instructions set up all dependencies for Food Rescue App. The comm
     3. Run CMake with the environment variables it requires. For the explanation of the variables, see the documentation for the foodrescue-app CMake run in [5.5. Android Build Process](#55-android-build-process).
 
         ```
-        # Adapt to your Android architecture. We use the aqtinstall architecture names here by convention:
-        # android_armv7, android_arm64_v8a, android_x86, android_x86_64
+        # Adapt to your Android architecture. We use the aqtinstall architecture names here
+        # by convention: android_armv7, android_arm64_v8a, android_x86, android_x86_64
         mkdir -p build/android_armv7 && cd build/android_armv7
 
         export ANDROID_SDK_ROOT=/opt/android-sdk
         export ANDROID_NDK=/opt/android-sdk/ndk/18.1.5063045
-        export ANDROID_PLATFORM=23
         export ANDROID_ARCH_ABI=armeabi-v7a
 
         cmake ../.. \
           -DCMAKE_SYSROOT=/opt/android-sdk/ndk/18.1.5063045/platforms/android-21/arch-arm \
           -DCMAKE_TOOLCHAIN_FILE=/usr/share/ECM/toolchain/Android.cmake \
-          -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 \
-          -DCMAKE_INSTALL_PREFIX=../../../../install/android
+          -DCMAKE_PREFIX_PATH=/opt/qt/5.12.5/android_armv7 \
+          -DCMAKE_INSTALL_PREFIX=$(readlink -f ../../../../install/android_armv7)
         ```
 
     4. Build and install:
@@ -552,19 +556,20 @@ The following instructions set up all dependencies for Food Rescue App. The comm
         * *(For all other variables, see the documentation for the foodrescue-app CMake run in [5.5. Android Build Process](#55-android-build-process).)*
 
         ```
-        mkdir -p build/android && cd build/android
+        # Adapt to your Android architecture. We use the aqtinstall architecture names here
+        # by convention: android_armv7, android_arm64_v8a, android_x86, android_x86_64
+        mkdir -p build/android_armv7 && cd build/android_armv7
 
         export ANDROID_SDK_ROOT=/opt/android-sdk
         export ANDROID_NDK=/opt/android-sdk/ndk/18.1.5063045
         export ANDROID_ARCH_ABI=armeabi-v7a
-        export ANDROID_PLATFORM=23
 
         cmake ../.. \
           -DCMAKE_TOOLCHAIN_FILE=/usr/share/ECM/toolchain/Android.cmake \
           -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 \
           -DBUILD_EXAMPLES=OFF \
           -DBUILD_BLACKBOX_TESTS=OFF \
-          -DCMAKE_INSTALL_PREFIX=../../../foodrescue-app/install/android
+          -DCMAKE_INSTALL_PREFIX=$(readlink -f ../../../foodrescue-app/install/android_armv7)
         ```
 
     3. **Build and install.**
@@ -613,14 +618,12 @@ if it's not found. However, it would clone it into the build directory, and that
     TODO: Include the directory `src/android/assets/` into the repo, then remove the step above to create it.
 
 
-11. **Adapt the makefile.** Due to open issues with the build process, right now you have to adapt `src/CMakeLists.txt` to your system as follows:
-
-    * In `set(foodrescue_EXTRA_LIBS …)` adapt the path to `libQt5Concurrent.so` for your system.
+11. **Adapt the makefile.** Due to open issues with the build process, right now you have to adapt `src/CMakeLists.txt` to your system. In `set(foodrescue_EXTRA_LIBS …)` adapt the path to `libQt5Concurrent.so` for your system. (TODO: This is bad because it ties the application source code to one specific Android ABI, making cross-compiling for different architectures uncomfortable.)
 
 
 ## 5.5. Android Build Process
 
-The following instructions create and install an APK package that will run successfully as an app under Android. The commands as shown below are for the `armeabi-v7a` Android ABI, but you can adapt them to your targeted ABI; the instructions have been tested successfully for both `armeabi-v7a` and `x86` already.
+With the following instructions, you can create an Android APK package, install it to an Android device and run Food Rescue App there. As detailed in section [5.4. Android Development Setup](#54-android-development-setup), the commands below are shown for the armeabi-v7a Android ABI, but you can adapt them to your targeted ABI easily.
 
 1. **Enter into the repository directory.**
 
@@ -642,8 +645,6 @@ The following instructions create and install an APK package that will run succe
     * **`ANDROID_NDK`.** TODO: Document.
 
     * **`ANDROID_ARCH_ABI`:** Adapt to the ABI ("application binary interface") of the targeted Android devices. The [available values](https://developer.android.com/ndk/guides/abis) are: `armeabi-v7a` (compatible with more or less all physical Android devices), `arm64-v8a` (newer physical Android devices), `x86` (Android emulators running on PCs, using 32 bit, including [appetize.io](https://appetize.io/)), `x86_64` (Android emulators running on PCs, using 64 bit).
-
-    * **`ANDROID_PLATFORM`.** API version of your Android SDK. TODO: Check if this is needed to be set at all; maybe it is not.
 
     * **`QTANDROID_EXPORTED_TARGET`.** A name component that will appear in Makefile targets to create the Android APK package define by a corresponding variable via `${ANDROID_APK_DIR}/AndroidManifest.xml`. Since we will only run `make && make install` later this name can be anything as it's not used directly, but it has to be define for CMake to not complain.
 
@@ -667,29 +668,33 @@ The following instructions create and install an APK package that will run succe
 
     * **`ZXing_DIR`.** An absolute path to a directory with the `ZXingConfig.cmake` file that defines the ZXing CMake package. It is located in a sub-directory of the installation directory chosen above. About the absolute path see on `CMAKE_INSTALL_PREFIX`.
 
+    * **`CMAKE_BUILD_TYPE`.** Controls the build type. Values include `Debug` (the default), `Release` and some more. See also [CMake manual: `CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/v3.0/variable/CMAKE_BUILD_TYPE.html).
+
     * **`CMAKE_ANDROID_ASSETS_DIRECTORIES`.** Optional. Points to directories that will be also be included into the Android `assets/` folder of the Android APK package. Files from here will not be found in the installation directory (`CMAKE_INSTALL_PREFIX`), just in the APK package. You do not need to mention `${ANDROID_APK_DIR}/assets/` here, as that is automatically included into the APK's assets directory.
 
     The code to run CMake (after you adapted the variables as explained above):
 
     ```
-    mkdir -p build/Android.ConsoleKit && cd build/Android.ConsoleKit
+    # Adapt to your Android architecture. We use the aqtinstall architecture names here
+    # by convention: android_armv7, android_arm64_v8a, android_x86, android_x86_64
+    mkdir -p build/android_armv7 && cd build/android_armv7
 
     export ANDROID_SDK_ROOT=/opt/android-sdk
     export ANDROID_NDK=/opt/android-sdk/ndk/18.1.5063045
     export ANDROID_ARCH_ABI=armeabi-v7a
-    export ANDROID_PLATFORM=23
 
     cmake ../.. \
       -DQTANDROID_EXPORTED_TARGET=foodrescue \
       -DANDROID_APK_DIR=$(readlink -f ../../src/android) \
       -DCMAKE_SYSROOT=/opt/android-sdk/ndk/18.1.5063045/platforms/android-21/arch-arm \
       -DCMAKE_TOOLCHAIN_FILE=/usr/share/ECM/toolchain/Android.cmake \
-      -DECM_ADDITIONAL_FIND_ROOT_PATH=/opt/qt/5.12.4/android_armv7 \
-      -DCMAKE_PREFIX_PATH=/opt/qt/5.12.4/android_armv7 \
+      -DECM_ADDITIONAL_FIND_ROOT_PATH=/opt/qt/5.12.5/android_armv7 \
+      -DCMAKE_PREFIX_PATH=/opt/qt/5.12.5/android_armv7 \
       -DANDROID_SDK_BUILD_TOOLS_REVISION=28.0.2 \
-      -DCMAKE_INSTALL_PREFIX=$(readlink -f../../install/android) \
+      -DCMAKE_INSTALL_PREFIX=$(readlink -f ../../install/android) \
       -DKF5Kirigami2_DIR=$(readlink -f ../../install/android/lib/cmake/KF5Kirigami2) \
       -DZXing_DIR=$(readlink -f ../../install/android/lib/cmake/ZXing)
+      -DCMAKE_BUILD_TYPE=Debug
     ```
 
 4. **Build the application.** Note that `make install` is necessary before every `make create-apk` as otherwise newly added files like icons would not land in the Android APK package. Only the files found in `${CMAKE_INSTALL_PREFIX}` at the time when `make create-apk` runs will make it to the APK package! (TODO: This seems to be a bug in the build dependencies, we should try to get it fixed.)
@@ -705,7 +710,7 @@ The following instructions create and install an APK package that will run succe
     ```
     could not find libm.so in
       …/foodrescue-app/build/…/bin
-      …/foodrescue-app/install/android/lib/
+      …/foodrescue-app/install/android_armv7/lib/
       /opt/qt/5.12.5/android_armv7
     could not find libc++_shared.so in [… as above]
     could not find libdl.so in [… as above]
@@ -838,61 +843,86 @@ If you use Qt Creator as your IDE, here are ways to make developing for this (an
 
 # 6. Release Guide
 
-The default build type is "Debug". To create a release build that is ready for packaging and uploading, follow the process below:
+The default build type is "Debug". To create a release build that is ready for packaging and publishing, follow the process below.
 
 
-## 6.1. Desktop Linux
+## 6.1. Initial Setup
+
+1. **Select the Android ABIs to support.** You must support both **armeabi-v7a and arm64-v8a** for publishing to Google Play ([see](https://stackoverflow.com/a/53413715)), everything else is optional. Some details about each ABI:
+
+    * **armeabi-v7a.** This is the older default processor architecture of Android devices. Processors supporting arm64-v8a can also run software made for armeabi-v7a but it will run slower, not utilizing the full capabilities of the CPU ([see](https://stackoverflow.com/a/33230181)). Still, for testing or for publishing outside Google Play, a single APK made for `armeabi-v7a` is enough.
+
+    * **arm64-v8a.** The newer, 64 bit version of the older, 32 bit armeabi-v7a architecture. Now forming the new default architecture of Android devices. arm64-v8a and armeabi-v7a together account for 98% of all Android devices in use ([see](https://android.stackexchange.com/a/202022)), so everything else is indeed optional.
+
+    * **x86.** This is just the normal, 32 bit Intel PC architecture. Supporting the x86 and x86_64 ABIs is relevant for Android emulators, including when you intend to use the [appetize.io](https://appetize.io/) service for web-base demos of Android apps.
+
+        Physical Android devices do not use this architecture, except for Chromebooks ([see](https://android.stackexchange.com/a/202022)). Most Chromebooks still use the `x86` and `x86_64` processor architecture and only some use ARM based processors. However, since Chromebooks can also run Linux desktop applications ([see](https://en.wikipedia.org/wiki/Chromebook#Integration_with_Linux)), that seems to be a better route for this application to support them, given that they are more like a notebook than like a typical Android phone or tablet and given that Food Rescue App is available as a native Linux application as well.
+
+    * **x86_64.** The modern 64 bit variant of the Intel PC architecture. For publishing on Google Play, you cannot support only x86 without also supporting x86_64 ([see](https://stackoverflow.com/a/57660992)). So you can either support just armeabi-v7a and arm64-v8a, or all four ABIs.
+
+2. **Set up Google Play Console.** Use any Google account to register on [Google Play Console](https://play.google.com/apps/publish/), the place for publishing Android apps on Google Play. Then create your app in Google Play Console, and do the necessary steps there to be able to upload your first release. Be sure to disable "Google Play App Signing" for your app, as that excludes uploading the locally signed apps that are generated by our build process.
+
+3. **Configure package signing.** It is not possible to use [app signing by Google Play](https://support.google.com/googleplay/android-developer/answer/7384423). That would in theory enable to upload an unsigned AAB file and let Google sign it. But the build process prevents creating unsigned APKs in release mode, as all unsigned builds are always created as debug builds, and these are rejected by Google Play. This is true even when passing `-DCMAKE_BUILD_TYPE=Release` to `cmake`. It can be considered a bug in `androiddeployqt` ([details](https://stackoverflow.com/a/28509035)).
+
+    To set up local app signing, you have to create a keystore file with a signing keypair in Qt Creator. Choose "Projects → (any Android kit) → Build → Build Steps → Build Android APK", click on "Details", then "Keystore: … Create..." and fill in the form. Be sure to remember the location and password of your keystore file and the alias name of your signing key inside it. For full documentation, [see here](https://doc.qt.io/qtcreator/creator-deploying-android.html#signing-android-packages).
+
+    TODO: Find out and document how to create the keystore from the command line instead of relying on Qt creator ([see](https://developer.android.com/training/articles/keystore)).
+
+
+## 6.2. All Platforms
+
+1. **Update the version.** Updating the version defines the current state as the version number you enter. You have to adapt:
+
+    * In `CMakeLists.txt`: line `project(foodrescue-app VERSION …)`. This version string should only have two components, such as "0.2".
+    * In `src/android/AndroidManifest.xml`: line `<manifest … android:versionName="0.2" android:versionCode="200" …>`. As per our convention documented there, this version string has three components, the last of which is the "packaging version" that is omitted in the `CMakeLists.txt` version string. It is needed for example to disambiguate [multiple APKs](https://developer.android.com/google/play/publishing/multiple-apks) uploaded for the same release.
+
+
+## 6.3. Desktop Linux
 
 TODO
 
 
-## 6.2. F-Droid
+## 6.4. F-Droid
 
 TODO
 
 
-## 6.3. Google Play
+## 6.5. Google Play
 
-This does not describe the initial setup to be able to upload the application to Google Play for the first time. For that, [see here](https://support.google.com/googleplay/android-developer/answer/113469). Instead, this is the process to follow to upload any update to the application to Google Play.
+This is the process to update the application on Google Play. It does not describe the initial setup to be able to upload the application for the first time. For that, [see here](https://support.google.com/googleplay/android-developer/answer/113469).
 
-1. **Configure package signing.** This is necessary only the first time you start creating Android packages for Google Play on a new device. Alternatively and probably more comfortably, use [app signing by Google Play](https://support.google.com/googleplay/android-developer/answer/7384423).
+1. **Create a release build APK for ABI armeabi-v7a.** This can be done on your usual development host. Follow the usual instructions to build the application, just with the following changes:
 
-    Even with `-DCMAKE_BUILD_TYPE=Release` passed to the `cmake` call, the generated Android APK package will sill be named `foodrescue_build_apk-debug.apk`. This is because a release package will only be generated when you provide a certificate for signing – which can be considered a bug in `androiddeployqt` ([details](https://stackoverflow.com/a/28509035)). TODO: How to configure package signing.
+    * Use a different build directory, such as `build/Android.ConsoleKit.Release`.
+    * Use `CMAKE_BUILD_TYPE=Release`. (TODO: Change this to the `RelMinSize` or similar value to create a minimum size release package.)
+    * Instead of `make create-apk`, run `make create-apk ARGS="--sign $(readlink -f ../path/to/your/android_release.keystore) foodrescue --storepass your-keystore-password"`. This is document in the KDE ECM [AndroidToolchain help page](https://api.kde.org/ecm/toolchain/Android.html#deploying-qt-applications) and in the output of `/opt/qt/5.12.5/android_armv7/bin/androiddeployqt --help`.
 
-2. **Update the version.** TODO
+2. **Increment the Android version code by one.** Each APK uploaded to Google Play needs its own unique version code, including the separate builds for armeabi-v7a and arm64-v8a that we create in this process ([source](https://stackoverflow.com/a/56361240)). Increment only by one, which affects only the packaging version according to our own conventions used for the Android version code.
 
-3. **Create a release build.** To control the build type, use `cmake` variable [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/v3.0/variable/CMAKE_BUILD_TYPE.html). For a release build, use:
+3. **Create a release build APK for ABI arm64-v8a.** This is currently done on a build server ([instructions](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA#z=YRxrPujPWlxmLBEuMtPGf1GA)). You can also do it on your development system by having separate build and installation directories for each ABI version.
 
-    ```
-    -DCMAKE_BUILD_TYPE=Release
-    ```
+4. **Create release build APKs for ABIs x86 and x86_64. (optional)** This is currently done on a build server ([instructions](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA#z=ZMF-ImrwTwDVxcMvGoEae6yH)). You can also do it on your development system by having separate build and installation directories for each ABI version.
 
-    TODO: Change this to the RelMinSize or similar value to create a minimum size release package.
+5. **Log in to [Google Play Console](https://play.google.com/apps/publish/).**
 
-4. **Create an AAB package.** An AAB (Android Application Bundle) combines the APK packages of multiple processor architectures (ABIs, meaning Application Binary Interface). The ABIs to support are only **`armeabi-v7a` and `arm64-v8a`** (the "newer version"). Together these account for 98% of all Android devices in use ([see](https://android.stackexchange.com/a/202022)). Also, native apps must support both `armeabi-v7a` and `arm64-v8a` to be publishable on Google Play ([see](https://stackoverflow.com/a/53413715)).
+6. **Upload the APKs to Google Play.** You have to upload *all* the APKs generated above. Google Play will take care to choose the correct one for each device wanting to download one.
 
-    Typically, processors supporting `arm64-v8a` also support code made for `armeabi-v7a` but it will run slower, not utilizing the full capabilities of the CPU ([see](https://stackoverflow.com/a/33230181)). So for testing or for publishing outside Google Play, a single APK made for `armeabi-v7a` is enough.
-
-    For end users, support for the `x86` and `x86_64` ABIs only matters with respect to Chromebooks ([see](https://android.stackexchange.com/a/202022)). Most Chromebooks still use the x86 and x86_64 processor architecture and only some use ARM based processors. However, since Chromebooks can also run Linux desktop applications ([see](https://en.wikipedia.org/wiki/Chromebook#Integration_with_Linux)), that seems to be a better route for a cross-platform application like this to support them, given that they are more like a notebook than like a typical Android phone or tablet.
-
-    Finally, support for the `x86` and `x86_64` ABIs would also be relevant for Android emulators. But for a cross-platform application that also runs natively under Windows, Linux and Mac OS X, emulators are only useful for developers during testing. And developers can build their own version anyway.
-
-5. **Log in to Google Play Console.** Use any Google account to register on [Google Play Console](https://play.google.com/apps/publish/), the place for publishing Android apps on Google Play.
-
-6. **Update the screenshots.** If there were significant changes to the user interface, run the application under Android and create screenshots for uploading to Google Play. For that, execute something like this to update one of the screenshots for a 7" tablet saved in the Food Rescue App repository. The `convert` command requires to have ImageMagick installed.
+7. **Update the screenshots.** If there were significant changes to the user interface, run the application under Android and create screenshots for uploading to Google Play. For that, execute something like this:
 
     ```
-    cd /path/to/foodrescue-app/
-    adb exec-out screencap -p > metadata-screenshot-tablet7-1.png
-    convert -quality 75 metadata-screenshot-tablet7-1.png metadata-screenshot-tablet7-1.jpg
+    adb exec-out screencap -p > Screenshot.Android_7inch.en.portrait.2020-07-03.1.png
+    convert -quality 75 Screenshot.Android_7inch.en.portrait.2020-07-03.1.png Screenshot.Android_7inch.en.portrait.2020-07-03.1.jpg
     ```
+
+    (The `convert` command requires to have ImageMagick installed.)
 
     Then upload the screensots to Google Play Console under "All Apps → Food Rescue → Store Entry".
 
-7. **Upload to Google Play.** TODO.
+
+Note that, as an alternative to the process above, it should be possible to create an AAB package. An AAB (Android Application Bundle) combines the APK packages of multiple processor architectures (ABIs, meaning Application Binary Interface). This requires (1) enabling Google Play App Signing, which means trusting Google to sign your application's installable APKs which will be created by Google Play for devices automatically and (2) creating the AAB package with a modified build process. This [is possible](https://doc.qt.io/qt-5/android-publishing-to-googleplay.html), but it is not yet clear which version of `androiddeployqt` is necessary for that. (TODO: Find out and document how to build AAB packages.)
 
 
-## 6.4. Apple AppStore
+## 6.6. Apple AppStore
 
 TODO
 
