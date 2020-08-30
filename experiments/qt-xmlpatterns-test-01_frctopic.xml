@@ -1,0 +1,50 @@
+<book xmlns="http://docbook.org/ns/docbook" version="5.1">
+    <topic type="refrigerator_storage">
+
+        <info>
+            <title>Fridge storage of smoked or processed ham</title>
+
+            <!-- <xi:include href="author-n-n.xml"/> -->
+
+            <edition><date>2020-05-01</date></edition>
+
+            <abstract>
+                <simpara>It stays fresh for about a week.</simpara>
+            </abstract>
+
+            <subjectset scheme="off-categories-subset-frc">
+                <subject>
+                    <subjectterm>meats</subjectterm>
+                </subject>
+
+                <subject>
+                    <subjectterm>hams</subjectterm>
+                </subject>
+            </subjectset>
+        </info>
+
+
+        <simpara>The typical maximum storage time in the refrigerator is:</simpara>
+
+        <itemizedlist>
+            <listitem>
+                <simpara>
+                    <emphasis>1 Weeks</emphasis> in the fridge, if stored there immediately after purchase, whether sealed or not
+                </simpara>
+            </listitem>
+        </itemizedlist>
+
+        <simpara>(The above applies to: 'Meat: Smoked or Processed: Ham (Fresh, cook-before-eating, Shoulder Roll (Butt), boneless)'.)</simpara>
+
+        <simpara>Sources used:</simpara>
+
+        <itemizedlist>
+            <listitem>
+                <simpara>USDA-1 (PRODUCTS.ID=93)</simpara>
+            </listitem>
+        </itemizedlist>
+
+        <!-- <xi:include href="bibliography.xml"/> -->
+
+    </topic>
+</book>

@@ -1,0 +1,7 @@
+<book xmlns="http://docbook.org/ns/docbook" version="5.1">
+  <topic type="pantry_storage">topic 1</topic>
+  <topic type="refrigerator_storage">topic 2</topic>
+  <topic type="freezer_storage">topic 3</topic>
+  <topic type="pantry_storage">topic 4</topic>
+  <topic type="refrigerator_storage">topic 5</topic>
+</book>
