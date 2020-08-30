@@ -60,6 +60,11 @@ The application is built with KDE Kirigami, a rather unknown but powerful base t
 * **Avoid Android ≥9.** In this application's online demo, landscape mode does not work at all when you choose Android 9.0 or 10.0.
 
 
+**Screenshots:**
+
+![Android app after searching for a food category](doc/readme-screenshot-1.png?raw=true "After searching for 'meat' (in German)")
+
+
 **Features:**
 
 * **Mobile/desktop convergent.** The application runs from the same codebase and with the same user interface as a native (!) application on both phones, tablets and desktop computers. This is made possible by Qt 5 and, based on that, the [KDE Kirigami](https://kde.org/products/kirigami/) framework. Kirigami is a niche technology right now and not advertised much, but it totally works and allows an efficient "write once, run everywhere" development mode that also reduces software maintenance costs because there is only one codebase.
