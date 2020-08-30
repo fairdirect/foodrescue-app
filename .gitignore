@@ -6,7 +6,7 @@
 /build/
 /install/
 
-# Ignore directory used for temporar files while debugging.
+# Ignore directory used for temporary files while debugging.
 /debug/
 
 # Ignore external libraries.

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   class="barcode-canvas"
+   version="1.1"
+   style="shape-rendering:crispEdges"
+   id="svg1246"
+   sodipodi:docname="barcode.svg"
+   width="52.91666mm"
+   height="52.916668mm"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   inkscape:export-filename="/home/matthias/Projects/Fairdirect.Food_Rescue_App/Repo.foodrescue-app/src/images/barcode-64x64.png"
+   inkscape:export-xdpi="30.719999"
+   inkscape:export-ydpi="30.719999">
+  <metadata
+     id="metadata1252">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs1250" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1280"
+     inkscape:window-height="736"
+     id="namedview1248"
+     showgrid="false"
+     units="mm"
+     inkscape:zoom="0.59"
+     inkscape:cx="339.67231"
+     inkscape:cy="97.924792"
+     inkscape:window-x="0"
+     inkscape:window-y="1024"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g1244"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <g
+     id="g1244"
+     style="text-rendering:geometricPrecision"
+     transform="matrix(1.7360547,0,0,1.7360547,-499.98375,-261.79054)">
+    <rect
+       x="288"
+       y="150.79625"
+       width="3.4910226"
+       height="115.20374"
+       id="rect1210"
+       style="fill:#000000;stroke-width:0.62305981" />
+    <rect
+       x="294.98206"
+       y="150.79625"
+       width="3.4910226"
+       height="115.20374"
+       id="rect1212"
+       style="fill:#000000;stroke-width:0.62305981" />
+    <rect
+       x="301.96408"
+       y="150.79625"
+       width="10.473067"
+       height="115.20374"
+       id="rect1214"
+       style="fill:#000000;stroke-width:0.62305981" />
+    <rect
+       x="319.41919"
+       y="150.79625"
+       width="6.9820452"
+       height="115.20374"
+       id="rect1216"
+       style="fill:#000000;stroke-width:0.62305981" />
+    <rect
+       x="333.3833"
+       y="150.79625"
+       width="6.9820452"
+       height="115.20374"
+       id="rect1218"
+       style="fill:#000000;stroke-width:0.62305981" />
+    <rect
+       x="343.85635"
+       y="150.79625"
+       width="3.4910226"
+       height="115.20374"
+       id="rect1220"
+       style="fill:#000000;stroke-width:0.62305981" />
+    <rect
+       x="350.83841"
+       y="150.79625"
+       width="10.473067"
+       height="115.20374"
+       id="rect1222"
+       style="fill:#000000;stroke-width:0.62305981" />
+    <rect
+       x="368.29352"
+       y="150.79625"
+       width="10.473067"
+       height="115.20374"
+       id="rect1224"
+       style="fill:#000000;stroke-width:0.62305981" />
+    <rect
+       x="382.2576"
+       y="150.79625"
+       width="3.4910226"
+       height="115.20374"
+       id="rect1226"
+       style="fill:#000000;stroke-width:0.62305981" />
+    <rect
+       x="392.73068"
+       y="150.79625"
+       width="3.4910226"
+       height="115.20374"
+       id="rect1228"
+       style="fill:#000000;stroke-width:0.62305981" />
+    <rect
+       x="399.71271"
+       y="150.79625"
+       width="3.4910226"
+       height="115.20374"
+       id="rect1230"
+       style="fill:#000000;stroke-width:0.62305981" />
+  </g>
+</svg>
