@@ -11,8 +11,8 @@
 **[5. Development Guide](#5-development-guide)**
 
   * [5.1. Dependencies Overview](#51-dependencies-overview)
-  * [5.2. Desktop Development Setup](#52-desktop-development-setup)
-  * [5.3. Desktop Build Process](#53-desktop-build-process)
+  * [5.2. Linux Development Setup](#52-linux-development-setup)
+  * [5.3. Linux Build Process](#53-linux-build-process)
   * [5.4. Android Development Setup](#54-android-development-setup)
   * [5.5. Android Build Process](#55-android-build-process)
   * [5.6. Qt Creator Setup](#56-qt-creator-setup)
@@ -101,6 +101,9 @@ The application is built with KDE Kirigami, a rather unknown but powerful base t
 * **Memory consumption due to Qt.** Applications are supposed to use the UI libraries of the operating system. This is quite memory efficient, as the shared library system means that the code of these libraries is mapped into the virtual memory spaces of all processes accessing them, without duplicating them in the main memory. However, Qt is a cross-platform library made in such a way that it provides its own UI library, implemented down to the level of OpenGL rendering. This duplicates functionality provided by the operating system and can only be shared between other processes also using the Qt libraries. Except under Desktop Linux (where Qt is widespread), Food Rescue App will often be the only Qt based process in the memory. So the memory used by the Qt libraries can be counted as additional memory use compared to an application using the OS libraries. (On the other hand, one could also argue that the problem starts with operating systems using different UI libraries and that a cross-platform UI library like Qt is the right way to do things.)
 
     The amount of this (unavoidable) additional memory usage of "barebones Qt" is about 18-20 MiB. This has been determined from the amount of Linux shared memory of a Qt 5 widget-based application that does not use any libraries beyond Qt (here: `tom-ui`). Basically look up the process in `top` and find the value in column `SHR`. To be exact, some more would have to be added on top of the 18-20 MiB, to account for the variables associated with the Qt code in shared memory.
+
+
+**Alternative uses:** Since this is open source software, you are free to create anything else out of this application if you like. Since the application is essentially an offline reader for dynamically collected DocBook content, the closest alternative use would be to just exchange the database and use it as an offline reader for other content. When made generic, such a software could be called a databook reader. [See here](https://dynalist.io/d/To5BNup9nYdPq7QQ3KlYa-mA#z=-E1SzFIlt-BBqgUOV2aO4FQZ) for more details.
 
 
 **Documentation:**
@@ -345,7 +348,7 @@ This assumes you want to use a Linux host for development and build the desktop 
     sudo ldconfig
     ```
 
-    TODO: In the above instructions, do a shallow clone that contains the history only starting from the relevant commit 57c4a89. Not sure if there is any good solution for that, though. See: https://stackoverflow.com/q/31278902.
+    TODO: In the above instructions, do a shallow clone that contains the history only starting from the relevant commit 57c4a89. Not sure if there is any good solution for that, though ([see](https://stackoverflow.com/q/31278902)).
 
 8. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packages on demand, you can install all the Qt header files already:
 
