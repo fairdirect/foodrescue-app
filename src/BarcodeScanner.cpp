@@ -53,7 +53,7 @@ static Barcode::DecodeResult toDecodeResult(const ZXing::Result& result) {
     return { static_cast<Barcode::DecodeStatus>(result.status()),
         static_cast<Barcode::Format>(result.format()),
         QString::fromStdWString(result.text()),
-        QByteArray(result.rawBytes().charPtr(), result.rawBytes().length()),
+        QByteArray(reinterpret_cast<const char*>(result.rawBytes().data()), result.rawBytes().size()),
         toQVectorOfQPoints(result.resultPoints()),
         result.isValid() };
 }
