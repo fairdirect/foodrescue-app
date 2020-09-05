@@ -231,7 +231,8 @@ Kirigami.ScrollablePage {
                     }
 
                     onAccepted: {
-                        var content = database.content(input)
+                        var uiLanguage = Qt.locale().name.substring(0,2)
+                        var content = database.content(input, uiLanguage)
                         browserContent.text = contentOrMessage(content, input)
 
                         // AutoComplete gives up focus in its onAccepted handler. But if nothing was found

@@ -361,7 +361,13 @@ This assumes you want to use a Linux host for development and build the desktop 
       qttools5-dev qttools5-dev-tools qtwayland5-dev-tools qtxmlpatterns5-dev-tools
     ```
 
-9. **Install the database.** The application relies on the database that is the build output of [project `foodrescue-content`](https://github.com/fairdirect/foodrescue-content). Since during development we'll want to run the application without installing it, we'll have to install the database manually:
+9. **Install the translation tooling.**
+
+    ```
+    sudo apt install omegat
+    ```
+
+10. **Install the database.** The application relies on the database that is the build output of [project `foodrescue-content`](https://github.com/fairdirect/foodrescue-content). Since during development we'll want to run the application without installing it, we'll have to install the database manually:
 
     1. To build that database, follow [the project's README](https://github.com/fairdirect/foodrescue-content#readme). To install it.
 
@@ -375,6 +381,7 @@ This assumes you want to use a Linux host for development and build the desktop 
         sqlite3 foodrescue-content.sqlite3 <<SQLEND
             CREATE INDEX idx_code ON products(code);
             CREATE INDEX idx_categories_topics ON topic_categories(category_id,topic_id);
+            CREATE INDEX idx_category_names ON category_names(category_id);
         SQLEND
         ```
 
@@ -903,7 +910,13 @@ This is the process to update the application on Google Play. It does not descri
 
     * Use a different build directory, such as `build/Android.ConsoleKit.Release`.
     * Use `CMAKE_BUILD_TYPE=Release`. (TODO: Change this to the `RelMinSize` or similar value to create a minimum size release package.)
-    * Instead of `make create-apk`, run `make create-apk ARGS="--sign $(readlink -f ../path/to/your/android_release.keystore) foodrescue --storepass your-keystore-password"`. This is document in the KDE ECM [AndroidToolchain help page](https://api.kde.org/ecm/toolchain/Android.html#deploying-qt-applications) and in the output of `/opt/qt/5.12.5/android_armv7/bin/androiddeployqt --help`.
+    * Instead of `make create-apk`, run:
+
+        ```
+        make create-apk ARGS="--sign $(readlink -f ../path/to/your/android_release.keystore) foodrescue --storepass your-keystore-password"
+        ```
+
+        This is documented in the KDE ECM [AndroidToolchain help page](https://api.kde.org/ecm/toolchain/Android.html#deploying-qt-applications) and in the output of `/opt/qt/5.12.5/android_armv7/bin/androiddeployqt --help`.
 
 2. **Increment the Android version code by one.** Each APK uploaded to Google Play needs its own unique version code, including the separate builds for armeabi-v7a and arm64-v8a that we create in this process ([source](https://stackoverflow.com/a/56361240)). Increment only by one, which affects only the packaging version according to our own conventions used for the Android version code.
 

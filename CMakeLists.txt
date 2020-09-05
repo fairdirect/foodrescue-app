@@ -102,7 +102,9 @@ add_definitions(
     -DQT_NO_URL_CAST_FROM_STRING
 )
 
-# Enable C++11 features for clang and gcc.
+# Enable C++14 features in clang and gcc.
+#   C++ 14 is necessary to link to ZXing-C++, as some version newer than 1.0.8 started to use lambdas
+#   with auto parameters in its headers. Everything else only requires C++ 11.
 set(CMAKE_CXX_STANDARD 14)
 
 

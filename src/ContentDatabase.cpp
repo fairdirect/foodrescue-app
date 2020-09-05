@@ -179,12 +179,13 @@ void ContentDatabase::clearCompletions() {
  * @param searchTerm Text to use as the search term to find associated content topics in the
  *   database. This can be either text as decoded from a product barcode or a category name. The
  *   search term has to be in normalized format (see ContentDatabase::normalize()).
+ * @param searchTerm The language that result topics should have, given as a two-letter language
+ *   code.
  * @return The content topics resulting from the database search, combined into a single DocBook
  *   XML document. All topic meta-information about the topics (author, content section,
  *   version date, categories etc.) is rendered into the returned document.
  */
-QString ContentDatabase::contentAsDocbook(QString searchTerm) {
-
+QString ContentDatabase::contentAsDocbook(QString searchTerm, QString language) {
     QRegExp isNumber("[0-9]*");
     QSqlQuery query;
 
@@ -206,18 +207,21 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
             "        FROM all_product_categories "
             "            INNER JOIN category_structure ON all_product_categories.category_id = category_structure.category_id "
             ") "
-            "SELECT DISTINCT topic_contents.title, topics.section, topics.version, topic_contents.content, category_names.category_id "
+            "SELECT DISTINCT topic_contents.title, topics.section, topics.version, topic_contents.content "
             "FROM products "
             "    INNER JOIN all_product_categories ON products.id = all_product_categories.product_id "
             "    INNER JOIN category_names ON all_product_categories.category_id = category_names.category_id "
             "    INNER JOIN topic_categories ON category_names.category_id = topic_categories.category_id "
             "    INNER JOIN topics ON topic_categories.topic_id = topics.id "
             "    INNER JOIN topic_contents ON topics.id = topic_contents.topic_id "
-            "WHERE products.code = :code"
+            "WHERE "
+            "    products.code = :code AND "
+            "    topic_contents.lang = :lang"
         );
 
         query.bindValue(":code", searchTerm.toLongLong());
         // TODO: Check if the conversion was successful. See: https://doc.qt.io/qt-5/qstring.html#toLongLong
+        query.bindValue(":lang", language);
 
         qDebug() << "ContentDatabase::search: Value bound to: " << searchTerm.toLongLong();
     }
@@ -246,16 +250,19 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
             "            FROM category_ancestry "
             "                INNER JOIN category_structure ON category_ancestry.ancestor_category_id = category_structure.category_id "
             "    ) "
-            "SELECT DISTINCT topic_contents.title, topics.section, topics.version, topic_contents.content, category_names.category_id "
+            "SELECT DISTINCT topic_contents.title, topics.section, topics.version, topic_contents.content "
             "FROM category_names, var_1 "
             "    INNER JOIN category_ancestry ON category_ancestry.category_id = category_names.category_id "
             "    INNER JOIN topic_categories ON category_ancestry.ancestor_category_id = topic_categories.category_id "
             "    INNER JOIN topics ON topics.id = topic_categories.topic_id "
             "    INNER JOIN topic_contents ON topic_contents.topic_id = topics.id "
-            "WHERE category_names.category_id = var_1.category_id"
+            "WHERE "
+            "    category_names.category_id = var_1.category_id AND"
+            "    topic_contents.lang = :lang"
         );
 
         query.bindValue(":name", searchTerm);
+        query.bindValue(":lang", language);
     }
 
     // Execute the database query.
@@ -303,10 +310,10 @@ QString ContentDatabase::contentAsDocbook(QString searchTerm) {
  *   XML or Qt5 HTML document. All topic meta-information about the topics (author, content section,
  *   version date, categories etc.) is rendered into the returned document.
  */
-QString ContentDatabase::content(QString searchTerm, ContentFormat format) {
+QString ContentDatabase::content(QString searchTerm, QString language, ContentFormat format) {
 
     // Get the raw database search results.
-    QString docbook = contentAsDocbook(searchTerm);
+    QString docbook = contentAsDocbook(searchTerm, language);
 
     // Deal with the simple cases first.
     if (format == ContentFormat::DOCBOOK)

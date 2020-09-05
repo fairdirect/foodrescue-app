@@ -31,10 +31,10 @@ public:
     Q_INVOKABLE
     void clearCompletions();
 
-    QString contentAsDocbook(QString barcode);
+    QString contentAsDocbook(QString searchTerm, QString language);
 
     Q_INVOKABLE
-    QString content(QString searchTerm, ContentFormat format = ContentFormat::HTML);
+    QString content(QString searchTerm, QString language, ContentFormat format = ContentFormat::HTML);
 
     QString literature(QString searchTerm);
 
