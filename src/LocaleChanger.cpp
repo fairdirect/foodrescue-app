@@ -32,7 +32,8 @@ LocaleChanger::LocaleChanger(QQmlEngine* engine, QString pathPrefix, QString fil
  * @brief LanguageSwitcher::selectLanguage  Switch the user interface language of the application
  *   to the specified language.
  * @param locale  A Qt locale name, as defined in https://doc.qt.io/qt-5/qlocale.html#QLocale-1 .
- *   Note that a simple two-letter language code like "en" is also a valid locale name.
+ *   Note that a simple two-letter language code like "en" is also a valid locale name. Only the
+ *   language specifier of the locale is evaluated, anyway, as we ignore regional language variants.
  * @todo Make this a more independent class by not hardcoding the path template.
  */
 void LocaleChanger::changeLocale(QString locale) {
@@ -43,8 +44,9 @@ void LocaleChanger::changeLocale(QString locale) {
         QString(":%1/%2%3.qm").arg(pathPrefix).arg(filePrefix).arg(locale.left(2))
     );
 
-    // Chaning the language works also without removing the old translator first, since the new
-    // translation file is loaded into the old translator below. But the wiki example removes it first:
+    // Changing the language works also without removing the old translator, but then the old locale
+    // would be used as a fallback. See: https://doc.qt.io/qt-5/qtranslator.html#using-multiple-translations
+    // Also the wiki example removes the old translator first:
     // https://wiki.qt.io/How_to_create_a_multi_language_application#Switching_the_language
     qApp->removeTranslator(translator);
 
@@ -56,14 +58,14 @@ void LocaleChanger::changeLocale(QString locale) {
     }
 
     // Note: installTranslator() emits a QEvent::LanguageChange event, which may be handled by other
-    // components of the application that also need to react to language changes, such as topic language.
+    // components of the application that also need to react to language changes.
     qApp->installTranslator(translator); // qApp is a global variable made available by QGuiApplication
 
     // Render the QML UI with translations in the new language.
     //   This will re-evaluate all (!) QML bindings. If this causes weird effects, you might want to
     //   remove certain bindings before calling retranslate(), and potentially restore them later.
     //
-    //   TODO It seems cleaner to instead send a QEvent::LanguageChange event to engine, as documented here:
+    //   TODO It seems cleaner to instead send a QEvent::LanguageChange event to the engine, as documented here:
     //   https://doc.qt.io/qt-5/qtquick-internationalization.html#9-prepare-for-dynamic-language-changes .
     //   That can be done by implementing an event filter for this event when it is emitted by
     //   installTranslator() above, as per https://forum.qt.io/post/276252 . Maybe the engine then passes

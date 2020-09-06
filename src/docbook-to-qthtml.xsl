@@ -92,110 +92,92 @@
                 <!-- TODO: Render the proper i18n'ed versions of the section titles. -->
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Risks and caveats</xsl:with-param> -->
-                    <xsl:with-param name="header">Risiken und Vorsichtsmaßnahmen</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$risks-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">risks</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Edibility assessment</xsl:with-param> -->
-                    <xsl:with-param name="header">Essbarkeit</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$assessment-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">assessment</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Symptoms and causes</xsl:with-param> -->
-                    <xsl:with-param name="header">Symptome und Ursachen</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$symptoms-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">symptoms</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Pantry storage</xsl:with-param> -->
-                    <xsl:with-param name="header">Lagerung in der Vorratskammer</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$pantry-storage-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">pantry_storage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Refrigerator storage</xsl:with-param> -->
-                    <xsl:with-param name="header">Lagerung im Kühlschrank</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$refrigerator-storage-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">refrigerator_storage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Freezer storage</xsl:with-param> -->
-                    <xsl:with-param name="header">Lagerung im Gefrierschrank</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$freezer-storage-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">freezer_storage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Other storage types</xsl:with-param> -->
-                    <xsl:with-param name="header">Andere Arten der Lagerung</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$other-storage-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">other_storage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Commercial storage and management</xsl:with-param> -->
-                    <xsl:with-param name="header">Kommerzielle Lagerung und Handhabung</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$commercial-storage-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">commercial_storage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Donation options</xsl:with-param> -->
-                    <xsl:with-param name="header">Spendenmöglichkeiten</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$donation-options-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">donation_options</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Rescuing spoiled and damaged food</xsl:with-param> -->
-                    <xsl:with-param name="header">Maßnahmen bei Verderb und Beschädigung</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$post-spoilage-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">post_spoilage</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Edible parts</xsl:with-param> -->
-                    <xsl:with-param name="header">Essbare Bestandteile</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$edible-parts-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">edible_parts</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Preservation instructions</xsl:with-param> -->
-                    <xsl:with-param name="header">Konservierung</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$preservation-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">preservation</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Preparation instructions</xsl:with-param> -->
-                    <xsl:with-param name="header">Zubereitung</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$preparation-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">preparation</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">When you don't like this food</xsl:with-param> -->
-                    <xsl:with-param name="header">Wenn es nicht schmeckt</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$unliked-food-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">unliked_food</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Cleaning out residual food</xsl:with-param> -->
-                    <xsl:with-param name="header">Restmengen nutzen</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$residual-food-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">residual_food</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Reuse and recycling ideas</xsl:with-param> -->
-                    <xsl:with-param name="header">Wiederverwendung und Recycling</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$reuse-and-recycling-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">reuse_and_recycling</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Production waste</xsl:with-param> -->
-                    <xsl:with-param name="header">Produktionsabfälle</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$production-waste-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">production_waste</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
-                    <!-- <xsl:with-param name="header">Packaging waste</xsl:with-param> -->
-                    <xsl:with-param name="header">Verpackungsabfälle</xsl:with-param>
+                    <xsl:with-param name="header"><xsl:value-of select="$packaging-waste-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">packaging_waste</xsl:with-param>
                 </xsl:call-template>
 

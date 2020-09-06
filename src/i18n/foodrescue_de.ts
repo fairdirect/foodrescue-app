@@ -32,6 +32,7 @@
     <name>App</name>
     <message>
         <location filename="../qml/App.qml" line="95"/>
+        <location filename="../ContentDatabase.cpp" line="370"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
@@ -228,12 +229,12 @@
         <translation>Sprache der Anwendung:</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="47"/>
+        <location filename="../qml/SettingsPage.qml" line="50"/>
         <source>English</source>
         <translation>Englisch</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="49"/>
+        <location filename="../qml/SettingsPage.qml" line="52"/>
         <source>German</source>
         <translation>Deutsch</translation>
     </message>
@@ -254,6 +255,99 @@
         <location filename="../qml/StarsPage.qml" line="11"/>
         <source>Starred Articles</source>
         <translation>Gemerkte Artikel</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="329"/>
+        <source>Risks and caveats</source>
+        <translation>Risiken und Vorsichtsmaßnahmen</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="330"/>
+        <source>Edibility assessment</source>
+        <translation>Essbarkeit</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="331"/>
+        <source>Symptoms and causes</source>
+        <translation>Symptome und Ursachen</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="332"/>
+        <source>Pantry storage</source>
+        <translation>Lagerung in der Vorratskammer</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="333"/>
+        <source>Refrigerator storage</source>
+        <translation>Lagerung im Kühlschrank</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="334"/>
+        <source>Freezer storage</source>
+        <translation>Lagerung im Gefrierschrank</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="335"/>
+        <source>Other storage types</source>
+        <translation>Andere Arten der Lagerung</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="336"/>
+        <source>Commercial storage and management</source>
+        <translation>Kommerzielle Lagerung und Handhabung</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="337"/>
+        <source>Donation options</source>
+        <translation>Spendenmöglichkeiten</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="338"/>
+        <source>Rescuing spoiled and damaged food</source>
+        <translation>Maßnahmen bei Verderb und Beschädigung</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="339"/>
+        <source>Edible parts</source>
+        <translation>Essbare Bestandteile</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="340"/>
+        <source>Preservation instructions</source>
+        <translation>Konservierung</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="341"/>
+        <source>Preparation instructions</source>
+        <translation>Zubereitung</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="342"/>
+        <source>When you don&apos;t like this food</source>
+        <translation>Wenn es nicht schmeckt</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="343"/>
+        <source>Cleaning out residual food</source>
+        <translation>Restmengen nutzen</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="344"/>
+        <source>Reuse and recycling ideas</source>
+        <translation>Wiederverwendung und Recycling</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="345"/>
+        <source>Production waste</source>
+        <translation>Produktionsabfälle</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="346"/>
+        <source>Packaging waste</source>
+        <translation>Verpackungsabfälle</translation>
     </message>
 </context>
 </TS>

@@ -324,6 +324,24 @@ QString ContentDatabase::content(QString searchTerm, QString language, ContentFo
     // Deal with the remaining case: converting the content to HTML format.
     QString html;
     QXmlQuery query(QXmlQuery::XSLT20);
+    query.bindVariable("risks-title", QVariant(QObject::tr("Risks and caveats")));
+    query.bindVariable("assessment-title", QVariant(QObject::tr("Edibility assessment")));
+    query.bindVariable("symptoms-title", QVariant(QObject::tr("Symptoms and causes")));
+    query.bindVariable("pantry-storage-title", QVariant(QObject::tr("Pantry storage")));
+    query.bindVariable("refrigerator-storage-title", QVariant(QObject::tr("Refrigerator storage")));
+    query.bindVariable("freezer-storage-title", QVariant(QObject::tr("Freezer storage")));
+    query.bindVariable("other-storage-title", QVariant(QObject::tr("Other storage types")));
+    query.bindVariable("commercial-storage-title", QVariant(QObject::tr("Commercial storage and management")));
+    query.bindVariable("donation-options-title", QVariant(QObject::tr("Donation options")));
+    query.bindVariable("post-spoilage-title", QVariant(QObject::tr("Rescuing spoiled and damaged food")));
+    query.bindVariable("edible-parts-title", QVariant(QObject::tr("Edible parts")));
+    query.bindVariable("preservation-title", QVariant(QObject::tr("Preservation instructions")));
+    query.bindVariable("preparation-title", QVariant(QObject::tr("Preparation instructions")));
+    query.bindVariable("unliked-food-title", QVariant(QObject::tr("When you don't like this food")));
+    query.bindVariable("residual-food-title", QVariant(QObject::tr("Cleaning out residual food")));
+    query.bindVariable("reuse-and-recycling-title", QVariant(QObject::tr("Reuse and recycling ideas")));
+    query.bindVariable("production-waste-title", QVariant(QObject::tr("Production waste")));
+    query.bindVariable("packaging-waste-title", QVariant(QObject::tr("Packaging waste")));
     query.setFocus(docbook);
     query.setQuery(QUrl("qrc:/docbook-to-qthtml.xsl"));
     if (!query.isValid()) {
@@ -332,12 +350,19 @@ QString ContentDatabase::content(QString searchTerm, QString language, ContentFo
     }
     query.evaluateTo(&html);
 
+//    qDebug().noquote()
+//        << "\nContentDatabase::content(QString, ContentFormat): Content in DocBook format:\n\n"
+//        << formatXml(docbook);
+//    qDebug().noquote()
+//        << "\nContentDatabase::content(QString, ContentFormat): Content in HTML format:\n\n"
+//        << formatXml(html);
+
+    // The current locale is accessible as the global default locale by creating a QLocale object
+    // without arguments. See: https://doc.qt.io/qt-5/qlocale.html#setDefault
     qDebug().noquote()
-        << "\nContentDatabase::content(QString, ContentFormat): Content in DocBook format:\n\n"
-        << formatXml(docbook);
+        << "Current language: " << QLocale::languageToString(QLocale().language());
     qDebug().noquote()
-        << "\nContentDatabase::content(QString, ContentFormat): Content in HTML format:\n\n"
-        << formatXml(html);
+        << "Current locale: " << QLocale().name();
 
     return html;
 }
