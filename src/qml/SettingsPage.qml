@@ -43,11 +43,14 @@ Kirigami.ScrollablePage {
 
             model: ListModel {
                 id: languageModel
-                // TODO: Maybe automatically initialize this based on the available .qm translation files.
+
+                // Languages are not automatically initialized from available .qm translation files
+                // to be able to exclude languages with missing food rescue content translation.
+                // Otherwise, this would result in no search results for that language.
                 ListElement { label: qsTr("English"); language: "en" }
-                ListElement { label: qsTr("French");  language: "fr" }
+                // ListElement { label: qsTr("French");  language: "fr" } // Missing content translations.
                 ListElement { label: qsTr("German");  language: "de" }
-                ListElement { label: qsTr("Spanish"); language: "es" }
+                // ListElement { label: qsTr("Spanish"); language: "es" } // Missing content translations.
             }
 
             Component.onCompleted: {
