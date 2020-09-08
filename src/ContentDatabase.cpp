@@ -324,14 +324,14 @@ QString ContentDatabase::content(QString searchTerm, QString language, ContentFo
     // Deal with the remaining case: converting the content to HTML format.
     QString html;
     QXmlQuery query(QXmlQuery::XSLT20);
-    query.bindVariable("risks-title", QVariant(QObject::tr("Risks and caveats")));
-    query.bindVariable("assessment-title", QVariant(QObject::tr("Edibility assessment")));
     query.bindVariable("symptoms-title", QVariant(QObject::tr("Symptoms and causes")));
     query.bindVariable("pantry-storage-title", QVariant(QObject::tr("Pantry storage")));
     query.bindVariable("refrigerator-storage-title", QVariant(QObject::tr("Refrigerator storage")));
     query.bindVariable("freezer-storage-title", QVariant(QObject::tr("Freezer storage")));
     query.bindVariable("other-storage-title", QVariant(QObject::tr("Other storage types")));
     query.bindVariable("commercial-storage-title", QVariant(QObject::tr("Commercial storage and management")));
+    query.bindVariable("risks-title", QVariant(QObject::tr("Risks and caveats")));
+    query.bindVariable("assessment-title", QVariant(QObject::tr("Edibility assessment")));
     query.bindVariable("donation-options-title", QVariant(QObject::tr("Donation options")));
     query.bindVariable("post-spoilage-title", QVariant(QObject::tr("Rescuing spoiled and damaged food")));
     query.bindVariable("edible-parts-title", QVariant(QObject::tr("Edible parts")));

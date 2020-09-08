@@ -118,7 +118,7 @@ target_link_libraries(foodrescue
     Qt5::Core
     Qt5::Quick
     Qt5::Qml
-    Qt5::Svg
+    Qt5::Svg         # For Breeze icons, among other purposes.
     Qt5::Sql
     Qt5::Multimedia  # For the barcode scanner.
     Qt5::Gui         # For the barcode scanner.
@@ -126,7 +126,7 @@ target_link_libraries(foodrescue
     Qt5::Xml         # For formatted XML debug output. TODO: Avoid in non-debug builds.
     Qt5::XmlPatterns # For XSLT conversion of database contents for rendering.
     ZXing::ZXing     # For the barcode scanner.
-    # KF5::I18n      # TODO: Add when starting to use KDE i18n.
+    # KF5::I18n      # TODO: Add when starting to use KDE i18n. So far we use Qt i18n.
     ${foodrescue_EXTRA_LIBS}
 )
 

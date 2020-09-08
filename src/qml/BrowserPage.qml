@@ -27,7 +27,7 @@ Kirigami.ScrollablePage {
     leftAction: Kirigami.Action {
         iconName: "go-previous"
         text: qsTr("Last Search")
-        onTriggered: { showPassiveNotification("History back action (soon …)") }
+        onTriggered: { showPassiveNotification("History back") }
     }
 
     mainAction: Kirigami.Action {
@@ -41,16 +41,17 @@ Kirigami.ScrollablePage {
         // Event handler for a dynamically created ScannerPage object.
         // TODO: Document the parameters.
         function onBarcodeFound(code) {
-            console.log("BrowserPage: scanButton: 'barcodeFound()' received, code = " + code)
+            console.log("BrowserPage: 'barcodeFound()' received, code = " + code)
             autocomplete.input = code
-            var content = database.content(code)
+            var uiLanguage = Qt.locale().name.substring(0,2)
+            var content = database.content(code, uiLanguage)
             browserContent.text = contentOrMessage(content, code)
         }
 
         // Create the barcode scanner page and connect its signal to this page.
         //   Documentation for this technique: QtQuick.Controls.StackView::push()
-        //   and "Dynamic QML Object Creation from JavaScript",
-        //   https://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html and
+        //   and "Dynamic QML Object Creation from JavaScript" at
+        //   https://doc.qt.io/qt-5/qtqml-javascript-dynamicobjectcreation.html .
         //
         //   By providing a component as URL and not an item, Kirigami takes care
         //   of dynamic object creation and deletion. Deletion makes sure the camera
@@ -64,9 +65,10 @@ Kirigami.ScrollablePage {
         //   camera in Camera.LoadedState. That should speed up showing the barcode scanner
         //   from the second time on. Not sure how much would be gained, though.
         onTriggered: {
-            // On mobile platforms (and only there), Kirigami restores the focus after the scanner
-            // page closes again, to keep the status of the on-screen keyboard. Not intended
-            // because then the keyboard overlays the search results, so we give up that focus now.
+            // On mobile platforms (and only there), Kirigami restores the keyboard focus after the
+            // scanner page closes again, to keep the status of the on-screen keyboard. Not intended
+            // because then the keyboard overlays the search results. So we give up that focus now
+            // to prevent it from being restored later.
             autocomplete.focus = false
 
             var scannerPage = pageStack.layers.push(Qt.resolvedUrl("ScannerPage.qml"));
@@ -77,7 +79,7 @@ Kirigami.ScrollablePage {
     rightAction: Kirigami.Action {
         iconName: "go-next"
         text: qsTr("Next Search")
-        onTriggered: { showPassiveNotification("History forward action (soon …)") }
+        onTriggered: { showPassiveNotification("History forward") }
     }
 
     // No contextual actions so far.

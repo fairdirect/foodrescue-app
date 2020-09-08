@@ -92,18 +92,8 @@
                 <!-- TODO: Render the proper i18n'ed versions of the section titles. -->
 
                 <xsl:call-template name="section">
-                    <xsl:with-param name="header"><xsl:value-of select="$risks-title"/></xsl:with-param>
-                    <xsl:with-param name="topictype">risks</xsl:with-param>
-                </xsl:call-template>
-
-                <xsl:call-template name="section">
                     <xsl:with-param name="header"><xsl:value-of select="$assessment-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">assessment</xsl:with-param>
-                </xsl:call-template>
-
-                <xsl:call-template name="section">
-                    <xsl:with-param name="header"><xsl:value-of select="$symptoms-title"/></xsl:with-param>
-                    <xsl:with-param name="topictype">symptoms</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
@@ -129,6 +119,16 @@
                 <xsl:call-template name="section">
                     <xsl:with-param name="header"><xsl:value-of select="$commercial-storage-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">commercial_storage</xsl:with-param>
+                </xsl:call-template>
+
+                <xsl:call-template name="section">
+                    <xsl:with-param name="header"><xsl:value-of select="$risks-title"/></xsl:with-param>
+                    <xsl:with-param name="topictype">risks</xsl:with-param>
+                </xsl:call-template>
+
+                <xsl:call-template name="section">
+                    <xsl:with-param name="header"><xsl:value-of select="$symptoms-title"/></xsl:with-param>
+                    <xsl:with-param name="topictype">symptoms</xsl:with-param>
                 </xsl:call-template>
 
                 <xsl:call-template name="section">

@@ -8,7 +8,7 @@ import org.kde.kirigami 2.10 as Kirigami
 App {
     id: root
 
-    // TODO: What does this do? Do we need it?
+    // TODO: The context drawer is not used yet in the application, so this can be removed.
     // TODO: If possible, merge this into BaseApp with a condition inside the QML.
     contextDrawer: Kirigami.ContextDrawer {
         id: contextDrawer

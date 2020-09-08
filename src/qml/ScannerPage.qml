@@ -95,12 +95,14 @@ Kirigami.ScrollablePage {
         cameraState: Camera.LoadedState
 
         captureMode: Camera.CaptureViewfinder
+
         focus {
             // TODO: Only change focusMode if supported, to avoid messages like
             // "Focus mode selection is not supported".
             focusMode: CameraFocus.FocusContinuous
             focusPointMode: CameraFocus.FocusPointAuto
         }
+
         deviceId: {
             QtMultimedia.availableCameras[camerasComboBox.currentIndex] ?
                 QtMultimedia.availableCameras[camerasComboBox.currentIndex].deviceId : ""
@@ -159,16 +161,19 @@ Kirigami.ScrollablePage {
                 break;
             }
         }
+
         onDeviceIdChanged: {
             focus.focusMode = CameraFocus.FocusContinuous
             focus.focusPointMode = CameraFocus.FocusPointAuto
         }
+
         onLockStatusChanged: {
             if (tagDiscoveredInSession)
                 return
             if (lockStatus === Camera.Locked)
                 camera.unlock()
         }
+
         onError: console.log("camera error:" + errorString)
     }
 
