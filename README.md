@@ -889,6 +889,7 @@ The default build type is "Debug". To create a release build that is ready for p
 1. **Update the version.** Updating the version defines the current state as the version number you enter. You have to adapt:
 
     * In `CMakeLists.txt`: line `project(foodrescue-app VERSION …)`. This version string should only have two components, such as "0.2".
+    * In `src/qml/AboutPage.qml`: line `"version": "0.2"`. This version string should only have two components.
     * In `src/android/AndroidManifest.xml`: line `<manifest … android:versionName="0.2" android:versionCode="200" …>`. As per our convention documented there, this version string has three components, the last of which is the "packaging version" that is omitted in the `CMakeLists.txt` version string. It is needed for example to disambiguate [multiple APKs](https://developer.android.com/google/play/publishing/multiple-apks) uploaded for the same release.
 
 

@@ -24,7 +24,7 @@ Kirigami.ApplicationWindow {
     id: root
 
     // Displayed in the window title on desktop platforms.
-    title: "Food Rescue App"
+    title: "My Food Rescue"
 
     // The main page, displaying food rescue content.
     pageStack.initialPage: BrowserPage { id: browserPage }
@@ -76,7 +76,7 @@ Kirigami.ApplicationWindow {
     //   TODO: Try switching away from dynamic QML object instantiation (by loading QML from file),
     //   as that prevents using pre-compiled QML, so it is much slower.
     globalDrawer: Kirigami.GlobalDrawer {
-        title: "Food Rescue"
+        title: "My Food Rescue"
 
         // TODO: Replace the icon with a circular version in SVG.
         titleIcon: "qrc:///images/secondfood-applogo-256x188.png"

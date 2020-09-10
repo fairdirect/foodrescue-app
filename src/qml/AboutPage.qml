@@ -20,12 +20,13 @@ Kirigami.AboutPage {
     aboutData: {
 
         // Header section.
-        "displayName": "Food Rescue App",
-        "version": "0.1",
+        "displayName": "My Food Rescue",
+        "version": "0.2", // TODO: Initialize this automatically from the Android manifest file.
         "shortDescription": qsTr("Helps you decide which food is still edible."),
 
         // "Copyright" section.
         "copyrightStatement": qsTr("© 2020 Matthias Ansorg"),
+        // TODO: Replace the website link with https://myfoodrescue.app/ once available.
         "homepage": qsTr("https://fairdirect.org/food-rescue-app"), // Links to the correct translated version.
         "licenses": [ // TODO: Add all licenses, as that seems to be possible.
             {
