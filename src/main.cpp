@@ -12,6 +12,7 @@
 #include "BarcodeScanner.h"
 #include "BarcodeFilter.h"
 #include "ContentDatabase.h"
+#include "History.h"
 #include "LocaleChanger.h"
 
 // Export main() as part of a library interface. Needed on Android.
@@ -38,11 +39,10 @@ int main(int argc, char *argv[]) {
 
     // Make the barcode component available for use with Qt meta-objects and in QML.
     qRegisterMetaType<Barcode::Format>("BarcodeFormat");
-    // TODO: Perhaps rename the QML types to "BarcodeDecodeStatus" etc.. But since they are
-    //   typically not used in QML in client code, it does not matter much.
+    // TODO: Perhaps register these classes as QML types "BarcodeDecodeStatus" etc.. But since they
+    //   are typically not used in QML in client code, it does not matter much.
     qRegisterMetaType<Barcode::DecodeStatus>("DecodeStatus");
     qRegisterMetaType<Barcode::DecodeResult>("DecodeResult");
-
     qmlRegisterUncreatableMetaObject(
         Barcode::staticMetaObject, "local", 1, 0, "BarcodeFormat", "Error: only enums allowed"
     );
@@ -54,8 +54,9 @@ int main(int argc, char *argv[]) {
     db.connect();
 
     // Make the Food Rescue database available for use in QML.
-    //   TODO: Better than registering the type to be instantiated as a singleton in QML, provide
-    //   the above "db" object as a global object to be accessed in QML.
+    // TODO: Better than registering the type to be instantiated as a singleton object in QML, provide
+    //   the above "db" object as a context property that is accessible in QML. For that, use
+    //   engine.rootContext()->setContextProperty
     qmlRegisterType<ContentDatabase>("local", 1, 0, "ContentDatabase");
 
     QQmlApplicationEngine engine;
@@ -63,6 +64,13 @@ int main(int argc, char *argv[]) {
     // Set up the language switcher and make it available to QML.
     LocaleChanger localeChanger(&engine, QString("/i18n"), QString("foodrescue_"));
     engine.rootContext()->setContextProperty("localeChanger", &localeChanger);
+
+    // Set up the global history object and make it available to QML.
+    //   TODO: Insteaf of "", use a different homepage identifier, so that navigating back there
+    //   will indeed bring one back to the start screen. For that, a search term of "home:" could
+    //   be used, similar to the "config:" special URL in Firefox.
+    History browserHistory("");
+    engine.rootContext()->setContextProperty("browserHistory", &browserHistory);
 
     // Use different main files on desktop vs. mobile platform.
     // TODO: Switch to the "qrc:/something" URLs if possible. So far not working.

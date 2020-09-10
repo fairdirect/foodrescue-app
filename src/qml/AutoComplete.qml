@@ -45,12 +45,13 @@ FocusScope {
     height: field.height
 
     // Data source containing the current autocomplete suggestions.
-    //   In JavaScript, this is a string array, so access it with [index], not the usual .get(index).
-    //   For implementing in C++, use QStringList.
+    //   This property must be set when instantiating this QML component. Acceptable models are string
+    //   list models only. In JavaScript, these are a string array, so access it with [index], not the usual
+    //   .get(index). To implement such a model in C++, use QStringList.
     //
-    //   TODO: Allow client code to set this to any type of model accepted by a Repeater.
-    //   See: https://doc.qt.io/qt-5/qml-qtquick-repeater.html#model-prop . Right now, only a QStringList
-    //   is accepted.
+    //   TODO: Allow client code of this component to set this property to any type of model accepted by a
+    //   Repeater. See: https://doc.qt.io/qt-5/qml-qtquick-repeater.html#model-prop . Right now, only a
+    //   QStringList is accepted.
     property alias model: completions.model
 
     // The currently active, in-use user input that is the basis for the current completions.
@@ -115,6 +116,9 @@ FocusScope {
     // TODO: Add a parameter to make it configurable which HTML tag (incl. attributes) to use for the
     //   highlighting.
     // TODO: Maybe add a parameter to de-highlight the original parts with configurable HTML.
+    // TODO: It seems better to do this in C++, as it will be much faster in regex processing etc..
+    //   And it seems to be the responsibility of the model, and all models of this application are
+    //   done in C++ as a convention.
     function highlightCompletion(completion, fragmentsString) {
         var fragments = fragmentsString.trim().split(" ")
 
@@ -382,7 +386,7 @@ FocusScope {
 
                     // A delegate renders one list item.
                     //   TODO: Use a basic QML component to not tie AutoComplete to Kirigami. Or
-                    //   tell what to use here when wanting to use it independent of Kirigami.
+                    //   document what can be used here when wanting to use it independent of Kirigami.
                     delegate: Kirigami.BasicListItem {
                         id: listItem
 

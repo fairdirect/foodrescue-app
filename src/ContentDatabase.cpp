@@ -22,7 +22,7 @@
  * @brief Interface to a SQLite3 database with e-book like content.
  * @details The difference from typical e-book (such as EPUB) is that the content can be queried
  *   with a database interface. In this implementation (containing food rescue content), content
- *   can be queried based on product barcode or category, among others.
+ *   can be queried based on product barcode or food category.
  */
 ContentDatabase::ContentDatabase (QObject* parent) : QObject(parent) { }
 

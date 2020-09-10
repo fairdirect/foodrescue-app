@@ -13,6 +13,7 @@ set(foodrescue_SRCS
     BarcodeScanner.cpp
     BarcodeFilter.cpp
     Barcode.h
+    History.cpp
     LocaleChanger.cpp
 )
 

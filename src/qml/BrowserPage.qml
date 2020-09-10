@@ -10,10 +10,7 @@ import local 1.0 as Local // Our custom C++ based QML components, as exported in
 Kirigami.ScrollablePage {
     id: browserPage
 
-    // Page title.
-    //   TODO: Set the title as suitable for the current contents displayed in this window.
-    title: "Food Rescue"
-
+    title: "My Food Rescue"
     horizontalScrollBarPolicy: ScrollBar.AlwaysOff
     supportsRefreshing: false
 
@@ -26,8 +23,12 @@ Kirigami.ScrollablePage {
     //   org::kde::kirigami::Page::globalToolBarItem refers to this toolbar.
     leftAction: Kirigami.Action {
         iconName: "go-previous"
-        text: qsTr("Last Search")
-        onTriggered: { showPassiveNotification("History back") }
+        text: qsTr("Previous search")
+        enabled: browserHistory.backPossible
+        onTriggered: {
+            // showPassiveNotification("History back")
+            displayContent(browserHistory.back(), false)
+        }
     }
 
     mainAction: Kirigami.Action {
@@ -37,16 +38,6 @@ Kirigami.ScrollablePage {
         // a custom icon in Kirigami Page actions is currently prevented by a bug.
         iconName: "view-barcode"
         text: qsTr("Scan")
-
-        // Event handler for a dynamically created ScannerPage object.
-        // TODO: Document the parameters.
-        function onBarcodeFound(code) {
-            console.log("BrowserPage: 'barcodeFound()' received, code = " + code)
-            autocomplete.input = code
-            var uiLanguage = Qt.locale().name.substring(0,2)
-            var content = database.content(code, uiLanguage)
-            browserContent.text = contentOrMessage(content, code)
-        }
 
         // Create the barcode scanner page and connect its signal to this page.
         //   Documentation for this technique: QtQuick.Controls.StackView::push()
@@ -71,15 +62,19 @@ Kirigami.ScrollablePage {
             // to prevent it from being restored later.
             autocomplete.focus = false
 
-            var scannerPage = pageStack.layers.push(Qt.resolvedUrl("ScannerPage.qml"));
-            scannerPage.barcodeFound.connect(onBarcodeFound)
+            var scannerPage = pageStack.layers.push(Qt.resolvedUrl("ScannerPage.qml"))
+            scannerPage.barcodeFound.connect(displayContent)
         }
     }
 
     rightAction: Kirigami.Action {
         iconName: "go-next"
-        text: qsTr("Next Search")
-        onTriggered: { showPassiveNotification("History forward") }
+        text: qsTr("Next search")
+        enabled: browserHistory.forwardPossible
+        onTriggered: {
+            // showPassiveNotification("History forward")
+            displayContent(browserHistory.forward(), false)
+        }
     }
 
     // No contextual actions so far.
@@ -95,6 +90,32 @@ Kirigami.ScrollablePage {
         // Configure the timer so it fires with a delay after the last resize.
         supporterLogos.redrawTimer.running ? supporterLogos.redrawTimer.restart() : supporterLogos.redrawTimer.start()
         // console.log("BrowserPage.qml: browserPage: heightChanged() received")
+    }
+
+    // Utility function to display content for a certain search string in the browser.
+    // @param searchTerm string  The barcode or category name to display the content for.
+    // @param addToHistory boolean  If this call to display content should be appended as a new item
+    //   to the browser's history. Set to `false` while navigating through the past of that history.
+    function displayContent(searchTerm, addToHistory = true) {
+        console.log("BrowserPage: 'displayContent()' called, searchTerm = " + searchTerm)
+        if (addToHistory)
+            browserHistory.add(searchTerm)
+
+        autocomplete.input = searchTerm
+
+        // TODO: Set browserPage.title as a property binding, not imperatively like below.
+        browserPage.title = searchTerm === "" ? "My Food Rescue" : searchTerm
+
+        var uiLanguage = Qt.locale().name.substring(0,2)
+        var content = database.content(searchTerm, uiLanguage)
+        browserContent.text = contentOrMessage(content, searchTerm)
+
+        // If nothing was found, the user wants to search again instead of scroll. So we take the
+        // focus back, which was givev up in the AutoComplete onAccepted event handler.
+        if (content === "") {
+            autocomplete.focus = true;
+            autocomplete.completionsVisible = false;
+        }
     }
 
     // Displays a database search result or a "nothing found" message, as appropriate.
@@ -118,8 +139,8 @@ Kirigami.ScrollablePage {
 
     // Interface to the food rescue content.
     //   This is a C++ defined QML type, see ContentDatabase.h. Interface: method content(string).
-    //   Note that this is not the same ContentDatabase object that is created in main.cpp. It still
-    //   works because we rely on the QSqlDatabase default connection, see ContentDatabase.cpp for
+    //   Note that this is is a different ContentDatabase object from that created in main.cpp. It still
+    //   works because we rely on the QSqlDatabase default connection; see ContentDatabase.cpp for
     //   details.
     Local.ContentDatabase {
         id: database
@@ -232,18 +253,7 @@ Kirigami.ScrollablePage {
                         }
                     }
 
-                    onAccepted: {
-                        var uiLanguage = Qt.locale().name.substring(0,2)
-                        var content = database.content(input, uiLanguage)
-                        browserContent.text = contentOrMessage(content, input)
-
-                        // AutoComplete gives up focus in its onAccepted handler. But if nothing was found
-                        // the user wants to search again instead of scroll. So we take the focus back here.
-                        if (content === "") {
-                            focus = true
-                            completionsVisible = false
-                        }
-                    }
+                    onAccepted: displayContent(input)
 
                     // Clean up a search string a user entered into the browser's "address bar".
                     //   TODO: Somehow merge this with the function normalize() at the top of thils file.
