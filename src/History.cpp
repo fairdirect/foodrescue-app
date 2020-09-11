@@ -39,13 +39,8 @@ QString History::forward() {
 
 /** @brief Determine if navigating backwards in the history is possible. */
 bool History::backPossible() {
-    qDebug() << "History::backPossible() called.";
-    qDebug() << "Current history list is:" << m_history;
-    qDebug() << "Current index is:" << m_currentIndex;
-
-    if (m_history.size() == 0) {
+    if (m_history.size() == 0)
         return false;
-    }
     else {
         int lastIndex = m_history.size() - 1;
         return m_currentIndex <= lastIndex && m_currentIndex > 0;
@@ -54,11 +49,8 @@ bool History::backPossible() {
 
 /** @brief Determine if navigating forward in the history is possible. */
 bool History::forwardPossible() {
-    qDebug() << "History::forwardPossible() called.";
-
-    if (m_history.size() == 0) {
+    if (m_history.size() == 0)
         return false;
-    }
     else {
         int lastIndex = m_history.size() - 1;
         return m_currentIndex < lastIndex;
@@ -74,7 +66,6 @@ bool History::forwardPossible() {
  * @param searchTerm  The item to add to the history.
  */
 void History::add(QString item) {
-    qDebug() << "History::add() called, item =" << item;
     if (item == "") return;
 
     // Use erase(begin, end) with pointer arithmetic to erase all elements after the current.
@@ -84,7 +75,6 @@ void History::add(QString item) {
     m_history.erase(m_history.begin() + m_currentIndex + 1, m_history.end());
 
     if (item != current()) {
-        qDebug() << "History::add(): adding item";
         m_history << item;
         m_currentIndex = m_history.size() - 1;
     }
@@ -96,9 +86,5 @@ void History::add(QString item) {
  * @return The identifier string of the current history item.
  */
 QString History::current() {
-    qDebug() << "History::current() called."
-        << "m_currentIndex =" << m_currentIndex
-        << "m_history =" << m_history;
-
     return m_history.at(m_currentIndex);
 }
