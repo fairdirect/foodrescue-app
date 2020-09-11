@@ -79,7 +79,7 @@ Kirigami.ApplicationWindow {
         title: "My Food Rescue"
 
         // TODO: Replace the icon with a circular version in SVG.
-        titleIcon: "qrc:///images/secondfood-applogo-256x188.png"
+        titleIcon: "qrc:///images/applogo-3_exported+optipng-256x256.png"
 
         actions: [
             // TODO: Implement a browser history mechanism, then enable this menu item.

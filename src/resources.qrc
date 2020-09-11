@@ -3,7 +3,6 @@
         <file>android/res/drawable-hdpi/icon.png</file>
         <file>android/res/drawable-ldpi/icon.png</file>
         <file>android/res/drawable-mdpi/icon.png</file>
-        <file>images/secondfood-applogo-256x188.png</file>
         <file>qml/AboutPage.qml</file>
         <file>qml/App.qml</file>
         <file>qml/AppOnMobile.qml</file>
@@ -22,5 +21,7 @@
         <file>qml/StarsPage.qml</file>
         <file>images/credits-de-3_minified.svg</file>
         <file>images/credits-en-3_minified.svg</file>
+        <file>images/applogo-2_minified.svg</file>
+        <file>images/applogo-3_exported+optipng-256x256.png</file>
     </qresource>
 </RCC>
