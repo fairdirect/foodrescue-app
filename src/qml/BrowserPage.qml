@@ -82,15 +82,13 @@ Kirigami.ScrollablePage {
 
     onWidthChanged: {
         // Configure the timer so it fires with a delay after the last resize.
-        supporterLogos.redrawTimer.running ? supporterLogos.redrawTimer.restart() : supporterLogos.redrawTimer.start()
-        splashImage.redrawTimer.running ? splashImage.redrawTimer.restart() : splashImage.redrawTimer.start()
+        splashContent.redrawTimer.running ? splashContent.redrawTimer.restart() : splashContent.redrawTimer.start()
         // console.log("BrowserPage.qml: browserPage: widthChanged() received")
     }
 
     onHeightChanged: {
         // Configure the timer so it fires with a delay after the last resize.
-        supporterLogos.redrawTimer.running ? supporterLogos.redrawTimer.restart() : supporterLogos.redrawTimer.start()
-        splashImage.redrawTimer.running ? splashImage.redrawTimer.restart() : splashImage.redrawTimer.start()
+        splashContent.redrawTimer.running ? splashContent.redrawTimer.restart() : splashContent.redrawTimer.start()
         // console.log("BrowserPage.qml: browserPage: heightChanged() received")
     }
 
@@ -355,7 +353,7 @@ Kirigami.ScrollablePage {
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                color: "grey" // To debug the element's sizing, set this to "grey" instead of "transparent".
+                color: "transparent" // To debug the element's sizing, set this to "grey" instead of "transparent".
                 height: {
                     var kirigamiHeaderHeight = 40 // TODO: Determine the exact value.
                     var flickableVerticalBorder = 20 // TODO: Determine this value dynamically.
@@ -371,34 +369,40 @@ Kirigami.ScrollablePage {
                     onClicked: autocomplete.focus = false
                 }
 
-                // A footer graphic crediting supporters, shown while no browser content is present.
-                ImageNotice {
-                    id: supporterLogos
+                // Graphical content for the home screen at startup, before any user action.
+                SplashContent {
+                    id: splashContent
 
                     anchors.fill: parent
                     windowWidth: browserPage.width
                     windowHeight: browserPage.height
-
-                    // Show the correct localized version of the supporter logos graphic.
-                    //   If no localized version is available, the English version is shown.
-                    //
-                    //   TODO: Make this work as a dynamic binding to adapt when the locale changes.
-                    //   This binding depends on Qt.locale() but does not react when the locale
-                    //   changes due to a limitation of Qt (the QEvent::LocaleChanged signal is
-                    //   not automatically forwarded to Qt).
-                    imageSource: {
-                        var lang = Qt.locale().name.substring(0,2)
-                        if (lang === "de" || lang === "en")
-                            return "qrc:///images/credits-" + lang + "-3_minified.svg"
-                        else
-                            return "qrc:///images/credits-en-3_minified.svg"
-                    }
 
                     // Hide permanently after the first search (as the browser always has content after that,
                     // and if only "No content found.").
                     //   TODO: Better destroy the instance, or remove the image source, as it probably eats
                     //   CPU time and memory even while invisible.
                     visible: browserContent.text == ""
+
+                    // The app logo, shown large and centrally on the home screen.
+                    topImage: "qrc:///images/applogo-2_minified.svg"
+                    topImageAlignment: Image.AlignHCenter
+
+                    // A footer graphic crediting supporters.
+                    //   This is shown in a localized version. If no localized version is available,
+                    //   the English version is shown.
+                    //
+                    //   TODO: Make this work as a dynamic binding to adapt when the locale changes.
+                    //   This binding depends on Qt.locale() but does not react when the locale
+                    //   changes due to a limitation of Qt (the QEvent::LocaleChanged signal is
+                    //   not automatically forwarded to the Qt object).
+                    bottomImage: {
+                        var lang = Qt.locale().name.substring(0,2)
+                        if (lang === "de" || lang === "en")
+                            return "qrc:///images/credits-" + lang + "-3_minified.svg"
+                        else
+                            return "qrc:///images/credits-en-3_minified.svg"
+                    }
+                    bottomImageAlignment: Qt.AlignLeft // Because the BMBF logo must be left-aligned.
                 }
             }
         }
