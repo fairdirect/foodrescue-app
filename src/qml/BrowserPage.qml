@@ -305,24 +305,63 @@ Kirigami.ScrollablePage {
                 text: ""
                 textFormat: Text.RichText // Otherwise we get Text.StyledText, which is much less sophisticated.
                 wrapMode: Text.Wrap
-                onLinkActivated: Qt.openUrlExternally(link)
+
+                onLinkHovered: {
+                    browserContent.hoveredLink
+                }
+                onLinkActivated: {
+                    autocomplete.focus = false
+                    Qt.openUrlExternally(link)
+                }
+
+                ToolTip{
+                    id: urlToolTip
+                    visible: false
+                }
 
                 MouseArea {
+                    id: browserContentArea
+
                     anchors.fill: parent
 
-                    // Show a hand cursor when mousing over hyperlinks.
-                    //   Source: "Creating working hyperlinks in Qt Quick Text", https://blog.shantanu.io/?p=135
-                    cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    // Necessary to allow reading the mouse position, which we need to position the tooltip.
+                    //   See: https://doc.qt.io/qt-5/qml-qtquick-mousearea.html#mouseX-prop
+                    hoverEnabled: true
 
-                    // Don't eat clicks but forward them to the Text parent element. Otherwise links won't work.
-                    acceptedButtons: Qt.NoButton
-
-                    // Let clicking on browser content de-focus the autocomplete widget.
+                    // Let clicking on browser content de-focus the autocomplete widget, hiding its completions.
                     onClicked: autocomplete.focus = false
-                    // TODO: Check if consuming left-click events interferes with activating hyperlinks
-                    // via parent.onLinActivated. Before adding the focus change behavior on click the
-                    // MouseArea had "acceptedButtons: Qt.NoButton" to not eat click events. We might now
-                    // have to forward the mouse event to the parent.
+
+                    // Show a URL tooltip and hand cursor while hovering over a link.
+                    onPositionChanged: {
+                        var url = parent.linkAt(mouseX, mouseY)
+
+                        if (url) {
+                            // Show a hand cursor when mousing over hyperlinks.
+                            //   Adapting the cursor shape can also be done with a binding as follows:
+                            //   cursorShape: parent.linkAt(mouseX, mouseY) ? Qt.PointingHandCursor : Qt.ArrowCursor
+                            //   However, as that is an unnecessary call to linkAt() every mixel of movement,
+                            //   we do it imperatively here for performance reasons.
+                            cursorShape = Qt.PointingHandCursor
+
+                            // To make hyperlinks work, don't eat clicks but instead forward them to the parent.
+                            //   Could be handled with a binding, but the same logic as for cursorShape applies.
+                            //   TODO: As a simpler alternative, always accept click events but forward them to the
+                            //   parent in the onClick handler.
+                            acceptedButtons = Qt.NoButton
+
+                            urlToolTip.x = mouseX + 20
+                            urlToolTip.y = mouseY - 32 // Just enough to never prevent clicking the link.
+                            urlToolTip.text = url // TODO: Shorten the text with "…" for too long URLs.
+                            urlToolTip.visible = true
+                        }
+                        else {
+                            cursorShape = Qt.ArrowCursor
+                            urlToolTip.visible = false
+
+                            // To make our onClicked event handler work, we need to accept clicks.
+                            acceptedButtons = Qt.LeftButton
+                        }
+                    }
                 }
             }
 
