@@ -7,8 +7,12 @@ import org.kde.kirigami 2.10 as Kirigami
 // A scalable but size-limited graphical notice to display information using an SVG image.
 //   Typical uses include showing credits by rendering supporter logos to the homescreen. The
 //   implementation provides memory-efficient scaling, as the SVG will always be drawn with only the
-//   pixels needed. You could also use a raster graphic image instead of a SVG here, but that will
-//   not be memory efficient as you'd size it for the largest screens the application will be used on.
+//   pixels needed, even after resizing the window. In contrast, rendering the SVG once or using a
+//   raster graphic image is only perfectly memory efficient for one display size of the image,
+//   measured in pixel.
+//
+//   TODO: Rename and refactor, as it now has a more general use of displaying a SVG in a memory efficient
+//   manner.
 ColumnLayout {
     // TODO: Documentation.
     property alias imageSource: image.source
@@ -17,7 +21,7 @@ ColumnLayout {
     property alias redrawTimer: creditsRedrawTimer
 
     // Information about the (otherwise inaccessible) width of the containing window, to be set by the
-    // parent object when instantiating a LogoGrid.
+    // parent object when instantiating this QML type.
     property int windowWidth
     property int windowHeight
 
@@ -54,7 +58,7 @@ ColumnLayout {
             var sizeByHeight = Qt.size(image.height * image.sourceAspectRatio, image.height)
             image.sourceSize = (sizeByWidth.width < sizeByHeight.width) ? sizeByWidth : sizeByHeight
 
-            // console.log("LogoGrid.qml: new sourceSize: " + logos.sourceSize.width + "x" + logos.sourceSize.height)
+            // console.log("ImageNotice.qml: new sourceSize: " + logos.sourceSize.width + "x" + logos.sourceSize.height)
         }
     }
 
@@ -120,20 +124,22 @@ ColumnLayout {
         }
     }
 
-    // Placeholder to guarantee the BMBF logo's minimum exclusion area in the mobile version.
-    //   The BMBF logo is displayed immediately above and the logo SVG file has the exclusion area
-    //   inside. However, in the mobile interface of Kirigami applications, the left / main / right
-    //   action buttons are displayed at the bottom, and would overlay that exclusion area. With this
-    //   placeholder, they only overlay it, and not the logo image.
+    // Placeholder to prevent the mobile UI from overlapping with the image rendered above.
+    //   In the desktop version, nothing will overlap with the image rendered above, so if all
+    //   exclusion areas are incorporated into the image as they should, its positioning is fine.
+    //   However in the mobile interface of Kirigami applications, the left / main / right
+    //   action buttons are displayed at the bottom, and will overlay the image. This is counteracted
+    //   with this placeholder, so that the buttons will only overlay this placeholder, not the image.
     //
-    //   At some starts of the Android aplplication, the Kirigami buttons will not overlay the
-    //   placeholder but will be positioned immediately below. This seems to do with the event
-    //   sequence at startup and is a race condition that we don't want to investigate. Too much
-    //   space at the bottom is also not an issue, so we "play it safe".
+    //   Note that during some start sequences of the application in mobile mode under Android, the
+    //   Kirigami action buttons will not overlay this placeholder but will be positioned below it.
+    //   This seems to be a race condition bug in Kirigami and should not be relied on in any way.
     //
-    //   This element can also be rendered in another color to help debug page sizing.
+    //   TODO: Report the Kirigami bug mentioned above.
+    //   TODO: Move this element to the client code of this QML type, as otherwise it ties this
+    //   QML type to be positioned to the bottom of the page. It should be a generic type though.
     Rectangle {
-        color: "transparent"
+        color: "transparent" // To help help debug page sizing, switch from "transparent" to "grey".
         Layout.fillWidth: true
         Layout.preferredHeight: 20
         visible: Kirigami.Settings.isMobile

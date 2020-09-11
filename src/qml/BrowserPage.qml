@@ -83,12 +83,14 @@ Kirigami.ScrollablePage {
     onWidthChanged: {
         // Configure the timer so it fires with a delay after the last resize.
         supporterLogos.redrawTimer.running ? supporterLogos.redrawTimer.restart() : supporterLogos.redrawTimer.start()
+        splashImage.redrawTimer.running ? splashImage.redrawTimer.restart() : splashImage.redrawTimer.start()
         // console.log("BrowserPage.qml: browserPage: widthChanged() received")
     }
 
     onHeightChanged: {
         // Configure the timer so it fires with a delay after the last resize.
         supporterLogos.redrawTimer.running ? supporterLogos.redrawTimer.restart() : supporterLogos.redrawTimer.start()
+        splashImage.redrawTimer.running ? splashImage.redrawTimer.restart() : splashImage.redrawTimer.start()
         // console.log("BrowserPage.qml: browserPage: heightChanged() received")
     }
 
@@ -151,10 +153,11 @@ Kirigami.ScrollablePage {
     //   Details: https://stackoverflow.com/a/62853851
     //
     //   Positioning, sizing and margin'ing the Flickable with either Layout or anchors properties
-    //   does not work, probably because ScrollablePage overrides these settings when integrating
-    //   the element into the page. This is different from placing just the Flickable's content here
-    //   and should be considered a bug in Kirigami. For now, just assume the Flickable takes up all
-    //   available space up to its contentWidth × contentHeight.
+    //   does not work, probably because ScrollablePage overrides these settings of a Flickable
+    //   when integrating it into the page. Kirigami behaves differently (and correctly) if we would
+    //   only place the Flickable's content elements here in place of the Flickable. So the inability
+    //   to position, size and margin a Flickable here should be considered a bug in Kirigami.
+    //   For now, we can only size the Flickable to be large enough for its content (browserUI).
     //
     //   TODO: Get the above mentioned bug in Kirigami fixed, then set the sizing and margins.
     Flickable {
@@ -164,6 +167,8 @@ Kirigami.ScrollablePage {
         contentWidth: browserUI.width
         contentHeight: browserUI.height
 
+        // TODO: These margins probably have no effect yet due to the Kirigami bug documented for
+        // the Flickable above. Test and confirm.
         bottomMargin: 20
         leftMargin:   20
         rightMargin:  20
@@ -194,9 +199,8 @@ Kirigami.ScrollablePage {
                 event.accepted = true;
                 break
 
-            // Starting to edit the autocomplete text field.
-            //   F2 typical as a shortcut for "go to edit mode".
-
+            // For editing the autocomplete text field.
+            //   Note that F2 is a typical shortcut for "go to edit mode".
             case Qt.Key_F2:
                 autocomplete.focus = true;
                 if (database.completionModel.length > 0)
@@ -209,6 +213,8 @@ Kirigami.ScrollablePage {
         Column {
             id: browserUI
 
+            // Hack to make the margins of "browser" effective, which do not yet have an effect of
+            // their own due to a Kirigami bug documented above at "Flickable { … }"
             width: browserPage.width - browser.leftMargin - browser.rightMargin
             spacing: 20
 
@@ -299,7 +305,7 @@ Kirigami.ScrollablePage {
                 anchors.right: parent.right
 
                 text: ""
-                textFormat: Text.RichText // Otherwise we get Text.StyledText, offering much fewer options.
+                textFormat: Text.RichText // Otherwise we get Text.StyledText, which is much less sophisticated.
                 wrapMode: Text.Wrap
                 onLinkActivated: Qt.openUrlExternally(link)
 
@@ -323,15 +329,18 @@ Kirigami.ScrollablePage {
             }
 
             // Component to fill the empty space at the bottom of the page so that clicking there will
-            // remove the focus from the autocomplete field. Also contains supporter logos at startup.
+            // remove the focus from the autocomplete field. Also contains startup screen images.
             //
             //   Placing this into the Kirigami.ScrollablePage itself would be much simpler in terms of
-            //   anchors, but is not possible because of re-parenting done by ScrollablePage, leading to
-            //   errors "Cannot anchor to an item that isn't a parent or sibling." So instead we have to
-            //   make the Flickable's content as high as the page.
+            //   anchors. But it is not possible because of ScrollablePage re-parents its content elements,
+            //   so that elements appearing as sibling elements in ScrollablePage in the code are no longer
+            //   sibling elements at runtime. This leads to an error "Cannot anchor to an item that isn't a
+            //   parent or sibling." So instead we have to do a calculation to size this element so that it
+            //   pushes the size of its ancestor element "browser" (the Flickable) to be as high as the
+            //   page.
             //
-            //   The Rectangle is only here to allow outlining the area for debugging purposes. Otherwise,
-            //   replacing it with a MouseArea will also do.
+            //   This is a Rectangle only to support debugging by outlining the area. Otherwise, it could also be
+            //   replaced with a MouseArea, then rendering the nested MouseArea inside unnecessary.
             //
             //   TODO: Replace this with MouseArea { anchors.fill: parent; z: -1; onClicked: autocomplete.focus = false; }
             //   as a preceding sibling of Flickable. This has the advantage to fill the whole page, incl.
@@ -346,7 +355,7 @@ Kirigami.ScrollablePage {
                 anchors.left: parent.left
                 anchors.right: parent.right
 
-                color: "transparent" // For debugging sizing, use "white".
+                color: "grey" // To debug the element's sizing, set this to "grey" instead of "transparent".
                 height: {
                     var kirigamiHeaderHeight = 40 // TODO: Determine the exact value.
                     var flickableVerticalBorder = 20 // TODO: Determine this value dynamically.
