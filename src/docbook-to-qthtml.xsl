@@ -6,8 +6,8 @@
     See for the documentation of Qt's Text.RichText format: https://doc.qt.io/qt-5/richtext-html-subset.html
     In addition, some undocumented features are available:
 
-    * custom tags, see https://stackoverflow.com/q/62684658
-    * style element in the header, with CSS styling for tags and classes
+    * The "style" element can be used in the header, allowing CSS styling by elements and CSS class name.
+    * There are some custom elements, see https://stackoverflow.com/q/62684658 .
 
     Remarks about the quirks and limitations of Qt's HTML rendering using rendering. All of the below
     is about the Qt's HTML rendering using "textFormat: Text.RichText" (in QML); the other HTML
@@ -23,28 +23,39 @@
     * "width" has to be an attribute for the "table" tag, it cannot be used as a CSS property.
     * HTML entities like `&nbsp;` cannot be used (only after defining them somehow, perhaps).
     * Block elements containing nothing or only whitespace are not rendered (also not their margin etc.).
-      To create a spacer element, you can set color:transparent.
-    * The height of a "p" element does not shrink below its normal height, independent of what
+      To create a spacer element, use an element with dummy content and set color:transparent.
+    * The minimum vertical space taken up by any element is approx. 16 px (the default height of text). That
+      applies even for a simple, empty `br` element and cannot be fixed by CSS.
+    * The height of a "p" element does not shrink below its default height, independent of what
       you set for the "font-size" and "line-height" CSS attributes. It seems that the font size
       can be increased, but not decreased below its default size. To be able to use empty "p" elements
       as spacers of configurable height, you could try starting with a very small default font size
       for everything.
-    * As a vertical spacer, `<table style="margin-bottom: 4px"/>` works best.
     * By default, there is a vertical margin between "p" elements. It can be removed with margin:0px.
     * There is no default vertical margin around "div" or "table" elements.
-    * The minimum vertical space taken up by any element is approx. 16 px (one height of normal text). That
-      applies even for a simple, empty `br` element and cannot be fixed by CSS.
     * An inline element (like "img") after a block-level element ("p", "div") is added to the last line of the
       block-level element.
-    * A "hr" element tag produces no visible output, and it is not clear how to fix that.
+    * A "hr" element produces no visible output, and it is not clear how to fix that.
     * For a "div" element between two tables, "margin-top" works but "margin-bottom" has no effect. However for
-      a "div" element between two "div" or "p" elements, both variants work.
+      a "div" element between "div" or "p" elements, both variants work.
     * It is possible to use images with `src="qrc:/…"`.
     * A pixel can be considered approx. 1/16 of the default line height, roughly indepenent of device screen density.
-
-    Remarks about the quirks and limitations of Qt's XSLT implementation:
-
-    * TODO
+    * The CSS property "border" has no effect, for example "border: 10px solid rgb(200, 0, 0);". Splitting this into
+      the individual properties border-width, border-style and border-color works, however.
+    * When applying a border to a table, it is also applied to all table cells, except when also adding the CSS property
+      "-qt-table-type: frame;" to the table. If not doing this, there would be two visible borders around a single-cell
+      table, making it impossible to use the table for text frames. It is not possible to remove such a duplicate border
+      by other means.
+    * The CSS property "border-style" has no effect. A border is always rendered solid.
+    * The heading default margins are approximately h1 {margin-top:20px} and h2 {margin-top:15px}.
+    * The CSS uses the wrong "Internet explorer style" box model, where margin is counted from the inner border position
+      instead of from the outer border position. This is true at least for tables and at least when using
+      "-qt-table-type: frame".
+    * When using "-qt-table-type: frame;", paddings and margins have no effect whatsoever on the gap between table content
+      and table border. Except that "margin:" set on for example a h1 table content element will create a left margin, but
+      no vertical margins.
+    * It is somehow possible to only show parts of a table's borders (such as only the bottom), but it is not clear anymore
+      how that was achieved once.
 -->
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -61,15 +72,33 @@
                 <!-- No title element here, as Qt 5.12 renders it visibly atop the document due to a bug. -->
 
                 <style>
-                    table.h1 { background-color: lightslategray; }
-                    table.h1 td { padding: 8px; }
-                    table.h1 h1 { color: whitesmoke; font-weight: normal; }
+                    table.h1 {
+                        -qt-table-type: frame;
+                        border-width: 2px;
+                        border-color: rgb(210, 210, 210);
+                    }
+                    table.h1 td { }
+                    table.h1 h1 {
+                        margin-left: 10px;
+                        color: rgb(60, 60, 60);
+                        font-size: 32pt;
+                        font-weight: bold;
+                    }
 
-                    table.h2 { background-color: lightgray; }
-                    table.h2 td { padding: 4px; padding-left: 8px; }
-                    table.h2 h2 { color: dimgray; font-weight: normal; }
+                    h2 {
+                        margin-top: 10px;
+                        color: rgb(60, 60, 60);
+                        font-size: 26pt;
+                    }
 
-                    em { font-style: normal; font-weight: bold; color: gb(70, 70, 70); }
+                    h3 {
+                        margin-top: 15px;
+                        color: rgb(120, 120, 120);
+                        font-size: 16pt;
+                    }
+
+                    em { font-style: normal; font-weight: bold; color: rgb(70, 70, 70); }
+                    a { text-decoration: none; }
 
                     div.spacer-16 { color: transparent; margin-top: 0px; }
                     div.spacer-20 { color: transparent; margin-top: 4px; }
@@ -195,8 +224,11 @@
 
         <xsl:if test="./db:topic[@type = $topictype]" >
 
-            <!-- Create a gap to the previous content. Automatically omitted at the start of the document. -->
-            <div class="spacer-56">.</div>
+            <!-- Create a gap to the previous content.
+                This is automatically rendered with zero height at the start of the document due to
+                a Qt bug, but in this case this is an advantage over table { margin-top: 56px; }.
+            -->
+            <div class="spacer-40">.</div>
 
             <!-- Render the section title. -->
             <table class="h1" width="100%">
@@ -205,14 +237,7 @@
 
             <!-- Render the topics within the section. -->
             <xsl:for-each select="./db:topic[@type = $topictype]" >
-                <div class="spacer-16">.</div>
-
-                <table class="h2" width="100%">
-                    <tr><td><h2><xsl:value-of select="./db:info/db:title"/></h2></td></tr>
-                </table>
-
-                <div class="spacer-16">.</div>
-
+                <h2><xsl:value-of select="./db:info/db:title"/></h2>
                 <xsl:apply-templates/>
             </xsl:for-each>
         </xsl:if>
