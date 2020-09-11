@@ -186,6 +186,11 @@
                 </xsl:call-template>
 
                 <xsl:call-template name="section">
+                    <xsl:with-param name="header"><xsl:value-of select="$utilization-title"/></xsl:with-param>
+                    <xsl:with-param name="topictype">utilization</xsl:with-param>
+                </xsl:call-template>
+
+                <xsl:call-template name="section">
                     <xsl:with-param name="header"><xsl:value-of select="$unliked-food-title"/></xsl:with-param>
                     <xsl:with-param name="topictype">unliked_food</xsl:with-param>
                 </xsl:call-template>

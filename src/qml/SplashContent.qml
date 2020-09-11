@@ -3,19 +3,18 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
 import org.kde.kirigami 2.10 as Kirigami
 
-// A scalable but size-limited graphical notice to display information using an SVG image.
-//   Typical uses include showing credits by rendering supporter logos to the homescreen. The
+// Two size-adjusting SVG images that can be used as splash page or start screen content.
+//   Typical uses for the top image include a large logo or illustration similar to a splashscreen.
+//
+//   Typical uses for the bottom image include showing credits by using supporter logos. The
 //   implementation provides memory-efficient scaling, as the SVG will always be drawn with only the
 //   pixels needed, even after resizing the window. In contrast, rendering the SVG once or using a
 //   raster graphic image is only perfectly memory efficient for one display size of the image,
 //   measured in pixel.
 //
-//   Usage instructions: Upon instantiation, set the size to the maximum size to be filled by this
-//   component, for example: SplashContent { anchors.fill: parent }. It will adapt its contents to
-//   fill this space as much as possible while keeping aspect ratio of all elements intact.
-//
-//   TODO: Rename and refactor, as it now has a more general use of displaying a SVG in a memory efficient
-//   manner.
+//   Usage instructions: This component takes only the space you assign to it explicitly. So upon
+//   instantiation, assign to it the maximum space it should fill. For example:
+//   SplashContent { anchors.fill: parent }.
 ColumnLayout {
     id: container
 

@@ -333,7 +333,7 @@ Kirigami.ScrollablePage {
 
                     // Show a URL tooltip and hand cursor while hovering over a link.
                     onPositionChanged: {
-                        var url = parent.linkAt(mouseX, mouseY)
+                        var url = parent.linkAt(mouseX, mouseY) // Empty string if no link at current position.
 
                         if (url) {
                             // Show a hand cursor when mousing over hyperlinks.
@@ -354,12 +354,11 @@ Kirigami.ScrollablePage {
                             urlToolTip.text = url // TODO: Shorten the text with "…" for too long URLs.
                             urlToolTip.visible = true
                         }
+                        // We are no longer hovering a link, so restore everything to normal.
                         else {
                             cursorShape = Qt.ArrowCursor
                             urlToolTip.visible = false
-
-                            // To make our onClicked event handler work, we need to accept clicks.
-                            acceptedButtons = Qt.LeftButton
+                            acceptedButtons = Qt.LeftButton // Needed for the onClicked handler to be called.
                         }
                     }
                 }

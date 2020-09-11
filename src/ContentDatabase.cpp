@@ -335,8 +335,9 @@ QString ContentDatabase::content(QString searchTerm, QString language, ContentFo
     query.bindVariable("donation-options-title", QVariant(QObject::tr("Donation options")));
     query.bindVariable("post-spoilage-title", QVariant(QObject::tr("Rescuing spoiled and damaged food")));
     query.bindVariable("edible-parts-title", QVariant(QObject::tr("Edible parts")));
-    query.bindVariable("preservation-title", QVariant(QObject::tr("Preservation instructions")));
-    query.bindVariable("preparation-title", QVariant(QObject::tr("Preparation instructions")));
+    query.bindVariable("preservation-title", QVariant(QObject::tr("Preservation")));
+    query.bindVariable("preparation-title", QVariant(QObject::tr("Preparation")));
+    query.bindVariable("utilization-title", QVariant(QObject::tr("Utilization of excess amounts")));
     query.bindVariable("unliked-food-title", QVariant(QObject::tr("When you don't like this food")));
     query.bindVariable("residual-food-title", QVariant(QObject::tr("Cleaning out residual food")));
     query.bindVariable("reuse-and-recycling-title", QVariant(QObject::tr("Reuse and recycling ideas")));
