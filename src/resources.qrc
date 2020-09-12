@@ -24,4 +24,7 @@
         <file>images/applogo-2_minified.svg</file>
         <file>images/applogo-3_exported+optipng-256x256.png</file>
     </qresource>
+    <qresource prefix="/+android">
+        <file alias="qtquickcontrols2.conf">qtquickcontrols2.android.conf</file>
+    </qresource>
 </RCC>
