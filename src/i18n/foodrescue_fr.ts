@@ -4,7 +4,7 @@
     <extra-po-header-language>fr</extra-po-header-language>
     <extra-po-header-project_id_version>Food Rescue App UI</extra-po-header-project_id_version>
     <extra-po-header-x_generator>POEditor.com</extra-po-header-x_generator>
-    <extra-po-headers>MIME-Version,Content-Type,Content-Transfer-Encoding,X-Generator,Project-Id-Version,Language,X-Qt-Contexts</extra-po-headers>
+    <extra-po-headers>MIME-Version,Content-Type,Content-Transfer-Encoding,X-Generator,Project-Id-Version,Language,X-Qt-Contexts,X-Qt-Contexts</extra-po-headers>
 <context>
     <name>AboutPage</name>
     <message>

@@ -18,12 +18,12 @@
         <translation>© 2020 Matthias Ansorg</translation>
     </message>
     <message>
-        <location filename="../qml/AboutPage.qml" line="29"/>
+        <location filename="../qml/AboutPage.qml" line="30"/>
         <source>https://fairdirect.org/food-rescue-app</source>
         <translation>https://fairdirect.org/food-rescue-app</translation>
     </message>
     <message>
-        <location filename="../qml/AboutPage.qml" line="32"/>
+        <location filename="../qml/AboutPage.qml" line="33"/>
         <source>MIT Licencse</source>
         <translation>MIT Licencse</translation>
     </message>
@@ -31,18 +31,17 @@
 <context>
     <name>App</name>
     <message>
-        <location filename="../qml/App.qml" line="95"/>
-        <location filename="../ContentDatabase.cpp" line="370"/>
+        <location filename="../qml/App.qml" line="92"/>
         <source>Settings</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../qml/App.qml" line="103"/>
+        <location filename="../qml/App.qml" line="100"/>
         <source>About</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="../qml/App.qml" line="108"/>
+        <location filename="../qml/App.qml" line="105"/>
         <source>License Notes</source>
         <translation>License Notes</translation>
     </message>
@@ -55,34 +54,34 @@
 <context>
     <name>BrowserPage</name>
     <message>
-        <location filename="../qml/BrowserPage.qml" line="29"/>
-        <source>Last Search</source>
-        <translation>Last Search</translation>
-    </message>
-    <message>
-        <location filename="../qml/BrowserPage.qml" line="39"/>
+        <location filename="../qml/BrowserPage.qml" line="40"/>
         <source>Scan</source>
         <translation>Scan</translation>
     </message>
     <message>
-        <location filename="../qml/BrowserPage.qml" line="79"/>
-        <source>Next Search</source>
-        <translation>Next Search</translation>
-    </message>
-    <message>
-        <location filename="../qml/BrowserPage.qml" line="105"/>
+        <location filename="../qml/BrowserPage.qml" line="128"/>
         <source>No content found.</source>
         <translation>No content found.</translation>
     </message>
     <message>
-        <location filename="../qml/BrowserPage.qml" line="107"/>
+        <location filename="../qml/BrowserPage.qml" line="130"/>
         <source>No content found for</source>
         <translation>No content found for</translation>
     </message>
     <message>
-        <location filename="../qml/BrowserPage.qml" line="209"/>
+        <location filename="../qml/BrowserPage.qml" line="241"/>
         <source>food category or barcode</source>
         <translation>food category or barcode</translation>
+    </message>
+    <message>
+        <location filename="../qml/BrowserPage.qml" line="26"/>
+        <source>Previous search</source>
+        <translation>Previous search</translation>
+    </message>
+    <message>
+        <location filename="../qml/BrowserPage.qml" line="72"/>
+        <source>Next search</source>
+        <translation>Next search</translation>
     </message>
 </context>
 <context>
@@ -201,17 +200,17 @@
         <translation>Scan a Barcode</translation>
     </message>
     <message>
-        <location filename="../qml/ScannerPage.qml" line="209"/>
+        <location filename="../qml/ScannerPage.qml" line="214"/>
         <source>Camera: </source>
         <translation>Camera: </translation>
     </message>
     <message>
-        <location filename="../qml/ScannerPage.qml" line="228"/>
+        <location filename="../qml/ScannerPage.qml" line="233"/>
         <source>Barcodes found:)</source>
         <translation>Barcodes found:)</translation>
     </message>
     <message>
-        <location filename="../qml/ScannerPage.qml" line="229"/>
+        <location filename="../qml/ScannerPage.qml" line="234"/>
         <source>Last barcode:</source>
         <translation>Last barcode:</translation>
     </message>
@@ -224,17 +223,17 @@
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="23"/>
+        <location filename="../qml/SettingsPage.qml" line="32"/>
         <source>User interface language:</source>
         <translation>User interface language:</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="50"/>
+        <location filename="../qml/SettingsPage.qml" line="59"/>
         <source>English</source>
         <translation>English</translation>
     </message>
     <message>
-        <location filename="../qml/SettingsPage.qml" line="52"/>
+        <location filename="../qml/SettingsPage.qml" line="61"/>
         <source>German</source>
         <translation>German</translation>
     </message>
@@ -248,11 +247,16 @@
         <source>Spanish</source>
         <translation>Spanish</translation>
     </message>
+    <message>
+        <location filename="../qml/SettingsPage.qml" line="22"/>
+        <source>Back</source>
+        <translation>Back</translation>
+    </message>
 </context>
 <context>
     <name>StarsPage</name>
     <message>
-        <location filename="../qml/StarsPage.qml" line="11"/>
+        <location filename="../qml/StarsPage.qml" line="12"/>
         <source>Starred Articles</source>
         <translation>Starred Articles</translation>
     </message>
@@ -260,94 +264,99 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../ContentDatabase.cpp" line="329"/>
+        <location filename="../ContentDatabase.cpp" line="333"/>
         <source>Risks and caveats</source>
         <translation>Risks and caveats</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="330"/>
+        <location filename="../ContentDatabase.cpp" line="334"/>
         <source>Edibility assessment</source>
         <translation>Edibility assessment</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="331"/>
+        <location filename="../ContentDatabase.cpp" line="327"/>
         <source>Symptoms and causes</source>
         <translation>Symptoms and causes</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="332"/>
+        <location filename="../ContentDatabase.cpp" line="328"/>
         <source>Pantry storage</source>
         <translation>Pantry storage</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="333"/>
+        <location filename="../ContentDatabase.cpp" line="329"/>
         <source>Refrigerator storage</source>
         <translation>Refrigerator storage</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="334"/>
+        <location filename="../ContentDatabase.cpp" line="330"/>
         <source>Freezer storage</source>
         <translation>Freezer storage</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="335"/>
+        <location filename="../ContentDatabase.cpp" line="331"/>
         <source>Other storage types</source>
         <translation>Other storage types</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="336"/>
+        <location filename="../ContentDatabase.cpp" line="332"/>
         <source>Commercial storage and management</source>
         <translation>Commercial storage and management</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="337"/>
+        <location filename="../ContentDatabase.cpp" line="335"/>
         <source>Donation options</source>
         <translation>Donation options</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="338"/>
+        <location filename="../ContentDatabase.cpp" line="336"/>
         <source>Rescuing spoiled and damaged food</source>
         <translation>Rescuing spoiled and damaged food</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="339"/>
+        <location filename="../ContentDatabase.cpp" line="337"/>
         <source>Edible parts</source>
         <translation>Edible parts</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="340"/>
-        <source>Preservation instructions</source>
-        <translation>Preservation instructions</translation>
-    </message>
-    <message>
         <location filename="../ContentDatabase.cpp" line="341"/>
-        <source>Preparation instructions</source>
-        <translation>Preparation instructions</translation>
-    </message>
-    <message>
-        <location filename="../ContentDatabase.cpp" line="342"/>
         <source>When you don&apos;t like this food</source>
         <translation>When you don&apos;t like this food</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="343"/>
+        <location filename="../ContentDatabase.cpp" line="342"/>
         <source>Cleaning out residual food</source>
         <translation>Cleaning out residual food</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="344"/>
+        <location filename="../ContentDatabase.cpp" line="343"/>
         <source>Reuse and recycling ideas</source>
         <translation>Reuse and recycling ideas</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="345"/>
+        <location filename="../ContentDatabase.cpp" line="344"/>
         <source>Production waste</source>
         <translation>Production waste</translation>
     </message>
     <message>
-        <location filename="../ContentDatabase.cpp" line="346"/>
+        <location filename="../ContentDatabase.cpp" line="345"/>
         <source>Packaging waste</source>
         <translation>Packaging waste</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="338"/>
+        <source>Preservation</source>
+        <translation>Preservation</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="339"/>
+        <source>Preparation</source>
+        <translation>Preparation</translation>
+    </message>
+    <message>
+        <location filename="../ContentDatabase.cpp" line="340"/>
+        <source>Utilization of excess amounts</source>
+        <translation>Utilization of excess amounts</translation>
     </message>
 </context>
 </TS>
