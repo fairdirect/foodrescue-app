@@ -5,10 +5,9 @@ import org.kde.kirigami 2.10 as Kirigami
 
 import QtQuick.Templates 2.4 as T
 
-// Page for "☰ → Settings".
+// Page for "☰ → Starred Articles".
+//   TODO: Implement a bookmarks mechanism on this page, then re-enable the corresponding menu item.
 Kirigami.ScrollablePage {
     id: starsPage
     title: qsTr("Starred Articles")
-
-
 }

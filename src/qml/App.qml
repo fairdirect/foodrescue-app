@@ -82,15 +82,12 @@ Kirigami.ApplicationWindow {
         titleIcon: "qrc:///images/applogo-3_exported+optipng-256x256.png"
 
         actions: [
-            // TODO: Implement a browser history mechanism, then enable this menu item.
+            // TODO: Implement a bookmarks mechanism, then enable this menu item.
 //          Kirigami.Action {
-//              text: qsTr("History")
+//              text: qsTr("Starred Articles")
+//              icon.name: "star-shape"
+//              onTriggered: pageStack.layers.push(Qt.resolvedUrl("qrc:///qml/StarsPage.qml"))
 //          },
-            Kirigami.Action {
-                text: qsTr("Starred Articles")
-                icon.name: "star-shape"
-                onTriggered: pageStack.layers.push(Qt.resolvedUrl("qrc:///qml/StarsPage.qml"))
-            },
             Kirigami.Action {
                 text: qsTr("Settings")
                 icon.name: "configure"

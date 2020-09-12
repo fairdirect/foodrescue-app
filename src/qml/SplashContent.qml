@@ -140,6 +140,10 @@ ColumnLayout {
     //     means it might not fill the whole canvas.
     //   (4) The image is aligned inside its canvas and the canvas inside its container based on the
     //     defined alignment properties.
+    //
+    //   TODO Make the image size terminology and calculation simpler by calculating the image
+    //   dimensions (in Layout.preferred*) ourselves in such a way that they already conform to the
+    //   image aspect ratio.
     Image {
         id: bottomImage
 
