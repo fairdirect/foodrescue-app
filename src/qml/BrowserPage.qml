@@ -146,6 +146,11 @@ Kirigami.ScrollablePage {
         id: database
     }
 
+    SystemPalette {
+        id: activeColors
+        colorGroup: SystemPalette.Active
+    }
+
     // Scrollable element wrapping the content.
     //   This is necessary to allow scrolling with the keyboard in a Kirigami ScrollablePage.
     //   Details: https://stackoverflow.com/a/62853851
@@ -314,9 +319,51 @@ Kirigami.ScrollablePage {
                     Qt.openUrlExternally(link)
                 }
 
-                ToolTip{
+                // A status bar / footer text showing the link target URL, as users are used to from Firefox and Chrome.
+                //   TODO: Fix that in rare cases, the tooltip is displayed at the top rather than at the
+                //   bottom. Happens for the first link in page "nuts" when scrolled to the top. It seems
+                //   to be caused by the inability to determine browserContentArea.height in these cases,
+                //   as it does not happen when setting the y position as  urlToolTip.y = mouseY in the
+                //   browserContentArea.onPositionChanged event handler.
+                //
+                //   TODO: Position the tooltip at the very bottom of the content browser area and from
+                //   the very left to the very right. This seems only possible when choosing the window as its parent.
+                //
+                //   TODO: Fix that the chosen colors do not allow external styling. For example, when
+                //   using Material style with Theme=Dark, the text is still black on grey because
+                //   activeColors uses SystemPalette, which always refers to style "Default".
+                //
+                //   TODO: Fix that one cannot click on hyperlinks at the very bottom of a page because
+                //   the tooltip will overlay them. Ideally, that should still happen but clicking the
+                //   link should still be possible.
+                ToolTip {
                     id: urlToolTip
                     visible: false
+                    x: 0
+                    y: browserContentArea.height // Does not work with browserContent.height for whatever reason.
+
+                    // The tooltip text.
+                    //   TODO: Providing this customization here rather than using the default is only
+                    //   necessary to prevent white text on grey background in Material style with
+                    //   Theme=Dark. So after making this ToolTip styling aware, it will no longer
+                    //   be needed.
+                    contentItem: Text {
+                        text: urlToolTip.text
+                        font: urlToolTip.font
+                        color: activeColors.text
+                    }
+
+                    // TODO: Also choose the correct theme color when using a different style than Default, for
+                    // example Material style, Universal style etc.. See: https://stackoverflow.com/a/45897926
+                    background: Rectangle {
+                        color: activeColors.window
+
+                        // Workaround for the issue that, when mousing over a group of links quickly
+                        // so that tooltips have to change quickly, it can happen that the background
+                        // rectangle is either too short or too long compared to its text content.
+                        //   TODO: Report the issue described above to Qt.
+                        width: browserContentArea.width
+                    }
                 }
 
                 MouseArea {
@@ -332,6 +379,9 @@ Kirigami.ScrollablePage {
                     onClicked: autocomplete.focus = false
 
                     // Show a URL tooltip and hand cursor while hovering over a link.
+                    //   TODO: For performance reasons, adapt tooltip, cursor shape and accepted
+                    //   buttons only when detecting a change in linkAt() results compared to the
+                    //   last call to this event handler.
                     onPositionChanged: {
                         var url = parent.linkAt(mouseX, mouseY) // Empty string if no link at current position.
 
@@ -349,8 +399,8 @@ Kirigami.ScrollablePage {
                             //   parent in the onClick handler.
                             acceptedButtons = Qt.NoButton
 
-                            urlToolTip.x = mouseX + 20
-                            urlToolTip.y = mouseY - 32 // Just enough to never prevent clicking the link.
+//                            urlToolTip.x = mouseX + 20
+//                            urlToolTip.y = mouseY - 32 // Just enough to never prevent clicking the link.
                             urlToolTip.text = url // TODO: Shorten the text with "…" for too long URLs.
                             urlToolTip.visible = true
                         }
