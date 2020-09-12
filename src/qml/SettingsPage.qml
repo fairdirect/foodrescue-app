@@ -14,6 +14,15 @@ Kirigami.ScrollablePage {
     // Let's use the same background as in BrowserPage.qml.
     background: Rectangle { color: "white" }
 
+    // Secondary button to close the settings page.
+    //   Sometimes changing the UI language on the settings page will cause the top-left "Back"
+    //   button to disappear. As a workaround until fixing this, another back button is provided.
+    mainAction: Kirigami.Action {
+        iconName: "go-previous"
+        text: qsTr("Back")
+        onTriggered: pageStack.layers.pop()
+    }
+
     // A two-column layout with form elements and their labels.
     //   See file FormLayoutGallery.qml in application Kirigami Gallery for a usage example.
     Kirigami.FormLayout {
@@ -21,7 +30,7 @@ Kirigami.ScrollablePage {
         ComboBox {
             id: languageChanger
             Kirigami.FormData.label: qsTr("User interface language:")
-            textRole: "label" // Role of the model to show as the combobox list items.
+            textRole: "label" // Model role to use for the texts of combobox list items.
 
             // Initialize the combobox with "no entry selected".
             //   This will be adapted in Component.onCompleted {} to select the current language.
@@ -38,8 +47,8 @@ Kirigami.ScrollablePage {
             //   https://doc.qt.io/qt-5/qtquickcontrols2-customize.html#customizing-combobox
             //   https://doc.qt.io/qt-5/qml-palette.html#qtquickcontrols2-palette
             // TODO: Report this bug, get it fixed, and remove this workaround.
-            popup.palette.light:    "#7ba9c6" // Background of the popup's current item.
-            popup.palette.midlight: "#308cc6" // Background of the popup's item while clicking.
+            popup.palette.light:    "#7ba9c6" // Background of the ComboBox's current item.
+            popup.palette.midlight: "#308cc6" // Background of the ComboBox's item while clicking.
 
             model: ListModel {
                 id: languageModel
