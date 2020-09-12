@@ -27,17 +27,18 @@
     <!-- Alternatively you can list the features yourself here. -->
     <!-- %%INSERT_FEATURES -->
 
-    <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
+    <supports-screens android:largeScreens="true" android:normalScreens="true" android:smallScreens="true" android:anyDensity="true"/>
 
     <!-- android:icon loads icon "icon.png" or "icon.svg" (as available) from folder @drawable,
       which is here src/android/res/drawable-* -->
-    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="Food Rescue" android:icon="@drawable/icon">
+    <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="My Food Rescue" android:icon="@drawable/icon">
 
         <!-- android:configChanges lists changes in the app's environment that the app will
           adapt to itself rather than relying on Android restarting it. Here, this is managed
           by the Qt framework for us, and it works. -->
-        <!-- TODO: Add android:theme="@style/AppTheme" once we have a theme file. -->
-        <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="foodrescue" android:screenOrientation="unspecified" android:windowSoftInputMode="adjustResize" android:launchMode="singleTop">
+        <!-- TODO: Add android:theme="@style/AppTheme" once we have a theme file. However, this might
+          not be relevant for Qt applications, as we already have the qtquickcontrols2.conf mechanism. -->
+        <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.qtproject.qt5.android.bindings.QtActivity" android:label="My Food Rescue" android:screenOrientation="unspecified" android:windowSoftInputMode="adjustResize" android:launchMode="singleTop">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
