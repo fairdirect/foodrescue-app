@@ -932,13 +932,20 @@ This is the process to update the application on Google Play. It does not descri
 7. **Update the screenshots.** If there were significant changes to the user interface, run the application under Android and create screenshots for uploading to Google Play. For that, execute something like this:
 
     ```
-    adb exec-out screencap -p > Screenshot.Android_7inch.en.portrait.2020-07-03.1.png
-    convert -quality 75 Screenshot.Android_7inch.en.portrait.2020-07-03.1.png Screenshot.Android_7inch.en.portrait.2020-07-03.1.jpg
+    cd ./Publications.GooglePlay/
+
+    adb exec-out screencap -p > Screenshot.Android_7inch.en.portrait.$(date +%Y-%m-%d).1.png
+    adb exec-out screencap -p > Screenshot.Android_7inch.en.portrait.$(date +%Y-%m-%d).2.png
+    ...
+
+    for file in Screenshot.Android_7inch.en.portrait.$(date +%Y-%m-%d).*.png; do convert -quality 75 $file ${file/.png/.jpg}; done
     ```
 
     (The `convert` command requires to have ImageMagick installed.)
 
     Then upload the screensots to Google Play Console under "All Apps → Food Rescue → Store Entry".
+
+    TODO: Adapt the screenshots command to create files with a sequential number in the last filename component automatically.
 
 
 Note that, as an alternative to the process above, it should be possible to create an AAB package. An AAB (Android Application Bundle) combines the APK packages of multiple processor architectures (ABIs, meaning Application Binary Interface). This requires (1) enabling Google Play App Signing, which means trusting Google to sign your application's installable APKs which will be created by Google Play for devices automatically and (2) creating the AAB package with a modified build process. This [is possible](https://doc.qt.io/qt-5/android-publishing-to-googleplay.html), but it is not yet clear which version of `androiddeployqt` is necessary for that. (TODO: Find out and document how to build AAB packages.)
