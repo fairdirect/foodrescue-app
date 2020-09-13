@@ -21,7 +21,7 @@ Kirigami.AboutPage {
 
         // Header section.
         "displayName": "My Food Rescue",
-        "version": "0.2", // TODO: Initialize this automatically from the Android manifest file.
+        "version": "0.3", // TODO: Initialize this automatically from the Android manifest file.
         "shortDescription": qsTr("Helps you decide which food is still edible."),
 
         // "Copyright" section.

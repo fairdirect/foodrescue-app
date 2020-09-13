@@ -13,7 +13,7 @@ endif()
 cmake_minimum_required(VERSION 3.0)
 
 # Project name and version. Also enables "CXX" language
-project(foodrescue-app VERSION 0.2)
+project(foodrescue-app VERSION 0.3)
 
 # TODO: What's this?
 include(FeatureSummary)
