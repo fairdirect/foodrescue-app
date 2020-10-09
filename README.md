@@ -46,10 +46,10 @@ The application is built with KDE Kirigami, a rather unknown but powerful base t
 **Screenshots:** (Click to enlarge.)
 
 <p align="center">
-  <a href="doc/readme-screenshot-1.jpg?raw=true"><img src="doc/readme-screenshot-1.jpg?raw=true" width="25%"></a>
-  <a href="doc/readme-screenshot-2.jpg?raw=true"><img src="doc/readme-screenshot-2.jpg?raw=true" width="25%"></a>
-  <a href="doc/readme-screenshot-3.jpg?raw=true"><img src="doc/readme-screenshot-3.jpg?raw=true" width="25%"></a>
-  <a href="doc/readme-screenshot-4.jpg?raw=true"><img src="doc/readme-screenshot-4.jpg?raw=true" width="25%"></a>
+  <a href="doc/readme-screenshot-1.jpg?raw=true"><img src="doc/readme-screenshot-1.jpg?raw=true" width="24%"></a>
+  <a href="doc/readme-screenshot-2.jpg?raw=true"><img src="doc/readme-screenshot-2.jpg?raw=true" width="24%"></a>
+  <a href="doc/readme-screenshot-3.jpg?raw=true"><img src="doc/readme-screenshot-3.jpg?raw=true" width="24%"></a>
+  <a href="doc/readme-screenshot-4.jpg?raw=true"><img src="doc/readme-screenshot-4.jpg?raw=true" width="24%"></a>
 </p>
 
 
