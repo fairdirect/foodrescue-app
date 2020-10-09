@@ -21,10 +21,8 @@
 
   * [6.1. Initial Setup](#61-initial-setup)
   * [6.2. All Platforms](#62-all-platforms)
-  * [6.3. Desktop Linux](#63-desktop-linux)
-  * [6.4. F-Droid](#64-f-droid)
-  * [6.5. Google Play](#65-google-play)
-  * [6.6. Apple AppStore](#66-apple-appstore)
+  * [6.3. Google Play](#63-google-play)
+  * [6.4. APK on website](#64-apk-on-website)
 
 **[7. Style Guide](#7-style-guide)**
 
@@ -45,24 +43,24 @@ This repository contains an open source application to help assess if food is st
 The application is built with KDE Kirigami, a rather unknown but powerful base technology that makes this a native, cross-platform, desktop/mobile convergent application. See below for the full list of features enabled by this choice.
 
 
+**Screenshots:** (Click to enlarge.)
+
+<p align="center">
+  <a href="doc/readme-screenshot-1.jpg?raw=true"><img src="doc/readme-screenshot-1.jpg?raw=true" width="25%"></a>
+  <a href="doc/readme-screenshot-2.jpg?raw=true"><img src="doc/readme-screenshot-2.jpg?raw=true" width="25%"></a>
+  <a href="doc/readme-screenshot-3.jpg?raw=true"><img src="doc/readme-screenshot-3.jpg?raw=true" width="25%"></a>
+  <a href="doc/readme-screenshot-4.jpg?raw=true"><img src="doc/readme-screenshot-4.jpg?raw=true" width="25%"></a>
+</p>
+
+
 **Online Demo:** An online demo of the Android version of Food Rescue App is [available on appetize.io](https://appetize.io/app/hkw36e77yj8bqra3mufde078ug?device=nexus7&scale=75&orientation=portrait&osVersion=8.1). This gives you a complete, browser based Android emulator with Food Rescue App pre-installed to try it out. Due to the nature of operating an Android device through the browser, not all features are available. Notes:
 
 * **No camera.** The "scan barcode" button only shows a dummy camera view and you cannot scan barcodes.
-
 * **Search for barcodes.** To look up content associated with barcodes, you can however type their numbers directly into the search field. Good examples are: `1000110007387`, `2165741004149`, `2205873003013`.
-
 * **Search for food categories.** The most interesting way to interact with the demo is to look up the content for food categories by entering the categories into auto-complete search field. Type whatever English food category names you can think of; or also names in other languages after changing the application language in the settings.
-
 * **Disable the virtual keyboard.** Since you have a proper keyboard on a desktop computer to type, it helps with screen space to disable the Android on-screen keyboard completely. You can do that after clicking on the keyboard symbol in the bottom right.
-
 * **Avoid landscape mode.** Due to a bug in the appetize.io product, the directions of the arrow keys are switched in landscape mode: <kbd>→</kbd> moves down, <kbd>↓</kbd> moves right etc.. Until that is fixed, better avoid landscape mode, or only navigate with the mouse in there.
-
 * **Avoid Android ≥9.** In this application's online demo, landscape mode does not work at all when you choose Android 9.0 or 10.0.
-
-
-**Screenshots:**
-
-![Android app after searching for a food category](doc/readme-screenshot-1.png?raw=true "After searching for 'meat' (in German)")
 
 
 **Features:**
@@ -121,24 +119,25 @@ The application is built with KDE Kirigami, a rather unknown but powerful base t
 
 # 2. Installation
 
-Right now, you would have to compile the software yourself from source ☹️ See chapter [5. Development](#5-development) for that.
 
-Eventually you will be able to install the software comfortably as follows:
+We provide installation packages only for Android at the moment. For other platforms, you would have to [build the software yourself](#5-development). Details:
 
-* **For Android.** Install directly from [F-Droid](https://f-droid.org/) or [Google Play](https://play.google.com/store/apps). Or install from the [KDE Android F-Droid repository](https://community.kde.org/Android/FDroid), which also contains all other Kirigami based Android applications.
+* **✅ For Android.** You can install the app directly [from Google Play](https://play.google.com/store/apps/details?id=org.fairdirect.foodrescue) or [download the APK](http://fairdirect.org/downloads/foodrescue.apk) of the latest release. In the future, we also want to publish it in [F-Droid](https://f-droid.org/) and the [KDE Android F-Droid repository](https://community.kde.org/Android/FDroid), which also contains all other Kirigami based Android applications.
 
-* **For iOS.** Install from the Apple App Store.
+* **❎ For iOS.** No installation package available. In the future, we want the app to be available in the Apple App Store.
 
-* **For Linux.** For Ubuntu 20.04 LTS and its variants, a Debian package is provided in a PPA package repository.
+* **❎ For Linux.** No installation package available. In the future, we want to provide a package for Ubuntu 20.04 LTS and its variants via a PPA package repository.
 
-* **For Windows.** Download a self-extracting installer and install from there.
+* **❎ For Windows.** No installation package available. In the future, we want to provide a self-extracting installer.
 
-* **For Mac OS X.** Download a DMG package and install from there.
+* **❎ For Mac OS X.** No installation package available. In the future, we want to provide a DMG package.
 
 
 # 3. Usage
 
-Tips for scanning a barcode, starting with the most important:
+**Basic usage:** The app will show you food rescue information associated with product barcodes or food category names. The most comfortable usage is to click the button with the barcode icon to scan a food packaging barcode with the device camera. If that yields no results, you can also enter a food category into the search field. Auto-complete will help you select from the existing categories. In addition, there's a browsing history feature available via the two buttons with arrow icons. Browsing history is stored until closing the application. All functionality is available in multiple languages, which can be changed in the settings. The selected language will influence how content is displayed and which language is used to auto-complete category names in the search field.
+
+**Tips for scanning barcodes:** (By importance, the important ones first.)
 
 * **Align the lines.** Barcode scanning works only when the barcode lines are either vertical or horizontal on your screen, or slanted up to about 15° from that. When the lines are 45°, no barcodes are recognized due to software limitations.
 
@@ -146,29 +145,27 @@ Tips for scanning a barcode, starting with the most important:
 
 * **Plain and steady.** Hold the barcode parallel to the camera lens and keep it steady for a few seconds. That is the best way to get a scan. The camera simply needs up to a few seconds to adjust exposure and focus to capture the barcode perfectly. This is a gradual process, so if you change something in the scene too early to "help" the camera, it will just slow down the barcode scanning as the camera has to start its adjustment process again.
 
-* **Not exactly parallel is ok.** It does not matter if the barcode plane is not exactly parallel to the camera lens. The barcode will appear slightly distorted in the camera viewfinder, but be detected with the same speed and precision.
-
 * **Lighting.** Good and even lighting is important for fast barcode recognition. Barcode recognition usually works acceptably with usual indoor lighting levels, but can become difficult the smaller the barcodes are.
 
 * **Exposure.** Barcode recognition is very sensitive to overexposure of the barcode area, but not much to underexposure. A dark camera image background leads to overexposure of the barcode's white area, so prefer a lit / light background. Or try moving the barcode closer to the camera so that less background is visible and won't influence the exposure so much.
 
+* **No need to scan straight down.** It does not matter if the barcode plane is not exactly parallel to the camera lens. The barcode will appear slightly distorted in the camera viewfinder, but be detected with the same speed and precision.
+
 * **Multiple barcodes.** In rare cases there can be misreadings if more than one barcode is visible and barcodes overlap partially. Numbers would then not correspond to either barcode. Overlapping barcodes will not happen in live usage, but might when testing with pieces of paper.
 
 
-The following keyboard combinations are available:
+**Keyboard combinations:** (TODO: Complete this list. There should be an official list somewhere.)
+
+* **Content browser related.**
+    * **Scroll a bit.** Arrow Up / Arrow Down.
+    * **Scroll one page.** Page Up / Page Down.
 
 * **Auto-complete related.** It works the same as in a Google Search:
-
     * **Edit mode.** F2 will always put the cursor back into the autocomplete field, and show the completions (if any).
     * **Next / previous completion.** Arrow Down / Arrow Up.
     * **Choose completion.** Return or Enter.
     * **Close completion box.** Escape.
     * **Close and leave completion box.** Press Escape twice. It will move the keyboard focus to the browser so you can keyboard-scroll there afterwards.
-
-* **Content browser related.**
-
-    * **Scroll a bit.** Arrow Up / Arrow Down.
-    * **Scroll one page.** Page Up / Page Down.
 
 * **Kirigami defaults.**
     * **Page back / forward.** Alt + Arrow Left / Alt + Arrow Right. You can also use the hardware keys "Page Back" and "Page Forward" if you have them. Not found often, but for example some Lenovo ThinkPad models have these above the Arrow Left / Arrow Right keys.
@@ -179,20 +176,15 @@ The following keyboard combinations are available:
     * **Close overlay sheet.** There is no default key binding for this. Esc does not work. Some applications bind the "Alt + Left" and "Page Back" keys to this, for example the Kirigami Gallery demo application.
     * **Close the application.** Ctrl + Q.
 
-* TODO: Complete this list. There should be an official list somewhere.
 
-
-The following command line options are available:
+**Command line options:**
 
 * **`-style`, `-stylesheet`, `-widgetcount`, `-reverse`, `-qmljsdebugger`:** The default command line options available in every Qt application and [documented by Qt](https://doc.qt.io/qt-5/qapplication.html#QApplication).
 
 
-The following environment variables are available:
+**Environment variables:**
 
 * **Under Linux: `LANG`, `LANGUAGE`, `LC_ALL`:** Sets or overrides the application's locale using relatively convoluted rules [summarizes here](https://superuser.com/a/392466). Qt automatically completes any language specified as a two-lette language code (like `de`) to a full five-letter language code with country code. For example, `de` is expanded to `de_DE` and `en` to `en_US`.
-
-
-TODO: Complete the usage instructions.
 
 
 # 4. Repository Layout
@@ -367,25 +359,13 @@ This assumes you want to use a Linux host for development and build the desktop 
     sudo apt install omegat
     ```
 
-10. **Install the database.** The application relies on the database that is the build output of [project `foodrescue-content`](https://github.com/fairdirect/foodrescue-content). Since during development we'll want to run the application without installing it, we'll have to install the database manually:
+10. **Install the database.** The application relies on a database that is the build output of [project `foodrescue-content`](https://github.com/fairdirect/foodrescue-content). During development we'll want to run the application without installing it every time. so we'll have to install the database manually to let the application find it. Instructions:
 
-    1. To build that database, follow [the project's README](https://github.com/fairdirect/foodrescue-content#readme). To install it.
+    1. Select the directory where to install the database. This depends on your operating system. Select a suitable location with path type `AppLocalDataLocation` from [Qt's list of standard locations](https://doc.qt.io/qt-5/qstandardpaths.html#StandardLocation-enum). For Linux, this would be `/usr/local/share/foodrescue/` or `~/.local/share/foodrescue/`.
 
-    2. Select the directory where to install the database. This depends on your operating system. Select a suitable location with path type `AppLocalDataLocation` from [Qt's list of standard locations](https://doc.qt.io/qt-5/qstandardpaths.html#StandardLocation-enum). For Linux, this would be `/usr/local/share/foodrescue/` or `~/.local/share/foodrescue/`.
+    2. Download the latest available version of the database from [foodrescue-content releases](https://github.com/fairdirect/foodrescue-content/releases) and place it into the database directory. (If you want, you can of course also follow the [foodrescue-content README](https://github.com/fairdirect/foodrescue-content#readme) to build the database yourself.)
 
-    3. Copy the database there, using filename `foodrescue-content.sqlite3`.
-
-    4. Add the relevant indexes to the database. They increase database size by ~12% but reduce the query time of the typical queries in Food Rescue App from 44 s to 0.2 s.
-
-        ```
-        sqlite3 foodrescue-content.sqlite3 <<SQLEND
-            CREATE INDEX idx_code ON products(code);
-            CREATE INDEX idx_categories_topics ON topic_categories(category_id,topic_id);
-            CREATE INDEX idx_category_names ON category_names(category_id);
-        SQLEND
-        ```
-
-        TODO: Add these indexes by default in the database build process, then remove the instruction from here.
+    3. Unpack the downloaded database: `unzip foodrescue-content.sqlite3.zip`. You should now have a file `foodrescue-content.sqlite3` that Food Rescue App will find at startup.
 
 
 ## 5.3. Linux Build Process
@@ -893,17 +873,7 @@ The default build type is "Debug". To create a release build that is ready for p
     * In `src/android/AndroidManifest.xml`: line `<manifest … android:versionName="0.2" android:versionCode="200" …>`. As per our convention documented there, this version string has three components, the last of which is the "packaging version" that is omitted in the `CMakeLists.txt` version string. It is needed for example to disambiguate [multiple APKs](https://developer.android.com/google/play/publishing/multiple-apks) uploaded for the same release.
 
 
-## 6.3. Desktop Linux
-
-TODO
-
-
-## 6.4. F-Droid
-
-TODO
-
-
-## 6.5. Google Play
+## 6.3. Google Play
 
 This is the process to update the application on Google Play. It does not describe the initial setup to be able to upload the application for the first time. For that, [see here](https://support.google.com/googleplay/android-developer/answer/113469).
 
@@ -951,9 +921,15 @@ This is the process to update the application on Google Play. It does not descri
 Note that, as an alternative to the process above, it should be possible to create an AAB package. An AAB (Android Application Bundle) combines the APK packages of multiple processor architectures (ABIs, meaning Application Binary Interface). This requires (1) enabling Google Play App Signing, which means trusting Google to sign your application's installable APKs which will be created by Google Play for devices automatically and (2) creating the AAB package with a modified build process. This [is possible](https://doc.qt.io/qt-5/android-publishing-to-googleplay.html), but it is not yet clear which version of `androiddeployqt` is necessary for that. (TODO: Find out and document how to build AAB packages.)
 
 
-## 6.6. Apple AppStore
+## 6.4. APK on website
 
-TODO
+The latest version of the Android build for ABI armeabi-v7a should always be uploaded to the project website, making it available under `http://fairdirect.org/downloads/foodrescue.apk`.
+
+This is achieved with the following command (and the necessary password):
+
+```
+scp ~/Projects/Fairdirect.Food_Rescue_App/Repo.foodrescue-app/build/Android.ConsoleKit/foodrescue_build_apk/build/outputs/apk/release/foodrescue_build_apk-release.apk wp12504218@ssh.server-he.de:~/www/domain-fairdirect.org/downloads/foodrescue.apk
+```
 
 
 # 7. Style Guide
