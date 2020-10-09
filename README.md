@@ -43,7 +43,7 @@ This repository contains an open source application to help assess if food is st
 The application is built with KDE Kirigami, a rather unknown but powerful base technology that makes this a native, cross-platform, desktop/mobile convergent application. See below for the full list of features enabled by this choice.
 
 
-**Screenshots:** (Click to enlarge.)
+**Screenshots:** (Click to enlarge.) For now, only screenshots of the Android app are provided.
 
 <p align="center">
   <a href="doc/readme-screenshot-1.jpg?raw=true"><img src="doc/readme-screenshot-1.jpg?raw=true" width="24%"></a>
