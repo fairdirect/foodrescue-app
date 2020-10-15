@@ -9,8 +9,7 @@
 #include <QtQml>
 #include <QDebug>
 
-#include "BarcodeScanner.h"
-#include "BarcodeFilter.h"
+#include "ZXingQtReader.h"
 #include "ContentDatabase.h"
 #include "History.h"
 #include "LocaleChanger.h"
@@ -37,17 +36,7 @@ int main(int argc, char *argv[]) {
         QApplication app(argc, argv);
     #endif
 
-    // Make the barcode component available for use with Qt meta-objects and in QML.
-    qRegisterMetaType<Barcode::Format>("BarcodeFormat");
-    // TODO: Perhaps register these classes as QML types "BarcodeDecodeStatus" etc.. But since they
-    //   are typically not used in QML in client code, it does not matter much.
-    qRegisterMetaType<Barcode::DecodeStatus>("DecodeStatus");
-    qRegisterMetaType<Barcode::DecodeResult>("DecodeResult");
-    qmlRegisterUncreatableMetaObject(
-        Barcode::staticMetaObject, "local", 1, 0, "BarcodeFormat", "Error: only enums allowed"
-    );
-    qmlRegisterType<BarcodeFilter>("local", 1, 0, "BarcodeFilter");
-    qmlRegisterType<BarcodeScanner>("local", 1, 0, "BarcodeScanner");
+	ZXingQt::registerQmlAndMetaTypes();
 
     // Create and initialize the Food Rescue SQLite3 database connection.
     ContentDatabase db;

@@ -150,7 +150,6 @@ find_package(
         Svg
         Sql
         Multimedia  # For the barcode scanner.
-        Concurrent  # For the barcode scanner.
         Quick       # For the barcode scanner.
         Xml         # For XML debug output in formatXml(). TODO: Avoid in non-debug builds.
         XmlPatterns # For XSLT conversion of database content for rendering.

@@ -20,6 +20,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
 import QtMultimedia 5.12
 import org.kde.kirigami 2.10 as Kirigami
+import ZXing 1.0
 import local 1.0 as Local // Our custom QML components, exported in main.cpp.
 
 // Sizing: The width of an OverlaySheet can be limited with Layout.preferredWidth and the content will
@@ -45,24 +46,13 @@ Kirigami.ScrollablePage {
     }
 
     // Barcode search algorithm, provided by ZXing-C++. Invisible.
-    Local.BarcodeScanner {
-        id: barcodeScanner
+    VideoFilter {
+        id: zxingFilter
 
-        // TODO: Make sure we include all necessary formats.
-        formats: [Local.BarcodeFormat.EAN_13, Local.BarcodeFormat.EAN_8]
-        tryHarder: true
-        tryRotate: true // Also tries recognizing barcodes in a 90° rotated image.
-        onDecodeResultChanged: console.log(decodeResult)
-    }
+        formats: ZXing.EAN13 | ZXing.EAN8
 
-    // Video filter looking for barcodes. Invisible.
-    Local.BarcodeFilter {
-        id: barcodeFilter
-        scanner: barcodeScanner
-        onTagFound: {
+        onFoundBarcode: {
             tagsFound++
-            lastTag = tag
-
             // Stop the camera manually to prevent finding more barcodes.
             //   The camera will be stopped automatically by destroying the page (see pageStack.layers.pop()
             //   below). However, it might recognize 1-2 more barcodes while the page is closing.
@@ -78,8 +68,10 @@ Kirigami.ScrollablePage {
             // different methods than org.kde.kirigami.PageRow. See the source code referenced from:
             // https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1PageRow.html#ab0a1367b4574053f31e376ed81e7e9c3
             pageStack.layers.pop()
+            lastTag = result.text
+            scannerPage.barcodeFound(lastTag)
 
-            scannerPage.barcodeFound(tag)
+            console.log(result)
         }
     }
 
@@ -194,7 +186,7 @@ Kirigami.ScrollablePage {
             id: viewFinder
 
             source: camera
-            filters: [barcodeFilter]
+            filters: [zxingFilter]
 
             Layout.fillWidth: true  // Takes the width not taken by siblings.
             Layout.fillHeight: true // Takes the height not taken by siblings.
