@@ -13,7 +13,7 @@ endif()
 cmake_minimum_required(VERSION 3.0)
 
 # Project name and version. Also enables "CXX" language
-project(foodrescue-app VERSION 0.3)
+project(foodrescue-app LANGUAGES CXX VERSION 0.3)
 
 # TODO: What's this?
 include(FeatureSummary)
@@ -103,8 +103,12 @@ add_definitions(
 )
 
 # Enable C++14 features in clang and gcc.
-#   C++ 14 is necessary to link to ZXing-C++, as some version newer than 1.0.8 started to use lambdas
-#   with auto parameters in its headers. Everything else only requires C++ 11.
+#   Needed only to link with the ZXing-C++ library, as some version newer than 1.0.8 started to use
+#   lambdas with auto parameters in header files. Earlier versions required only C++11, and all other
+#   code and libraries can also be used with a C++11 compiler. Note that ZXing-C++ newer than 1.1.1
+#   uses C++17 internally, but the interface is only C++14, as per its core/CMakeLists.txt:
+#   "the lib needs a c++-17 compiler but can be used with a c++-11 compiler (see examples)", just that
+#   it should say "a c++-14 compiler" in the end.
 set(CMAKE_CXX_STANDARD 14)
 
 
@@ -142,15 +146,16 @@ find_package(
     Qt5 ${REQUIRED_QT_VERSION}
     REQUIRED
     NO_MODULE
-    COMPONENTS     # To know the available component names: https://stackoverflow.com/a/62676473
-        Core       # Could also be omitted as it's a dependency of the other components.
+    COMPONENTS      # To know the available component names: https://stackoverflow.com/a/62676473
+        Concurrent  # For Kirigami.
+        Core        # Could also be omitted as it's a dependency of the other components.
         Gui
-        Qml
-        QuickControls2
-        Svg
-        Sql
         Multimedia  # For the barcode scanner.
+        Qml
         Quick       # For the barcode scanner.
+        QuickControls2
+        Sql
+        Svg
         Xml         # For XML debug output in formatXml(). TODO: Avoid in non-debug builds.
         XmlPatterns # For XSLT conversion of database content for rendering.
 )
@@ -165,14 +170,11 @@ find_package(KF5Kirigami2 REQUIRED)
 # find_package(KF5I18n) # TODO: Add when starting to use i18n.
 
 # Find ZXing C++ (a C++ reimplementation of popular barcode scanner library ZXing).
-#   Source: https://github.com/nu-book/zxing-cpp.
+#   Source repo: https://github.com/nu-book/zxing-cpp.
 #
-#   Current ZXing version requirements: minimum version zxing-cpp commit 57c4a89 (which is 1.0.8
-#   plus some commits), because the CMake package versioning support was introduced here.
-#
-#   TODO: Switch to find_package(ZXing 1.0.9 REQUIRED) once that release is out, and then drop the
-#   additional commit version requirement from above and README.md.
-find_package(ZXing 1.0.8 REQUIRED)
+#   Current ZXing version requirements: minimum version zxing-cpp commit 96b6a83 (which is 1.1.1
+#   plus some commits). Version 1.1.1 or even earlier may also work, but this is untested.
+find_package(ZXing 1.1.1 REQUIRED)
 
 # Include specific QML modules. (Example; enable when needed.)
 # ecm_find_qmlmodule(QtGraphicalEffects 1.0)

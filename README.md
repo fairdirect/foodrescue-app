@@ -323,7 +323,7 @@ This assumes you want to use a Linux host for development and build the desktop 
 
 6. **Make Qt5 your default Qt version.** If you have installed both Qt4 and Qt5 on your system, only one of them will be the default for same-named Qt binaries that you'll need during the development process. Build tools are not affected by this, as they will always call Qt binaries with a `-qt=5` argument to make sure they use Qt4 tools. But when using Qt binaries manually, not having Qt 5 as the default version is annoying. On Ubuntu `sudo apt install qt5-default` will make Qt5 the default, while on other systems you might have to deal with `qtchooser` ([details](https://stackoverflow.com/a/39742962)).
 
-7. **Install [ZXing-C++](https://github.com/nu-book/zxing-cpp).** This has to be compiled from source because we rely on a newer version than Ubuntu 20.04 [package zxing-cpp](https://launchpad.net/ubuntu/+source/zxing-cpp) (which anyway seems only available as a proposed package there right now). Commit 57c4a89 from 2020-06-25 is the last version that has been tested, and also the minimum necessary version (as it provides CMake package versioning that we rely on).
+7. **Install [ZXing-C++](https://github.com/nu-book/zxing-cpp).** This has to be compiled from source because we rely on a newer version than the [Ubuntu 20.04 package zxing-cpp](https://launchpad.net/ubuntu/+source/zxing-cpp) (which anyway is only available as a proposed package so far). Commit 96b6a83 from 2020-10-17 is the last version that has been tested. (Slightly earlier versions such as 1.1.1 from 2020-09-12 may also work, but this has not yet been tested.)
 
     We do a system-wide installation to keep `cmake` calls simple for desktop development. But we also use `checkinstall` (`sudo apt install checkinstall`) to create and install a simple Ubuntu package. That makes it much easier to uninstall all installed ZXing files again when necessary (`sudo apt remove zxing-cpp`).
 
@@ -331,16 +331,16 @@ This assumes you want to use a Linux host for development and build the desktop 
     cd /some/out-of-source/path/
     git clone https://github.com/nu-book/zxing-cpp.git
     cd zxing-cpp
-    git checkout 57c4a89
+    git checkout 96b6a83
 
     mkdir -p build/linux_amd64 && cd build/linux_amd64
     cmake ../..
     make
-    sudo checkinstall --pkgname zxing-cpp --pkgversion "1.0.8+57c4a89" --nodoc make install
+    sudo checkinstall --pkgname zxing-cpp --pkgversion "1.1.1+96b6a83" --nodoc make install
     sudo ldconfig
     ```
 
-    TODO: In the above instructions, do a shallow clone that contains the history only starting from the relevant commit 57c4a89. Not sure if there is any good solution for that, though ([see](https://stackoverflow.com/q/31278902)).
+    TODO: In the above instructions, do a shallow clone that contains the history only starting from the relevant commit. Not sure if there is any good solution for that, though ([see](https://stackoverflow.com/q/31278902)).
 
 8. **Install the remaining Qt header files (optional).** To be able to access all components of Qt in your code without having to install more packages on demand, you can install all the Qt header files already:
 

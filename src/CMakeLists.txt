@@ -42,6 +42,16 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Android")
         # If so, it should be moved to target_link_libraries(foodrescue …) below.
         KF5::Kirigami2
 
+        # A Qt component library required by the Kirigami plugin.
+        # TODO: Why is this only needed on Android? It should be necessary for the whole application.
+        # If so, it should be moved to target_link_libraries(foodrescue …) below.
+        # TODO: Should not be needed, but without this the library is not in the APK and we get
+        # "dlopen failed: library libQt5Concurrent.so not found" when the Android app starts.
+        # TODO: Give this library in the namespace naming format. Probably Qt5::Concurrent, but it
+        # does not work yet. Probably because find_package(Qt5 …) needs a component added, which
+        # might not be named "Concurrent".
+        /opt/qt/5.12.4/android_armv7/lib/libQt5Concurrent.so
+
         # TODO: Is this used at all?
         Qt5::AndroidExtras
     )
@@ -112,6 +122,7 @@ target_link_libraries(foodrescue
     Qt5::Sql
     Qt5::Multimedia  # For the barcode scanner.
     Qt5::Gui         # For the barcode scanner.
+    Qt5::Concurrent  # For Kirigami.
     Qt5::Xml         # For formatted XML debug output. TODO: Avoid in non-debug builds.
     Qt5::XmlPatterns # For XSLT conversion of database contents for rendering.
     ZXing::ZXing     # For the barcode scanner.

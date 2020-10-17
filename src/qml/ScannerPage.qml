@@ -38,7 +38,7 @@ Kirigami.ScrollablePage {
 
     // Activate the camera only while visible.
     //   Else it would consume energy and have its LED on permanently. This page is dynamically
-    //   created, so it is not visible before "inCompleted".
+    //   created, so it is not visible before "onCompleted".
     Component.onCompleted: {
         tagsFound = 0
         lastTag = ""
@@ -50,12 +50,17 @@ Kirigami.ScrollablePage {
         id: zxingFilter
 
         formats: ZXing.EAN13 | ZXing.EAN8
+        tryRotate: true
+        tryHarder: true
+
+        // Good option for debugging, to also see the results of video frames where no barcode was recognized.
+        // onNewResult: console.log(result)
 
         onFoundBarcode: {
             tagsFound++
             // Stop the camera manually to prevent finding more barcodes.
-            //   The camera will be stopped automatically by destroying the page (see pageStack.layers.pop()
-            //   below). However, it might recognize 1-2 more barcodes while the page is closing.
+            //   The camera would also be stopped automatically when the page is destroyed with
+            //   pageStack.layers.pop() below. However, it would recognize 1-2 more barcodes during that.
             camera.stop()
 
             // TODO: We'd better like to reference the page instead of just removing the upmost

@@ -371,7 +371,8 @@ inline void registerQmlAndMetaTypes()
 	qRegisterMetaType<ZXingQt::Result>("Result");
 
 	qmlRegisterUncreatableMetaObject(
-		ZXingQt::staticMetaObject, "ZXing", 1, 0, "ZXing", "Access to enums & flags only");
+        	ZXingQt::staticMetaObject, "ZXing", 1, 0, "ZXing", "Access to enums & flags only"
+	);
 	qmlRegisterType<ZXingQt::VideoFilter>("ZXing", 1, 0, "VideoFilter");
 }
 
