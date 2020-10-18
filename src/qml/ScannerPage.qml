@@ -1,9 +1,10 @@
 /**
- * Barcode scanner component, originally from https://github.com/swex/QZXingNu
+ * Barcode scanner component, originally from QZXingNu (https://github.com/swex/QZXingNu)
  *
  * Authors and copyright:
- *   © 2018-2020  Alexey Mednyy    (https://github.com/swex)
- *   © 2020       Matthias Ansorg  (https://github.com/tanius)
+ *   © 2018-2020  Alexey Mednyy      (https://github.com/swex)
+ *   © 2020       Matthias Ansorg    (https://github.com/tanius)
+ *   © 2020       Axel Waggershauser (https://github.com/axxel)
  *
  * The authors license this file to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy of the
@@ -20,13 +21,8 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.2
 import QtMultimedia 5.12
 import org.kde.kirigami 2.10 as Kirigami
-import ZXing 1.0
+import ZXing 1.0 as ZXing
 import local 1.0 as Local // Our custom QML components, exported in main.cpp.
-
-// Sizing: The width of an OverlaySheet can be limited with Layout.preferredWidth and the content will
-// adapt. But its height cannot be adapted – it is always as high as the content, potentially
-// showing a scrollbar. To avoid the scrollbar, limit content height.
-// Kirigami.OverlaySheet {
 
 Kirigami.ScrollablePage {
     id: scannerPage
@@ -46,15 +42,14 @@ Kirigami.ScrollablePage {
     }
 
     // Barcode search algorithm, provided by ZXing-C++. Invisible.
-    VideoFilter {
+    ZXing.VideoFilter {
         id: zxingFilter
 
         formats: ZXing.EAN13 | ZXing.EAN8
-        tryRotate: true
-        tryHarder: true
+        tryRotate: true // Also search for barcodes with horizontal bars, in addition to vertical.
+        tryHarder: true // Spend more effort on barcode recognition. Not really needed, as this is the default now.
 
-        // Good option for debugging, to also see the results of video frames where no barcode was recognized.
-        // onNewResult: console.log(result)
+        // onNewResult: console.log(result) // Good for debugging, also showing no-recognition results.
 
         onFoundBarcode: {
             tagsFound++
@@ -63,15 +58,15 @@ Kirigami.ScrollablePage {
             //   pageStack.layers.pop() below. However, it would recognize 1-2 more barcodes during that.
             camera.stop()
 
-            // TODO: We'd better like to reference the page instead of just removing the upmost
-            // layer. However, pageStack.layers.pop(scannerPage) does nothing and
-            // pageStack.layers.removePage(scannerPage) results in "TypeError: Property
-            // 'removePage' of object QQuickStackView_QML_9(…) is not a function". The documentation
-            // is not clear how to reference a page here, see:
-            // https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1PageRow.html
-            //   The reason is that pageStack.layers is a QtQuick.Controls.StackView, which has
-            // different methods than org.kde.kirigami.PageRow. See the source code referenced from:
-            // https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1PageRow.html#ab0a1367b4574053f31e376ed81e7e9c3
+            // TODO: Better reference the page instead of just removing the top layer.
+            //   So far, we could not find a way to do so. pageStack.layers.pop(scannerPage) does
+            //   nothing and pageStack.layers.removePage(scannerPage) results in "TypeError: Property
+            //   'removePage' of object QQuickStackView_QML_9(…) is not a function". The documentation
+            //   is not clear how to reference a page here, see:
+            //   https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1PageRow.html
+            //   But the reason is that pageStack.layers is a QtQuick.Controls.StackView, which has
+            //   different methods than org.kde.kirigami.PageRow. See the source code referenced from:
+            //   https://api.kde.org/frameworks/kirigami/html/classorg_1_1kde_1_1kirigami_1_1PageRow.html#ab0a1367b4574053f31e376ed81e7e9c3
             pageStack.layers.pop()
             lastTag = result.text
             scannerPage.barcodeFound(lastTag)

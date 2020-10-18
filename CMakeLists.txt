@@ -102,14 +102,10 @@ add_definitions(
     -DQT_NO_URL_CAST_FROM_STRING
 )
 
-# Enable C++14 features in clang and gcc.
-#   Needed only to link with the ZXing-C++ library, as some version newer than 1.0.8 started to use
-#   lambdas with auto parameters in header files. Earlier versions required only C++11, and all other
-#   code and libraries can also be used with a C++11 compiler. Note that ZXing-C++ newer than 1.1.1
-#   uses C++17 internally, but the interface is only C++14, as per its core/CMakeLists.txt:
-#   "the lib needs a c++-17 compiler but can be used with a c++-11 compiler (see examples)", just that
-#   it should say "a c++-14 compiler" in the end.
-set(CMAKE_CXX_STANDARD 14)
+# Enable C++11 features in clang and gcc.
+#   Note that ZXing-C++ uses C++14 internally resp. C++17 for versions newer than 1.1.1, but its
+#   linker interface is C++11. See: https://github.com/nu-book/zxing-cpp/blob/96b6a83/core/CMakeLists.txt#L465
+set(CMAKE_CXX_STANDARD 11)
 
 
 # ################# CMake module includes ##########################################################
