@@ -972,8 +972,6 @@ TODO
 
 TODO
 
-As a contributor, you will have to sign a contributor licensing agreement that allows the person or organization directing the development of Food Rescue App to re-license the program under terms of their choice in the future without having to contact you first. This is done in preparation for the worst case, which is that we cannot establish a working sustainability model for Food Rescue App as an open source software. Of course, all previous versions including the one to which you contributed will remain under the open source licenses applied at the time when the contributions were made.
-
 
 # 9. License and Credits
 
