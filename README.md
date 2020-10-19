@@ -53,6 +53,8 @@ The application is built with KDE Kirigami, a rather unknown but powerful base t
 </p>
 
 
+**Testing the software:** The simplest way to test the full functionality is to install the Android app. Just search for `org.fairdirect.foodrescue` in the Google Play app, or visit the [Play Store entry](https://play.google.com/store/apps/details?id=org.fairdirect.foodrescue) in your Android browser to install it from there. If you don't have access to an Android device, the online demo is another quick option to test the software (see below).
+
 **Online Demo:** An online demo of the Android version of Food Rescue App is [available on appetize.io](https://appetize.io/app/hkw36e77yj8bqra3mufde078ug?device=nexus7&scale=75&orientation=portrait&osVersion=8.1). This gives you a complete, browser based Android emulator with Food Rescue App pre-installed to try it out. Due to the nature of operating an Android device through the browser, not all features are available. Notes:
 
 * **No camera.** The "scan barcode" button only shows a dummy camera view and you cannot scan barcodes.
