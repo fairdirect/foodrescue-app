@@ -546,7 +546,9 @@ The commands below are shown for the armeabi-v7a Android ABI, but you can adapt 
         cd /path-to-your/zxing-cpp/
         ```
 
-    2. **Configure the build.** Explanations of the variables:
+    2. **Don't require a threads lib.** Until [pull request 166](https://github.com/nu-book/zxing-cpp/pull/166) makes it into the upstream ZXing code, you have to apply it to the ZXing source code manually. It prevents an Android build error when not finding an external threads library (which is not needed under Android anyway).
+
+    3. **Configure the build.** Explanations of the variables:
 
         * **`BUILD_…`**. Setting the CMake variables `BUILD_…=OFF` prevents building the ZXing-C++ examples, which would fail in step "Linking CXX executable ZXingWriter" with error message "ZXingWriter.cpp.o: requires unsupported dynamic reloc R_ARM_REL32". We don't need these examples for Android, and they are probably not made for Android anyway.
 
@@ -569,7 +571,7 @@ The commands below are shown for the armeabi-v7a Android ABI, but you can adapt 
           -DCMAKE_INSTALL_PREFIX=$(readlink -f ../../../foodrescue-app/install/android_armv7)
         ```
 
-    3. **Build and install.**
+    4. **Build and install.**
 
         ```
         make
