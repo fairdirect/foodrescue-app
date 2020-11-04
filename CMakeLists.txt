@@ -8,11 +8,18 @@ endif()
 
 # ################# Project configuration #############################################################
 
-# Require CMake ≥3.3 to get the IN_LIST operator.
-#   Required up here, before any usage of the affected language features.
-cmake_minimum_required(VERSION 3.0)
+# The CMake files of this project require only CMake ≥3.0. However, for the Android build, ECM ≥5.75.0
+# is needed (see below), which in turn needs CMake ≥3.18. This dependency is not yet declared in ECM
+# (see https://bugs.kde.org/show_bug.cgi?id=424392#c2 ). Until that is done, we record this
+# transitive dependency here.
+# The CMake version dependency is required up here, before any usage of affected language features.
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+    cmake_minimum_required(VERSION 3.18)
+else()
+    cmake_minimum_required(VERSION 3.0)
+endif()
 
-# Project name and version. Also enables "CXX" language
+# Project name and version. Also enables "C++" language.
 project(foodrescue-app LANGUAGES CXX VERSION 0.3)
 
 # TODO: What's this?
@@ -116,7 +123,14 @@ set(CMAKE_CXX_STANDARD 11)
 include(CPack)
 
 # Include KDE-related CMake modules (ECM = Extended CMake Modules).
-find_package(ECM 5.47.0 REQUIRED NO_MODULE)
+#   Under Android, we need a newer version due to a build issue in ZXing-C++. For details, see:
+#   https://github.com/fairdirect/foodrescue-app#52-linux-development-setup
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+    set(REQUIRED_ECM_VERSION 5.75.0)
+else()
+    set(REQUIRED_ECM_VERSION 5.68.0)
+endif()
+find_package(ECM ${REQUIRED_ECM_VERSION} REQUIRED NO_MODULE)
 set_package_properties(
     ECM PROPERTIES
     TYPE REQUIRED

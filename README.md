@@ -236,12 +236,12 @@ If you are setting up your development environment under Windows or Mac OS X, yo
 The dependencies of Food Rescue App are chosen to be matched by the newest current Ubuntu LTS release. So for example, Food Rescue App releases between 2020-04 and 2022-04 ([see](https://ubuntu.com/about/release-cycle)) will be installable under Ubuntu 20.04 LTS and you will be able to use default Ubuntu 20.04 LTS repository packages for its development. If your distribution provides older versions of the dependencies listed below, or you develop under Windows or Mac OS X, you have to install dependencies manually. There are a few exceptions from this rule of sticking to Ubuntu LTS packages:
 
 * The project currently also builds under Ubuntu 19.10, but that is not guaranteed for the future.
-* In cases where a version of Food Rescue App needs a package in a newer version than provided in the current Ubuntu LTS release, it will use the package versions provided in [Kubuntu Backports](https://launchpad.net/~kubuntu-ppa/+archive/ubuntu/backports). These might be not the latest releases either, but are easy to add on top of a normal Ubuntu distribution by adding a PPA. In contrast, KDE Neon is a Ubuntu LTS based distribution providing the most cutting edge versions, but adding that on top of a usual Ubuntu installation is messy and can lead to dependency hell.
+* In cases where a version of Food Rescue App needs a package in a newer version than provided in the current Ubuntu LTS release, where possible it will use the package versions provided in [Kubuntu Backports](https://launchpad.net/~kubuntu-ppa/+archive/ubuntu/backports). These might be not the latest releases either, but are easy to add on top of a normal Ubuntu distribution by adding a PPA. In contrast, KDE Neon is a Ubuntu LTS based distribution providing the most cutting edge versions, but adding that on top of a usual Ubuntu installation is messy and can lead to dependency hell.
 
 
 #### Dependencies for Android development
 
-When only building the desktop version of this application, any Qt >5.12 will fulfill the requirements of Kirigami and should work with the tooling provided by your Linux distribution. When you also want to build the Android application, it gets complicated. For Ubuntu 20.04 LTS, it is the safest to follow the development setup instructions in this document to end up with the right versions (the desktop development setup already chooses versions that can also be used for Android development). If you need other versions, see the table below.
+When only building the desktop version of this application, any Qt >5.12 will fulfill the requirements of Kirigami and should work with the tooling provided by your Linux distribution. When you also want to build the Android application, it gets complicated. For Ubuntu 20.04 LTS, it is the safest to follow the instructions in [5.2. Linux Development Setup](#52-linux-development-setup) and (5.4. Android Development Setup)[#54-android-development-setup] to get suitable versions of all dependencies. If you want to choose your own versions instead, see the table below.
 
 To find out the versions you have installed:
 
@@ -254,14 +254,16 @@ To find the version of [extra-cmake-modules](https://invent.kde.org/frameworks/e
 
 |                         | **NDK 18**    | **NDK 19**    | **NDK 20**    | **NDK 21** |
 |-------------------------|---------------|---------------|---------------|------------|
-| **Qt 5.12 for Android** | ECM ≥5.62.0   | n/a           | n/a           | n/a        |
+| **Qt 5.12 for Android** | ECM ≥5.75.0   | n/a           | n/a           | n/a        |
 | **Qt 5.13 for Android** | n/a           | n/a           | n/a           | n/a        |
-| **Qt 5.14 for Android** | ECM ≥5.68.0   | n/a           | n/a           | n/a        |
+| **Qt 5.14 for Android** | ECM ≥5.75.0   | n/a           | n/a           | n/a        |
 | **Qt 5.15 for Android** | ?             | n/a           | n/a           | n/a        |
 
 What makes the versions in the table necessary:
 
 While the Android platform and Qt library interfaces are mature and almost always backwards compatible, this is not true for the build process. New versions of Android NDK and Qt often introduce changes that necessitate changing build tools that rely on them. For Kirigami, the Android build process is mostly handled by [KDE extra-cmake-modules](https://invent.kde.org/frameworks/extra-cmake-modules) ("ECM").
+
+* **ECM version needed for ZXing-C++.** For the desktop build of ZXing-C++ 1.1.1, ECM ≥5.68.0 is sufficient, and for Qt 5.12 even ECM 5.62.0 is sufficient. However, ZXing-C++ uses a way of finding the threading library that, under Android, made [some changes in ECM](https://invent.kde.org/frameworks/extra-cmake-modules/-/merge_requests/31), which were then released into ECM 5.75.0. As a quick fix, you can also stick with ECM 5.68.0 as provided by Ubuntu 20.04 LTS and modify the ZXing-C++ sources using [these instructions](https://github.com/nu-book/zxing-cpp/pull/166). This is further discussed below in [5.2. Linux Development Setup](#52-linux-development-setup) in the section about installing ECM.
 
 * **Android NDK 19 and 20 support.** Support for Android NDK 20 exists since ECM [commit c9ebd39](https://invent.kde.org/frameworks/extra-cmake-modules/commit/c9ebd39), corresponding to version 5.68.0. Since some of the changes that make Android NDK 20 incompatible with previous ECM versions are also present in NDK 19 ([see](https://github.com/LaurentGomila/qt-android-cmake/blob/5a62962/AddQtAndroidApk.cmake#L172)), we infer that ECM 5.68.0 or newer is needed for NDK 19 as well. However there is an additional issue (TODO: link) that makes ECM incompatible with Android NDK ≥19. As of 2020-06-10, there is no fix, as even the now-current version ECM 5.71.0 exhibits this issue.
 
@@ -280,28 +282,51 @@ This assumes you want to use a Linux host for development and build the desktop 
      sudo apt install build-essential cmake checkinstall
      ```
 
-2. **Install Extra CMake Modules (ECM).** Under Ubuntu 20.04 LTS, you can install ECM 5.68.0 with:
+2. **Install Extra CMake Modules (ECM).** If you only want to build the Linux version and not for Android, ECM 5.68.0 or newer is sufficient and installed under Ubuntu 20.04 LTS with:
 
     ```
     sudo apt install extra-cmake-modules
     ```
 
-    ECM ≥5.68.0 is required for Qt ≥5.14, for Android NDK ≥19 and for Kirigami 5.68.0 (as installed below). There is no need for an even newer version. But if you encounter that need, or if your distribution does not provide ECM ≥5.68.0, you can install ECM manually as follows:
+    However, if you also want to build the Android version, you need ECM 5.75.0 due to [a ZXing-C++ build issue](https://invent.kde.org/frameworks/extra-cmake-modules/-/merge_requests/31). Under Ubuntu 20.04 LTS this is quite some effort as it depends on CMake 3.18, which you'll also have to build from source for this version of Ubuntu. (As a quick fix, you could instead remove the version checks for ECM 5.75.0 and CMake 3.18 from `CMakeLists.txt` and adapt the ZXing-C++ source according to [ZXing-C++ PR #166](https://github.com/nu-book/zxing-cpp/pull/166).)
 
-    ```
-    git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
-    cd extra-cmake-modules
+    Instructions to install ECM 5.75.0 under Ubuntu 20.04 LTS:
 
-    # Adapt to the commit of a stable version ≥5.68.0, here 5.72.0. Find the version tag commit hashes on
-    # https://invent.kde.org/frameworks/extra-cmake-modules/-/tags
-    git checkout ada528dc
+    1. Download and install CMake 3.18, which is required for ECM 5.75.0 ([details](https://bugs.kde.org/show_bug.cgi?id=424392#c2)). We use instructions following roughly [this post](https://askubuntu.com/a/865294).
 
-    mkdir build && cd build && cmake ..
-    make
+        ```
+        wget https://cmake.org/files/v3.18/cmake-3.18.4.tar.gz
+        tar -xzvf cmake-3.18.tar.gz
+        cd cmake-3.18.4
+        ./bootstrap
+        make -j$(nproc)
+        sudo checkinstall --pkgname cmake --pkgversion 3.18.4 make install
+        ```
 
-    # Adapt to the version you checked out, here 5.72.0.
-    sudo checkinstall --pkgname extra-cmake-modules --pkgversion 5.72.0 make install
-    ```
+    2. Log into a new terminal (or terminal tab) and confirm that CMake 3.18 is available:
+
+        ```
+        cmake --version
+        ```
+
+    3. In that new terminal, clone the ECM repository and check out version 5.75.0:
+
+        ```
+        git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
+        cd extra-cmake-modules
+
+        # The correct tag name is "v5.75.0" according to:
+        # https://invent.kde.org/frameworks/extra-cmake-modules/-/tags
+        git checkout v5.75.0
+        ```
+
+    4. Run CMake and Make and then install ECM as a local `.deb` package with `checkinstall`. The installation with `checkinstall` will automatically replace the CMake version you might have already installed on your system.
+
+        ```
+        mkdir build && cd build && cmake ..
+        make
+        sudo checkinstall --pkgname extra-cmake-modules --pkgversion 5.75.0 make install
+        ```
 
 3. **Install Qt 5.12.0 or up to 5.13.2.** Qt 5.12.0 or higher [is required](https://invent.kde.org/frameworks/kirigami/-/blob/f47bf90/CMakeLists.txt#L8) by KDE Kirigami 5.68.0. Under Ubuntu this is installed automatically as a [dependency of Kirigami](https://launchpad.net/ubuntu/focal/amd64/libkf5kirigami2-5/5.68.0-0ubuntu2) (see below). Ubuntu 20.04 LTS provides Qt 5.12.5 while Ubuntu 19.10 provides Qt 5.12.4 ([see](https://reposcope.com/package/qt5-default)).
 
@@ -426,7 +451,7 @@ This assumes you want to use a Linux host for development and build the Android 
 
 The commands below are shown for the armeabi-v7a Android ABI, but you can adapt them to your targeted ABI easily. This has been tested for armeabi-v7a, arm64-v8a and x86 already. One clone of the Git repository can be used to build for all Android ABIs by following these instructions multiple times but choosing separate build directories (`build/android_armv7`, `install/android_arm64_v8a` etc.) and install directories (`install/android_armv7`, `install/android_arm64_v8a` etc.).
 
-1. **Make the development setup for the desktop version.** Follow all steps from chapter "[5.2. Desktop Version Development Setup](#52-desktop-version-development-setup)". Ideally also make sure you can build and execute a desktop version; you can also do that during Android development to quickly test code that is not specific to Android. (If you want to build for Android only, you don't have to follow the steps to install Qt or Kirigami for the desktop version. But then you can't test with the desktop version either, obviously.)
+1. **Make the development setup for the desktop version.** Follow all steps from chapter "[5.2. Desktop Version Development Setup](#52-linux-development-setup)". Ideally also make sure you can build and execute a desktop version; you can also do that during Android development to quickly test code that is not specific to Android. (If you want to build for Android only, you don't have to follow the steps to install Qt or Kirigami for the desktop version. But then you can't test with the desktop version either, obviously.)
 
 2. **Create an Android installation directory.** Different from development of a desktop software, all components of the Android software must be installed. This is required for building an Android APK package with `make create-apk`. Note that Food Rescue App and all its custom libraries must be installed into the *same* directory for the Android APK building to succeed. We'll create an installation directory inside the repository directory `foodrescue-app` (which you already have from the desktop setup):
 
